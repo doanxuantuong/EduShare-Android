@@ -20,7 +20,7 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".feature.users.activity.RegisterActivity"
+            android:name=".feature.chat.activity.ConversationActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
