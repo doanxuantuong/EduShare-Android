@@ -2,8 +2,12 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.EduShare" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">#0D9488</item>
     </style>
 
     <style name="Theme.EduShare" parent="Base.Theme.EduShare" />
+
+    <style name="CircleAppearance" parent="">
+        <item name="cornerSize">50%</item>
+    </style>
 </resources>

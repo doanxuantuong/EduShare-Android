@@ -46,7 +46,7 @@ public class RegisterActivity extends AppCompatActivity {
                 userRequest.setStudentCode(teStudentCode.getText().toString().trim()); // Set nếu có dữ liệu
 
                 //Gửi lên Backend
-                userRepository.register(userRequest, new OnActionCallback() {
+                userRepository.register(userRequest, new OnActionCallback<String>() {
                     @Override
                     public void onSuccess(String message) {
                         Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
