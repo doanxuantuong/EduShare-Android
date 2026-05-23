@@ -20,14 +20,17 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".feature.chat.activity.ConversationActivity"
+
+            android:name=".feature.users.activity.ProfileActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".feature.users.activity.RegisterActivity" />
+        <activity android:name=".feature.chat.activity.ConversationActivity" />
+        <activity android:name=".feature.locations.MapActivity" />
     </application>
 
 </manifest>
