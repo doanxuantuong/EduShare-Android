@@ -10,14 +10,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.edushare.R;
 import com.example.edushare.common.base.OnActionCallback;
 import com.example.edushare.common.helper.RegisterValidator;
+import com.example.edushare.feature.users.LocalUserRepository;
 import com.example.edushare.feature.users.User;
-import com.example.edushare.feature.users.UserRepository;
 
 public class RegisterActivity extends AppCompatActivity {
+
     EditText teFullname, teEmail, teStudentCode, tePhone, tePassword, teRewritePassword;
     Button btnCreate;
 
-    private UserRepository userRepository;
+    private LocalUserRepository localUserRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,33 +31,45 @@ public class RegisterActivity extends AppCompatActivity {
         tePhone = findViewById(R.id.edt_phone);
         tePassword = findViewById(R.id.edt_register_password);
         teRewritePassword = findViewById(R.id.edt_register_password_rewrite);
+
         btnCreate = findViewById(R.id.btn_creaedt_account);
 
         btnCreate.setOnClickListener(v -> {
-            userRepository = new UserRepository();
 
-            //Gọi Validator để kiểm tra dữ liệu
-            if (RegisterValidator.validate(teFullname, teEmail, teStudentCode, tePhone, tePassword, teRewritePassword)) {
+            localUserRepository = new LocalUserRepository(this);
 
-                //Nếu hợp lệ, tạo Object User
+            // Validate dữ liệu
+            if (RegisterValidator.validate(teFullname, teEmail, teStudentCode, tePhone, tePassword,
+                    teRewritePassword)) {
+
+                // Tạo User object
                 User userRequest = new User();
+
                 userRequest.setId(teEmail.getText().toString().trim());
+
                 userRequest.setFullName(teFullname.getText().toString().trim());
+
                 userRequest.setEmail(teEmail.getText().toString().trim());
-                userRequest.setStudentCode(teStudentCode.getText().toString().trim()); // Set nếu có dữ liệu
 
-                //Gửi lên Backend
-                userRepository.register(userRequest, new OnActionCallback<String>() {
-                    @Override
-                    public void onSuccess(String message) {
-                        Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
-                    }
+                userRequest.setStudentCode(teStudentCode.getText().toString().trim());
 
-                    @Override
-                    public void onFailure(String error) {
-                        Toast.makeText(RegisterActivity.this, error, Toast.LENGTH_LONG).show();
-                    }
-                });
+                userRequest.setPhone(tePhone.getText().toString().trim());
+
+                // Register local bằng Room
+                localUserRepository.register(userRequest, tePassword.getText().toString().trim(),
+                        new OnActionCallback<String>() {
+
+                            @Override
+                            public void onSuccess(String message) {
+                                Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
+                            }
+
+                            @Override
+                            public void onFailure(String error) {
+                                Toast.makeText(RegisterActivity.this, error, Toast.LENGTH_LONG).show();
+                            }
+                        }
+                );
             }
         });
     }

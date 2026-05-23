@@ -1,4 +1,4 @@
-package com.example.edushare.data.local.entity;
+package com.example.edushare.feature.users.entity;
 
 import androidx.room.Entity;
 import androidx.room.PrimaryKey;

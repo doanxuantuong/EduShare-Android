@@ -1,10 +1,10 @@
-package com.example.edushare.data.local.roomdatabase;
+package com.example.edushare.common.roomdatabase;
 
 import androidx.room.Database;
 import androidx.room.RoomDatabase;
 
-import com.example.edushare.data.local.dao.UserDao;
-import com.example.edushare.data.local.entity.UserEntity;
+import com.example.edushare.feature.users.dao.UserDao;
+import com.example.edushare.feature.users.entity.UserEntity;
 
 @Database(entities = {UserEntity.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {

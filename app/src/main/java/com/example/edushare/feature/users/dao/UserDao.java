@@ -1,10 +1,10 @@
-package com.example.edushare.data.local.dao;
+package com.example.edushare.feature.users.dao;
 
 import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.Query;
 
-import com.example.edushare.data.local.entity.UserEntity;
+import com.example.edushare.feature.users.entity.UserEntity;
 
 @Dao
 public interface UserDao {

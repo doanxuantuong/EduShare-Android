@@ -3,10 +3,11 @@ package com.example.edushare.feature.users;
 import android.content.Context;
 
 import androidx.room.Room;
+import androidx.room.RoomDatabase;
 
 import com.example.edushare.common.base.OnActionCallback;
-import com.example.edushare.data.local.entity.UserEntity;
-import com.example.edushare.data.local.roomdatabase.AppDatabase;
+import com.example.edushare.common.roomdatabase.AppDatabase;
+import com.example.edushare.feature.users.entity.UserEntity;
 
 public class LocalUserRepository {
 
