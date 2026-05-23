@@ -20,11 +20,11 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".feature.users.activity.RegisterActivity"
+
+            android:name=".feature.users.activity.ProfileActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
