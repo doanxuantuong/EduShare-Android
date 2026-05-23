@@ -1,0 +1,36 @@
+package com.example.edushare.feature.users;
+
+import android.content.Context;
+
+import androidx.room.Room;
+
+import com.example.edushare.common.base.OnActionCallback;
+import com.example.edushare.data.local.entity.UserEntity;
+import com.example.edushare.data.local.roomdatabase.AppDatabase;
+
+public class LocalUserRepository {
+
+    private final AppDatabase db;
+
+    public LocalUserRepository(Context context) {
+        db = Room.databaseBuilder(context, AppDatabase.class, "edushare_db").allowMainThreadQueries().build();
+    }
+
+    public void register(User user, String password, OnActionCallback callback) {
+        UserEntity existingUser = db.userDao().findByEmail(user.getEmail());
+
+        // check email tồn tại
+        if(existingUser != null) {
+            callback.onFailure("Email đã tồn tại");
+            return;
+        }
+
+        // tạo entity
+        UserEntity userEntity = new UserEntity(user.getEmail(), user.getFullName(), user.getStudentCode(),
+                user.getPhone(), password);
+
+        // insert Room
+        db.userDao().insert(userEntity);
+        callback.onSuccess("Đăng ký thành công");
+    }
+}
