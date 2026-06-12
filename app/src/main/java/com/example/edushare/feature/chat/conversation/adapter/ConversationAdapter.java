@@ -1,4 +1,4 @@
-package com.example.edushare.feature.chat.adapter;
+package com.example.edushare.feature.chat.conversation.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.edushare.R;
-import com.example.edushare.feature.chat.model.Conversation;
+import com.example.edushare.feature.chat.conversation.model.Conversation;
 
 import java.util.List;
 

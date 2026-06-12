@@ -1,6 +1,8 @@
 package com.example.edushare.feature.chat;
 
-import com.example.edushare.feature.chat.model.Conversation;
+
+import com.example.edushare.feature.chat.conversation.model.Conversation;
+
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.GET;

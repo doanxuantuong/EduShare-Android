@@ -20,7 +20,7 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".feature.users.activity.RegisterActivity"
+            android:name=".feature.chat.conversation.activity.ConversationActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,9 +28,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-<!--        <activity android:name=".feature.users.activity.RegisterActivity" />-->
+        <activity
+            android:name=".feature.chat.message.activity.ChatDetailActivity"
+            android:exported="false" />
+        <activity android:name=".feature.users.activity.RegisterActivity" />
 <!--        <activity android:name=".feature.chat.activity.ConversationActivity" />-->
-<!--        <activity android:name=".feature.locations.MapActivity" />-->
+        <activity android:name=".feature.locations.MapActivity" />
     </application>
 
 </manifest>
