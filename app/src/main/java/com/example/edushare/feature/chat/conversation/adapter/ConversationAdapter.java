@@ -1,5 +1,6 @@
-package com.example.edushare.feature.chat.adapter;
+package com.example.edushare.feature.chat.conversation.adapter;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,14 +12,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.edushare.R;
-import com.example.edushare.feature.chat.model.Conversation;
+import com.example.edushare.feature.chat.conversation.model.Conversation;
+import com.example.edushare.feature.chat.message.activity.ChatDetailActivity;
 
 import java.util.List;
 
 /*
-* Adapter:
-* Dùng để load danh sách động có thể thay đổi liên tujc
-* */
+ * Adapter:
+ * Dùng để load danh sách động có thể thay đổi liên tujc
+ * */
 public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapter.ViewHolder> {
 
     private List<Conversation> conversationList;
@@ -65,6 +67,27 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
                 .circleCrop()
                 //Gắn vào cái khung ảnh (ivAvatar).
                 .into(holder.ivAvatar);
+
+        // Bắt sự kiện khi người dùng bấm vào 1 dòng chat
+        holder.itemView.setOnClickListener(v -> {
+            // Lấy vị trí thực tế của item đang được bấm
+            int currentPosition = holder.getBindingAdapterPosition();
+
+            if (currentPosition != RecyclerView.NO_POSITION) {
+                // Lấy ra đúng cái object Conversation mà người ta vừa bấm
+                Conversation currentConversation = conversationList.get(currentPosition);
+
+                Intent intent = new Intent(v.getContext(), ChatDetailActivity.class);
+
+                intent.putExtra("CONVERSATION_ID", currentConversation.getId());
+                intent.putExtra("RECEIVER_NAME", currentConversation.getPartnerName());
+                intent.putExtra("RECEIVER_ID", currentConversation.getPartnerId());
+                intent.putExtra("RECEIVER_AVATAR", currentConversation.getPartnerAvatarUrl());
+
+                // Khởi hành chuyển sang màn hình ChatDetailActivity
+                v.getContext().startActivity(intent);
+            }
+        });
 
         // Optional: Badge logic (showing it for some items as requested)
         if (position % 2 == 0) {

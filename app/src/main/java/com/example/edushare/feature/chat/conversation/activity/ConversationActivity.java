@@ -1,4 +1,4 @@
-package com.example.edushare.feature.chat.activity;
+package com.example.edushare.feature.chat.conversation.activity;
 
 import android.os.Bundle;
 import android.widget.Toast;
@@ -10,8 +10,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.edushare.R;
 import com.example.edushare.common.base.OnActionCallback;
 import com.example.edushare.feature.chat.ChatRepository;
-import com.example.edushare.feature.chat.adapter.ConversationAdapter;
-import com.example.edushare.feature.chat.model.Conversation;
+import com.example.edushare.feature.chat.conversation.adapter.ConversationAdapter;
+import com.example.edushare.feature.chat.conversation.model.Conversation;
 
 import java.util.ArrayList;
 import java.util.List;

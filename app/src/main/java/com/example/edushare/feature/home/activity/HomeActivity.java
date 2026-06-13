@@ -13,7 +13,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.edushare.R;
-import com.example.edushare.feature.chat.activity.ConversationActivity;
+import com.example.edushare.common.helper.BottomNavigationHelper;
+import com.example.edushare.feature.chat.conversation.activity.ConversationActivity;
 import com.example.edushare.feature.home.adapter.MarketplaceItemAdapter;
 import com.example.edushare.feature.home.model.MarketplaceItem;
 import com.example.edushare.feature.locations.MapActivity;
@@ -147,29 +148,8 @@ public class HomeActivity extends AppCompatActivity {
 
     private void setupBottomNavigation() {
         BottomNavigationView bottomNavigation = findViewById(R.id.bottomNavigation);
-        bottomNavigation.setSelectedItemId(R.id.nav_home);
-        bottomNavigation.setOnItemSelectedListener(item -> {
-            int itemId = item.getItemId();
-            if (itemId == R.id.nav_home) {
-                return true;
-            }
-            if (itemId == R.id.nav_map) {
-                startActivity(new Intent(this, MapActivity.class));
-                return true;
-            }
-            if (itemId == R.id.nav_chat) {
-                startActivity(new Intent(this, ConversationActivity.class));
-                return true;
-            }
-            if (itemId == R.id.nav_profile) {
-                startActivity(new Intent(this, ProfileActivity.class));
-                return true;
-            }
-            if (itemId == R.id.nav_post) {
-                Toast.makeText(this, R.string.home_post_coming_soon, Toast.LENGTH_SHORT).show();
-                return true;
-            }
-            return false;
-        });
+
+        // Gọi hàm dùng chung, truyền R.id.nav_home để nó biết đang ở màn hình Home
+        BottomNavigationHelper.setup(this, bottomNavigation, R.id.nav_home);
     }
 }

@@ -1,27 +1,26 @@
-package com.example.edushare.feature.chat.model;
+package com.example.edushare.feature.chat.conversation.model;
 
-public class Conversation {
-    private int id;
+import com.google.gson.annotations.SerializedName;
+
+import java.io.Serializable;
+
+public class Conversation implements Serializable {
+    @SerializedName("conversationId")
+    private Integer id;
     private String partnerId;
     private String partnerName;
     private String partnerAvatarUrl;
     private String lastMessage;
     private String updatedAt;
 
-    public Conversation(int id, String partnerId, String partnerName, String partnerAvatarUrl, String lastMessage, String updatedAt) {
-        this.id = id;
-        this.partnerId = partnerId;
-        this.partnerName = partnerName;
-        this.partnerAvatarUrl = partnerAvatarUrl;
-        this.lastMessage = lastMessage;
-        this.updatedAt = updatedAt;
+    public Conversation() {
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -63,5 +62,17 @@ public class Conversation {
 
     public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    @Override
+    public String toString() {
+        return "Conversation{" +
+                "id=" + id +
+                ", partnerId='" + partnerId + '\'' +
+                ", partnerName='" + partnerName + '\'' +
+                ", partnerAvatarUrl='" + partnerAvatarUrl + '\'' +
+                ", lastMessage='" + lastMessage + '\'' +
+                ", updatedAt='" + updatedAt + '\'' +
+                '}';
     }
 }

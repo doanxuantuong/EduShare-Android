@@ -1,6 +1,9 @@
 package com.example.edushare.feature.chat;
 
-import com.example.edushare.feature.chat.model.Conversation;
+
+import com.example.edushare.feature.chat.conversation.model.Conversation;
+import com.example.edushare.feature.chat.message.model.Message;
+
 import java.util.List;
 import retrofit2.Call;
 import retrofit2.http.GET;
@@ -18,4 +21,7 @@ public interface ChatApi {
     // @Query("userId"): Tham số truyền trên URL (?userId=...).
     // Tương đương với request.getParameter("userId") trong Servlet hoặc @RequestParam trong Spring.
     Call<List<Conversation>> getConversations(@Query("userId") String userId);
+
+    @GET("/conversations/messages")
+    Call<List<Message>> getMessages(@Query("conversationId") int conversationId);
 }
