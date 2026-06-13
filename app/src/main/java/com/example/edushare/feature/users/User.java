@@ -11,15 +11,18 @@ public class User {
     private String studentCode;
     private String avatarUrl;
 
+    private String phone;
+
     public User() {
     }
 
-    public User(String id, String fullName, String email, String studentCode, String avatarUrl) {
+    public User(String id, String fullName, String email, String studentCode, String avatarUrl, String phone) {
         this.id = id;
         this.fullName = fullName;
         this.email = email;
         this.studentCode = studentCode;
         this.avatarUrl = avatarUrl;
+        this.phone = phone;
     }
 
     public String getId() {
@@ -60,5 +63,13 @@ public class User {
 
     public void setAvatarUrl(String avatarUrl) {
         this.avatarUrl = avatarUrl;
+    }
+
+    public String getPhone() {
+        return phone;
+    }
+
+    public void setPhone(String phone) {
+        this.phone = phone;
     }
 }
