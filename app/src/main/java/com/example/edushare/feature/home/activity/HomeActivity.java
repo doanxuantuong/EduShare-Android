@@ -1,0 +1,175 @@
+package com.example.edushare.feature.home.activity;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.edushare.R;
+import com.example.edushare.feature.chat.activity.ConversationActivity;
+import com.example.edushare.feature.home.adapter.MarketplaceItemAdapter;
+import com.example.edushare.feature.home.model.MarketplaceItem;
+import com.example.edushare.feature.locations.MapActivity;
+import com.example.edushare.feature.users.activity.ProfileActivity;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+public class HomeActivity extends AppCompatActivity {
+    private final List<MarketplaceItem> allItems = new ArrayList<>();
+    private MarketplaceItemAdapter itemAdapter;
+    private EditText edtHomeSearch;
+    private TextView tvItemCount;
+    private TextView tvCategoryAll;
+    private TextView tvCategoryTextbooks;
+    private TextView tvCategoryLabEquipment;
+    private TextView tvCategoryElectronics;
+    private String selectedCategory = "All";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_home);
+
+        initViews();
+        setupMarketplaceItems();
+        setupCategoryFilters();
+        setupSearch();
+        setupBottomNavigation();
+    }
+
+    private void initViews() {
+        edtHomeSearch = findViewById(R.id.edtHomeSearch);
+        tvItemCount = findViewById(R.id.tvItemCount);
+        tvCategoryAll = findViewById(R.id.tvCategoryAll);
+        tvCategoryTextbooks = findViewById(R.id.tvCategoryTextbooks);
+        tvCategoryLabEquipment = findViewById(R.id.tvCategoryLabEquipment);
+        tvCategoryElectronics = findViewById(R.id.tvCategoryElectronics);
+
+        findViewById(R.id.btnLocation).setOnClickListener(view ->
+                startActivity(new Intent(this, MapActivity.class)));
+        findViewById(R.id.postNavigationCard).setOnClickListener(view ->
+                Toast.makeText(this, R.string.home_post_coming_soon, Toast.LENGTH_SHORT).show());
+    }
+
+    private void setupMarketplaceItems() {
+        allItems.add(new MarketplaceItem(
+                R.drawable.img_organic_chemistry_textbook,
+                getString(R.string.home_condition_good),
+                getString(R.string.home_sample_item_title),
+                getString(R.string.home_sample_item_location),
+                getString(R.string.home_sample_item_price),
+                getString(R.string.home_category_textbooks),
+                true
+        ));
+
+        RecyclerView rvMarketplaceItems = findViewById(R.id.rvMarketplaceItems);
+        itemAdapter = new MarketplaceItemAdapter(allItems);
+        rvMarketplaceItems.setLayoutManager(
+                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        rvMarketplaceItems.setAdapter(itemAdapter);
+    }
+
+    private void setupCategoryFilters() {
+        tvCategoryAll.setOnClickListener(view -> selectCategory("All", tvCategoryAll));
+        tvCategoryTextbooks.setOnClickListener(view ->
+                selectCategory(getString(R.string.home_category_textbooks), tvCategoryTextbooks));
+        tvCategoryLabEquipment.setOnClickListener(view ->
+                selectCategory(getString(R.string.home_category_lab_equipment), tvCategoryLabEquipment));
+        tvCategoryElectronics.setOnClickListener(view ->
+                selectCategory(getString(R.string.home_category_electronics), tvCategoryElectronics));
+    }
+
+    private void selectCategory(String category, TextView selectedView) {
+        selectedCategory = category;
+        resetCategoryStyle(tvCategoryAll);
+        resetCategoryStyle(tvCategoryTextbooks);
+        resetCategoryStyle(tvCategoryLabEquipment);
+        resetCategoryStyle(tvCategoryElectronics);
+        selectedView.setBackgroundResource(R.drawable.bg_home_category_active);
+        selectedView.setTextColor(getColor(R.color.white));
+        filterItems();
+    }
+
+    private void resetCategoryStyle(TextView categoryView) {
+        categoryView.setBackgroundResource(R.drawable.bg_home_category_inactive);
+        categoryView.setTextColor(getColor(R.color.home_text_primary));
+    }
+
+    private void setupSearch() {
+        edtHomeSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence text, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence text, int start, int before, int count) {
+                filterItems();
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+            }
+        });
+    }
+
+    private void filterItems() {
+        String query = edtHomeSearch.getText().toString().trim().toLowerCase(Locale.ROOT);
+        List<MarketplaceItem> filteredItems = new ArrayList<>();
+
+        for (MarketplaceItem item : allItems) {
+            boolean matchesCategory = "All".equals(selectedCategory)
+                    || selectedCategory.equals(item.getCategory());
+            boolean matchesQuery = query.isEmpty()
+                    || item.getTitle().toLowerCase(Locale.ROOT).contains(query);
+
+            if (matchesCategory && matchesQuery) {
+                filteredItems.add(item);
+            }
+        }
+
+        itemAdapter.replaceItems(filteredItems);
+        tvItemCount.setText(getResources().getQuantityString(
+                R.plurals.home_item_count_format,
+                filteredItems.size(),
+                filteredItems.size()
+        ));
+    }
+
+    private void setupBottomNavigation() {
+        BottomNavigationView bottomNavigation = findViewById(R.id.bottomNavigation);
+        bottomNavigation.setSelectedItemId(R.id.nav_home);
+        bottomNavigation.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.nav_home) {
+                return true;
+            }
+            if (itemId == R.id.nav_map) {
+                startActivity(new Intent(this, MapActivity.class));
+                return true;
+            }
+            if (itemId == R.id.nav_chat) {
+                startActivity(new Intent(this, ConversationActivity.class));
+                return true;
+            }
+            if (itemId == R.id.nav_profile) {
+                startActivity(new Intent(this, ProfileActivity.class));
+                return true;
+            }
+            if (itemId == R.id.nav_post) {
+                Toast.makeText(this, R.string.home_post_coming_soon, Toast.LENGTH_SHORT).show();
+                return true;
+            }
+            return false;
+        });
+    }
+}

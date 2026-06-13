@@ -9,4 +9,31 @@
     <string name="menu_chat">Chat</string>
     <string name="menu_profile">Profile</string>
     <string name="desc_avatar">User Avatar</string>
+    <string name="home_subtitle">Student Marketplace</string>
+    <string name="home_search_hint">Search for textbooks, equipment...</string>
+    <string name="home_category_all">All</string>
+    <string name="home_category_textbooks">Textbooks</string>
+    <string name="home_category_lab_equipment">Lab Equipment</string>
+    <string name="home_category_electronics">Electronics</string>
+    <string name="home_active_items">Active Items</string>
+    <string name="home_free_items">Free Items</string>
+    <string name="home_students">Students</string>
+    <string name="home_available_items">Available Items</string>
+    <string name="home_active_items_count">248</string>
+    <string name="home_free_items_count">89</string>
+    <string name="home_students_count">156</string>
+    <string name="home_item_count">1 items</string>
+    <plurals name="home_item_count_format">
+        <item quantity="one">%1$d items</item>
+        <item quantity="other">%1$d items</item>
+    </plurals>
+    <string name="home_post_coming_soon">Post feature is coming soon</string>
+    <string name="home_condition_good">Good</string>
+    <string name="home_sample_item_title">Organic Chemistry Textbook - 5th...</string>
+    <string name="home_sample_item_location">Dorm A - Room 305</string>
+    <string name="home_sample_item_price">150,000đ</string>
+    <string name="desc_edushare_logo">EduShare logo</string>
+    <string name="desc_location">Open map</string>
+    <string name="desc_item_photo">Organic Chemistry textbook</string>
+    <string name="desc_verified_seller">Verified seller</string>
 </resources>
