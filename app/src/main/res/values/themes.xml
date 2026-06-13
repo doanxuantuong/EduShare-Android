@@ -3,9 +3,17 @@
     <style name="Base.Theme.EduShare" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <item name="colorPrimary">#0D9488</item>
+        <item name="android:fontFamily">sans</item>
+        <item name="android:navigationBarColor">@color/white</item>
+        <item name="android:statusBarColor">@color/white</item>
+        <item name="android:windowLightStatusBar">true</item>
     </style>
 
     <style name="Theme.EduShare" parent="Base.Theme.EduShare" />
+
+    <style name="Theme.EduShare.Home" parent="Theme.EduShare">
+        <item name="android:windowBackground">@color/home_background</item>
+    </style>
 
     <style name="CircleAppearance" parent="">
         <item name="cornerSize">50%</item>
