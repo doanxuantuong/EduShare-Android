@@ -10,10 +10,13 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.edushare.R;
 import com.example.edushare.common.base.OnActionCallback;
 import com.example.edushare.feature.chat.ChatRepository;
 import com.example.edushare.feature.chat.message.adapter.MessageAdapter;
+import com.example.edushare.feature.chat.message.dto.MessageRequest;
+import com.example.edushare.feature.chat.message.dto.MessageResponse;
 import com.example.edushare.feature.chat.message.model.Message;
 
 import java.util.ArrayList;
@@ -36,12 +39,14 @@ public class ChatDetailActivity extends AppCompatActivity {
     private MessageAdapter messageAdapter;
 
     // Danh sách tin nhắn lấy từ API, Repository
-    private List<Message> messageList;
+    private List<MessageResponse> messageList;
 
     // DATA LẤY TỪ ACTIVITY TRUYỀN QUA
     private int conversationId;
     private String receiverName;
     private String receiverAvatarUrl;
+    private String senderId;
+//    private int receiverId;
 
     // =======================================
     // PHẦN 3: Thanh soạn tin nhắn và gửi tin nhắn
@@ -63,11 +68,25 @@ public class ChatDetailActivity extends AppCompatActivity {
         // Khởi tạo Adapter và RecyclerView
         setupRecyclerView();
 
-        btnBack.setOnClickListener(l ->{
+        btnBack.setOnClickListener(l -> {
             finish();
         });
 
-        // Call API
+        btnSend.setOnClickListener(l -> {
+            String message = etMessage.getText().toString();
+            if (message != null && !message.isEmpty()) {
+                MessageRequest messageRequest = new MessageRequest();
+                messageRequest.setContent(message);
+                messageRequest.setConversationId(conversationId);
+                messageRequest.setSenderId(senderId);
+
+                fetchCreateMessageFromApi(messageRequest);
+
+                etMessage.setText("");
+            }
+        });
+
+        // Call API lấy danh sách đoạn tin nhắn của conversation
         chatRepository = new ChatRepository();
         fetchMessagesByConversationIdFromApi(conversationId);
 
@@ -92,8 +111,10 @@ public class ChatDetailActivity extends AppCompatActivity {
         // LẤY DATA ĐƯỢC TRUYỀN TỪ BÊN item_chat qua (bên ConversationActivity)
         Intent intent = getIntent();
 
-        if (intent != null){
+        if (intent != null) {
             conversationId = intent.getIntExtra("CONVERSATION_ID", -1);
+            senderId = intent.getStringExtra("SENDER_ID");
+//            receiverId = intent.getIntExtra("RECEIVER_ID", -1);
             receiverName = intent.getStringExtra("RECEIVER_NAME");
             receiverAvatarUrl = intent.getStringExtra("RECEIVER_AVATAR");
 
@@ -116,10 +137,10 @@ public class ChatDetailActivity extends AppCompatActivity {
 
     private void fetchMessagesByConversationIdFromApi(int conversationId) {
         try {
-            chatRepository.getMessages(conversationId, new OnActionCallback<List<Message>>() {
+            chatRepository.getMessages(conversationId, new OnActionCallback<List<MessageResponse>>() {
                 @SuppressLint("NotifyDataSetChanged")
                 @Override
-                public void onSuccess(List<Message> data) {
+                public void onSuccess(List<MessageResponse> data) {
                     messageList.clear();
                     messageList.addAll(data);
 
@@ -134,6 +155,21 @@ public class ChatDetailActivity extends AppCompatActivity {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private void fetchCreateMessageFromApi(MessageRequest messageRequest) {
+        chatRepository.sendMessage(messageRequest, new OnActionCallback<MessageResponse>() {
+            @Override
+            public void onSuccess(MessageResponse data) {
+                messageList.add(data);
+                messageAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(String error) {
+                Toast.makeText(ChatDetailActivity.this, error, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 }

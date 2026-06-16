@@ -83,6 +83,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
                 intent.putExtra("RECEIVER_NAME", currentConversation.getPartnerName());
                 intent.putExtra("RECEIVER_ID", currentConversation.getPartnerId());
                 intent.putExtra("RECEIVER_AVATAR", currentConversation.getPartnerAvatarUrl());
+                intent.putExtra("SENDER_ID", "fire-base-uid-test-12");
 
                 // Khởi hành chuyển sang màn hình ChatDetailActivity
                 v.getContext().startActivity(intent);

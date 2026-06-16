@@ -2,11 +2,16 @@ package com.example.edushare.feature.chat;
 
 
 import com.example.edushare.feature.chat.conversation.model.Conversation;
+import com.example.edushare.feature.chat.message.dto.MessageRequest;
+import com.example.edushare.feature.chat.message.dto.MessageResponse;
 import com.example.edushare.feature.chat.message.model.Message;
 
 import java.util.List;
+
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 public interface ChatApi {
@@ -23,5 +28,8 @@ public interface ChatApi {
     Call<List<Conversation>> getConversations(@Query("userId") String userId);
 
     @GET("/conversations/messages")
-    Call<List<Message>> getMessages(@Query("conversationId") int conversationId);
+    Call<List<MessageResponse>> getMessages(@Query("conversationId") int conversationId);
+
+    @POST("/conversations/messages")
+    Call<MessageResponse> sendMessage(@Body MessageRequest messageRequest);
 }

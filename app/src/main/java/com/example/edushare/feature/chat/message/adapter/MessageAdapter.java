@@ -11,18 +11,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.edushare.R;
+import com.example.edushare.feature.chat.message.dto.MessageResponse;
 import com.example.edushare.feature.chat.message.model.Message;
 
 import java.util.List;
 
 public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
-    private final List<Message> messageList;
+    private final List<MessageResponse> messageList;
     private final String currentUserId;
     private final String receiverAvatarUrl;
     private static final int TYPE_SENT = 1;
     private static final int TYPE_RECEIVED = 2;
 
-    public MessageAdapter(List<Message> messageList, String currentUserId, String receiverAvatarUrl) {
+    public MessageAdapter(List<MessageResponse> messageList, String currentUserId, String receiverAvatarUrl) {
         this.messageList = messageList;
         this.currentUserId = currentUserId;
         this.receiverAvatarUrl = receiverAvatarUrl;
@@ -50,7 +51,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        Message message = messageList.get(position);
+        MessageResponse message = messageList.get(position);
 
         if(holder.getItemViewType() == TYPE_SENT) {
             SentMessageViewHolder sentMessageViewHolder = (SentMessageViewHolder) holder;

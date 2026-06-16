@@ -5,6 +5,8 @@ import androidx.annotation.NonNull;
 import com.example.edushare.common.base.OnActionCallback;
 import com.example.edushare.common.base.RetrofitClient;
 import com.example.edushare.feature.chat.conversation.model.Conversation;
+import com.example.edushare.feature.chat.message.dto.MessageRequest;
+import com.example.edushare.feature.chat.message.dto.MessageResponse;
 import com.example.edushare.feature.chat.message.model.Message;
 
 import java.util.List;
@@ -51,11 +53,11 @@ public class ChatRepository {
         });
     }
 
-    public void getMessages(int conversationId, OnActionCallback<List<Message>> callback) {
+    public void getMessages(int conversationId, OnActionCallback<List<MessageResponse>> callback) {
         try {
-            chatApi.getMessages(conversationId).enqueue(new Callback<List<Message>>() {
+            chatApi.getMessages(conversationId).enqueue(new Callback<List<MessageResponse>>() {
                 @Override
-                public void onResponse(@NonNull Call<List<Message>> call, @NonNull Response<List<Message>> response) {
+                public void onResponse(@NonNull Call<List<MessageResponse>> call, @NonNull Response<List<MessageResponse>> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         callback.onSuccess(response.body());
                     } else {
@@ -64,7 +66,30 @@ public class ChatRepository {
                 }
 
                 @Override
-                public void onFailure(@NonNull Call<List<Message>> call,@NonNull Throwable t) {
+                public void onFailure(@NonNull Call<List<MessageResponse>> call,@NonNull Throwable t) {
+                    callback.onFailure("Lỗi kết nối: " + t.getMessage());
+                }
+            });
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void sendMessage(MessageRequest messageRequest, OnActionCallback<MessageResponse> callback) {
+        try {
+            chatApi.sendMessage(messageRequest).enqueue(new Callback<MessageResponse>() {
+                @Override
+                public void onResponse(@NonNull Call<MessageResponse> call, @NonNull Response<MessageResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        callback.onSuccess(response.body());
+                    } else {
+                        callback.onFailure("Lỗi Server: " + response.code());
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<MessageResponse> call,@NonNull Throwable t) {
                     callback.onFailure("Lỗi kết nối: " + t.getMessage());
                 }
             });
