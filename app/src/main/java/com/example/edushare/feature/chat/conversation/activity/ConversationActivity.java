@@ -38,7 +38,7 @@ public class ConversationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //Chỉ định giao diện hiển thị cho Activity
-        setContentView(R.layout.chat_list);
+        setContentView(R.layout.activity_chat_list);
 
         //Khởi tạo sự kiện cho các View
         initViews();

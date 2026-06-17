@@ -94,7 +94,7 @@ public class ChatDetailActivity extends AppCompatActivity {
 
         btnSend.setOnClickListener(l -> {
             String message = etMessage.getText().toString();
-            if (message != null && !message.isEmpty()) {
+            if (!message.isEmpty()) {
                 MessageRequest messageRequest = new MessageRequest();
                 messageRequest.setContent(message);
                 messageRequest.setConversationId(conversationId);
@@ -175,6 +175,8 @@ public class ChatDetailActivity extends AppCompatActivity {
                     messageList.addAll(data);
 
                     messageAdapter.notifyDataSetChanged();
+
+                    markConversationAsRead();
                 }
 
                 @Override
@@ -201,6 +203,20 @@ public class ChatDetailActivity extends AppCompatActivity {
             @Override
             public void onFailure(String error) {
                 Toast.makeText(ChatDetailActivity.this, error, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void markConversationAsRead() {
+        chatRepository.markMessageAsRead(conversationId, senderId, new OnActionCallback<Integer>() {
+            @Override
+            public void onSuccess(Integer data) {
+
+            }
+
+            @Override
+            public void onFailure(String error) {
+                Log.e("ChatDetail", "Mark read failed: " + error);
             }
         });
     }

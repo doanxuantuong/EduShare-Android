@@ -7,6 +7,7 @@
     android:padding="16dp"
     android:background="?attr/selectableItemBackground">
 
+    <!--  Avatar  -->
     <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/ivAvatar"
         android:layout_width="56dp"
@@ -17,6 +18,7 @@
         app:shapeAppearanceOverlay="@style/CircleAppearance"
         tools:src="@tools:sample/avatars" />
 
+    <!--  Nút xnah hoạt động  -->
     <View
         android:id="@+id/viewOnlineStatus"
         android:layout_width="12dp"
@@ -28,6 +30,7 @@
         android:layout_marginEnd="2dp"
         android:layout_marginBottom="2dp" />
 
+    <!--  Tên người nhận  -->
     <TextView
         android:id="@+id/tvName"
         android:layout_width="0dp"
@@ -44,6 +47,7 @@
         app:layout_constraintTop_toTopOf="@+id/ivAvatar"
         tools:text="Nguyen Van A" />
 
+    <!-- Đoạn tin nhắn cuối -->
     <TextView
         android:id="@+id/tvLastMessage"
         android:layout_width="0dp"
@@ -58,6 +62,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tvName"
         tools:text="Is the textbook still available?" />
 
+    <!-- Thời gian gửi cuối -->
     <TextView
         android:id="@+id/tvTime"
         android:layout_width="wrap_content"
@@ -68,6 +73,7 @@
         app:layout_constraintTop_toTopOf="@+id/tvName"
         tools:text="2m ago" />
 
+    <!--  Số lượng tin nhắn chưa đọc  -->
     <TextView
         android:id="@+id/tvBadge"
         android:layout_width="20dp"

@@ -66,7 +66,7 @@ public class ChatRepository {
                 }
 
                 @Override
-                public void onFailure(@NonNull Call<List<MessageResponse>> call,@NonNull Throwable t) {
+                public void onFailure(@NonNull Call<List<MessageResponse>> call, @NonNull Throwable t) {
                     callback.onFailure("Lỗi kết nối: " + t.getMessage());
                 }
             });
@@ -89,7 +89,7 @@ public class ChatRepository {
                 }
 
                 @Override
-                public void onFailure(@NonNull Call<MessageResponse> call,@NonNull Throwable t) {
+                public void onFailure(@NonNull Call<MessageResponse> call, @NonNull Throwable t) {
                     callback.onFailure("Lỗi kết nối: " + t.getMessage());
                 }
             });
@@ -97,5 +97,23 @@ public class ChatRepository {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void markMessageAsRead(int conversationId, String userId, OnActionCallback<Integer> callback) {
+        chatApi.markMessageAsRead(conversationId, userId).enqueue(new Callback<Integer>() {
+            @Override
+            public void onResponse(Call<Integer> call, Response<Integer> response) {
+                if (response.isSuccessful()) {
+                    callback.onSuccess(response.body());
+                } else {
+                    callback.onFailure("Lỗi Server: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Integer> call, Throwable t) {
+                callback.onFailure("Lỗi kết nối: " + t.getMessage());
+            }
+        });
     }
 }

@@ -12,6 +12,8 @@ import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface ChatApi {
@@ -32,4 +34,7 @@ public interface ChatApi {
 
     @POST("/conversations/messages")
     Call<MessageResponse> sendMessage(@Body MessageRequest messageRequest);
+
+    @PUT("/conversations/messages/{conversationId}/read")
+    Call<Integer> markMessageAsRead(@Path("conversationId") int conversationId, @Query("userId") String userId);
 }

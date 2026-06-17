@@ -56,6 +56,15 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
         holder.tvLastMessage.setText(conversation.getLastMessage());
         holder.tvTime.setText(conversation.getUpdatedAt());
 
+        Long unreadCount = conversation.getUnreadCount();
+
+        if (unreadCount != null && unreadCount > 0) {
+            holder.tvBadge.setVisibility(View.VISIBLE);
+            holder.tvBadge.setText(String.valueOf(unreadCount));
+        } else {
+            holder.tvBadge.setVisibility(View.GONE);
+        }
+
         // Glide for image loading
         // Glide.with(...) giống như một thẻ <img> của HTML nhưng xịn hơn.
         Glide.with(holder.itemView.getContext())
@@ -89,14 +98,6 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
                 v.getContext().startActivity(intent);
             }
         });
-
-        // Optional: Badge logic (showing it for some items as requested)
-        if (position % 2 == 0) {
-            holder.tvBadge.setVisibility(View.VISIBLE);
-            holder.tvBadge.setText(String.valueOf(position + 1));
-        } else {
-            holder.tvBadge.setVisibility(View.GONE);
-        }
     }
 
     @Override

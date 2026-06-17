@@ -12,6 +12,8 @@ public class Conversation implements Serializable {
     private String recipientAvatarUrl;
     private String lastMessage;
     private String updatedAt;
+    @SerializedName("unreadCount")
+    private Long unreadCount;
 
     public Conversation() {
     }
@@ -62,6 +64,14 @@ public class Conversation implements Serializable {
 
     public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Long getUnreadCount() {
+        return unreadCount;
+    }
+
+    public void setUnreadCount(Long unreadCount) {
+        this.unreadCount = unreadCount;
     }
 
     @Override
