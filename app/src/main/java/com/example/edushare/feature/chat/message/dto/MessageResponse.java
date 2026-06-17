@@ -9,7 +9,11 @@ public class MessageResponse implements Serializable {
     private String senderId;
     private String content;
     private Boolean isRead;
-    private Timestamp createdAt;
+
+    //Bên ANROID khi nhận sẽ nhận dạng JSON
+    //Nền cần nhận dạng String thay vì Timestamp
+    //do có thể bên JSON trả về dạng khác nhau: "createdAt": [2026, 6, 17, 14, 43, 22]
+    private String createdAt;
 
     public MessageResponse() {
     }
@@ -54,13 +58,11 @@ public class MessageResponse implements Serializable {
         isRead = read;
     }
 
-    public Timestamp getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Timestamp createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
-
-
 }

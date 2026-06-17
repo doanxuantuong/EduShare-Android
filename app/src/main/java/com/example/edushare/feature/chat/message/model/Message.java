@@ -11,7 +11,7 @@ public class Message implements Serializable {
     private String senderId;
     private String content;
     private Boolean isRead;
-    private Timestamp createdAt;
+    private String createdAt;
 
     public Message() {
     }
@@ -56,13 +56,11 @@ public class Message implements Serializable {
         isRead = read;
     }
 
-    public Timestamp getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Timestamp createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
-
-
 }

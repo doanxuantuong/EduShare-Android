@@ -176,6 +176,7 @@ public class ChatDetailActivity extends AppCompatActivity {
 
                     messageAdapter.notifyDataSetChanged();
 
+                    // Đánh dấu là đã đọc tin nhắn cuối cùng
                     markConversationAsRead();
                 }
 
@@ -193,11 +194,7 @@ public class ChatDetailActivity extends AppCompatActivity {
         chatRepository.sendMessage(messageRequest, new OnActionCallback<MessageResponse>() {
             @Override
             public void onSuccess(MessageResponse data) {
-                messageList.add(data);
-                //Có một item mới vừa được thêm vào ở vị trí cuối danh sách.
-                messageAdapter.notifyItemInserted(messageList.size() - 1);
-                //Kéo RecyclerView xuống vị trí tin nhắn cuối cùng.
-                rvMessages.scrollToPosition(messageList.size() - 1);
+                addNewMessage(data);
             }
 
             @Override
@@ -219,6 +216,23 @@ public class ChatDetailActivity extends AppCompatActivity {
                 Log.e("ChatDetail", "Mark read failed: " + error);
             }
         });
+    }
+
+    // Khi có 1 tin nhắn mới được thêm vào list
+    public void addNewMessage(MessageResponse newMessage) {
+        int oldSize = messageList.size();
+        messageList.add(newMessage);
+
+        if (oldSize > 0) {
+            // 1. Cập nhật lại tin nhắn ngay trước đó (để nó ẩn thời gian/avatar đi vì không còn là tin cuối)
+            messageAdapter.notifyItemChanged(oldSize - 1);
+        }
+
+        // 2. Thông báo thêm tin nhắn mới
+        messageAdapter.notifyItemInserted(oldSize);
+
+        // 3. Cuộn xuống cuối cùng
+        rvMessages.scrollToPosition(oldSize);
     }
 
     @SuppressLint("CheckResult")
@@ -260,9 +274,7 @@ public class ChatDetailActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 // Kiểm tra xem tin nhắn này có thuộc về cuộc hội thoại đang mở không
                 if (newMessage.getConversationId() == conversationId) {
-                    messageList.add(newMessage);
-                    messageAdapter.notifyItemInserted(messageList.size() - 1);
-                    rvMessages.scrollToPosition(messageList.size() - 1);
+                   addNewMessage(newMessage);
                 }
             });
         });

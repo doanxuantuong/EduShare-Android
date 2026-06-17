@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.edushare.R;
+import com.example.edushare.common.utils.DateTimeUtils;
 import com.example.edushare.feature.chat.conversation.model.Conversation;
 import com.example.edushare.feature.chat.message.activity.ChatDetailActivity;
 
@@ -54,7 +55,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
 
         holder.tvName.setText(conversation.getRecipientName());
         holder.tvLastMessage.setText(conversation.getLastMessage());
-        holder.tvTime.setText(conversation.getUpdatedAt());
+        holder.tvTime.setText(DateTimeUtils.getRelativeTime(conversation.getUpdatedAt()));
 
         Long unreadCount = conversation.getUnreadCount();
 
