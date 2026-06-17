@@ -1,6 +1,7 @@
 package com.example.edushare.feature.chat.conversation.activity;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -9,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.edushare.R;
 import com.example.edushare.common.base.OnActionCallback;
+import com.example.edushare.common.helper.BottomNavigationHelper;
 import com.example.edushare.feature.chat.ChatRepository;
 import com.example.edushare.feature.chat.conversation.adapter.ConversationAdapter;
 import com.example.edushare.feature.chat.conversation.model.Conversation;
@@ -32,7 +34,7 @@ public class ConversationActivity extends AppCompatActivity {
     private ConversationAdapter adapter;
     private List<Conversation> conversationList;
     private ChatRepository chatRepository;
-
+    private View footerLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,6 +54,12 @@ public class ConversationActivity extends AppCompatActivity {
 
     private void initViews() {
         rvChatList = findViewById(R.id.rvChatList);
+
+        // 2. Ánh xạ thẻ <include> trong file xml (ID là footer_layout)
+        footerLayout = findViewById(R.id.footer_layout);
+
+        // 3. Kích hoạt bộ Helper: Truyền id của tab Chat (R.id.nav_chat) để nó biết đường làm sáng đèn icon Chat
+        BottomNavigationHelper.setup(this, footerLayout, R.id.nav_chat);
     }
 
     private void setupRecyclerView() {
