@@ -1,14 +1,18 @@
 package com.example.edushare.feature.chat.message.activity;
 
+import static ua.naiksoftware.stomp.dto.LifecycleEvent.Type.OPENED;
+
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.edushare.R;
@@ -18,9 +22,13 @@ import com.example.edushare.feature.chat.message.adapter.MessageAdapter;
 import com.example.edushare.feature.chat.message.dto.MessageRequest;
 import com.example.edushare.feature.chat.message.dto.MessageResponse;
 import com.example.edushare.feature.chat.message.model.Message;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import ua.naiksoftware.stomp.Stomp;
+import ua.naiksoftware.stomp.StompClient;
 
 public class ChatDetailActivity extends AppCompatActivity {
 
@@ -43,16 +51,28 @@ public class ChatDetailActivity extends AppCompatActivity {
 
     // DATA LẤY TỪ ACTIVITY TRUYỀN QUA
     private int conversationId;
-    private String receiverName;
-    private String receiverAvatarUrl;
+    private String recipientName;
+    private String recipientAvatarUrl;
     private String senderId;
-//    private int receiverId;
+//    private int recipientId;
 
     // =======================================
     // PHẦN 3: Thanh soạn tin nhắn và gửi tin nhắn
     private EditText etMessage;
 
     private ImageButton btnSend;
+
+    private StompClient stompClient;
+
+    // Hủy kết nối WebSocket khi Activity bị hủy
+    // Tránh tốn RAM nếu WebSocket vẫn còn mở
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (stompClient != null && stompClient.isConnected()) {
+            stompClient.disconnect();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +109,8 @@ public class ChatDetailActivity extends AppCompatActivity {
         // Call API lấy danh sách đoạn tin nhắn của conversation
         chatRepository = new ChatRepository();
         fetchMessagesByConversationIdFromApi(conversationId);
+        // Kết nối WebSocket
+        connectWebSocket();
 
     }
 
@@ -114,12 +136,12 @@ public class ChatDetailActivity extends AppCompatActivity {
         if (intent != null) {
             conversationId = intent.getIntExtra("CONVERSATION_ID", -1);
             senderId = intent.getStringExtra("SENDER_ID");
-//            receiverId = intent.getIntExtra("RECEIVER_ID", -1);
-            receiverName = intent.getStringExtra("RECEIVER_NAME");
-            receiverAvatarUrl = intent.getStringExtra("RECEIVER_AVATAR");
+//            recipientId = intent.getIntExtra("recipient_ID", -1);
+            recipientName = intent.getStringExtra("RECIPIENT_NAME");
+            recipientAvatarUrl = intent.getStringExtra("RECIPIENT_AVATAR");
 
-            if (receiverName != null) {
-                tvPartnerName.setText(receiverName);
+            if (recipientName != null) {
+                tvPartnerName.setText(recipientName);
             }
         }
     }
@@ -129,9 +151,17 @@ public class ChatDetailActivity extends AppCompatActivity {
         messageList = new ArrayList<>();
 
         // Khởi tạo Adapter và gắn vào RecyclerView
-        messageAdapter = new MessageAdapter(messageList, "fire-base-uid-test-12", receiverAvatarUrl);
+        messageAdapter = new MessageAdapter(messageList, senderId, recipientAvatarUrl);
         rvMessages.setAdapter(messageAdapter);
-//        rvMessages.setLayoutManager(new LinearLayoutManager(this));
+
+        // Cấu hình LinearLayoutManager đảo ngược để hiên thị tin nhắn mới nhất ở dưới
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        // Bắt các item xếp chồng từ dưới lên
+        layoutManager.setStackFromEnd(true);
+
+        // Gắn layoutManager đã cấu hình vào RecyclerView
+        rvMessages.setLayoutManager(layoutManager);
+
     }
 
 
@@ -162,7 +192,10 @@ public class ChatDetailActivity extends AppCompatActivity {
             @Override
             public void onSuccess(MessageResponse data) {
                 messageList.add(data);
-                messageAdapter.notifyDataSetChanged();
+                //Có một item mới vừa được thêm vào ở vị trí cuối danh sách.
+                messageAdapter.notifyItemInserted(messageList.size() - 1);
+                //Kéo RecyclerView xuống vị trí tin nhắn cuối cùng.
+                rvMessages.scrollToPosition(messageList.size() - 1);
             }
 
             @Override
@@ -172,4 +205,50 @@ public class ChatDetailActivity extends AppCompatActivity {
         });
     }
 
+    @SuppressLint("CheckResult")
+    private void connectWebSocket() {
+        // 1. Tạo URL kết nối (Nhớ đổi 10.0.2.2 thành IP LAN nếu test trên điện thoại thật)
+        // Phải có đuôi /websocket vì cổng thuần của Spring Boot yêu cầu thế
+        String wsUrl = "ws://10.0.2.2:8080/ws-edushare/websocket";
+
+        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, wsUrl);
+        stompClient.connect();
+
+        // 2. Lắng nghe trạng thái kết nối (Để debug xem có dính lỗi mạng không)
+        stompClient.lifecycle().subscribe(lifecycleEvent -> {
+            switch (lifecycleEvent.getType()) {
+                case OPENED:
+                    Log.d("WebSocket", "Connection opened");
+                    break;
+                case ERROR:
+                    Log.d("WebSocket", "Lỗi kết nối", lifecycleEvent.getException());
+                    break;
+                case CLOSED:
+                    Log.d("SOCKET", "Đã ngắt kết nối");
+                    break;
+            }
+        });
+
+        // 3. Đăng ký nhận tin nhắn từ kênh của riêng mình (Dùng ID đăng nhập của user hiện tại)
+        String myTopic = "/topic/messages/" + senderId;
+        stompClient.topic(myTopic).subscribe(stompMessage -> {
+            // Xử lý tin nhắn nhận được
+            String jsonPayload = stompMessage.getPayload();
+            Log.d("SOCKET", "Nhận được data: " + jsonPayload);
+
+            // Parse JSON thành Object MessageResponse bằng Gson
+            Gson gson = new Gson();
+            MessageResponse newMessage = gson.fromJson(jsonPayload, MessageResponse.class);
+
+            // BẮT BUỘC: Android quy định chỉ Main Thread mới được phép cập nhật Giao diện
+            runOnUiThread(() -> {
+                // Kiểm tra xem tin nhắn này có thuộc về cuộc hội thoại đang mở không
+                if (newMessage.getConversationId() == conversationId) {
+                    messageList.add(newMessage);
+                    messageAdapter.notifyItemInserted(messageList.size() - 1);
+                    rvMessages.scrollToPosition(messageList.size() - 1);
+                }
+            });
+        });
+    }
 }

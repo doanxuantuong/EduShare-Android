@@ -32,6 +32,7 @@ public class ConversationActivity extends AppCompatActivity {
     private ConversationAdapter adapter;
     private List<Conversation> conversationList;
     private ChatRepository chatRepository;
+    private String currentUserId = "fire-base-uid-test-12";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,7 +48,17 @@ public class ConversationActivity extends AppCompatActivity {
         chatRepository = new ChatRepository();
 
         // Gọi API lấy dữ liệu thực
-        fetchConversationsFromApi("fire-base-uid-test-12");
+        fetchConversationsFromApi(currentUserId);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Mỗi khi màn hình này hiện lên (kể cả lúc từ phòng chat quay ra),
+        // bắt buộc phải gọi lại API để lấy danh sách lastMessage mới nhất.
+        if (currentUserId != null) {
+            fetchConversationsFromApi(currentUserId);
+        }
     }
 
     private void initViews() {

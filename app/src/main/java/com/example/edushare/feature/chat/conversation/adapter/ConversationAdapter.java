@@ -52,7 +52,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Conversation conversation = conversationList.get(position);
 
-        holder.tvName.setText(conversation.getPartnerName());
+        holder.tvName.setText(conversation.getRecipientName());
         holder.tvLastMessage.setText(conversation.getLastMessage());
         holder.tvTime.setText(conversation.getUpdatedAt());
 
@@ -60,7 +60,7 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
         // Glide.with(...) giống như một thẻ <img> của HTML nhưng xịn hơn.
         Glide.with(holder.itemView.getContext())
                 //Đưa nó một URL (đường dẫn ảnh),
-                .load(conversation.getPartnerAvatarUrl())
+                .load(conversation.getRecipientAvatarUrl())
                 //Ảnh mặc định
                 .placeholder(android.R.drawable.ic_menu_report_image) // Default avatar placeholder
                 //Nó tự tải ảnh từ mạng về, tự bóp méo thành hình tròn (circleCrop())
@@ -80,9 +80,9 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
                 Intent intent = new Intent(v.getContext(), ChatDetailActivity.class);
 
                 intent.putExtra("CONVERSATION_ID", currentConversation.getId());
-                intent.putExtra("RECEIVER_NAME", currentConversation.getPartnerName());
-                intent.putExtra("RECEIVER_ID", currentConversation.getPartnerId());
-                intent.putExtra("RECEIVER_AVATAR", currentConversation.getPartnerAvatarUrl());
+                intent.putExtra("RECIPIENT_NAME", currentConversation.getRecipientName());
+                intent.putExtra("RECIPIENT_ID", currentConversation.getRecipientId());
+                intent.putExtra("RECIPIENT_AVATAR", currentConversation.getRecipientAvatarUrl());
                 intent.putExtra("SENDER_ID", "fire-base-uid-test-12");
 
                 // Khởi hành chuyển sang màn hình ChatDetailActivity

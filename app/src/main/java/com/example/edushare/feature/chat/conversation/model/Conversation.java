@@ -7,9 +7,9 @@ import java.io.Serializable;
 public class Conversation implements Serializable {
     @SerializedName("conversationId")
     private Integer id;
-    private String partnerId;
-    private String partnerName;
-    private String partnerAvatarUrl;
+    private String recipientId;
+    private String recipientName;
+    private String recipientAvatarUrl;
     private String lastMessage;
     private String updatedAt;
 
@@ -24,28 +24,28 @@ public class Conversation implements Serializable {
         this.id = id;
     }
 
-    public String getPartnerId() {
-        return partnerId;
+    public String getRecipientId() {
+        return recipientId;
     }
 
-    public void setPartnerId(String partnerId) {
-        this.partnerId = partnerId;
+    public void setRecipientId(String recipientId) {
+        this.recipientId = recipientId;
     }
 
-    public String getPartnerName() {
-        return partnerName;
+    public String getRecipientName() {
+        return recipientName;
     }
 
-    public void setPartnerName(String partnerName) {
-        this.partnerName = partnerName;
+    public void setRecipientName(String recipientName) {
+        this.recipientName = recipientName;
     }
 
-    public String getPartnerAvatarUrl() {
-        return partnerAvatarUrl;
+    public String getRecipientAvatarUrl() {
+        return recipientAvatarUrl;
     }
 
-    public void setPartnerAvatarUrl(String partnerAvatarUrl) {
-        this.partnerAvatarUrl = partnerAvatarUrl;
+    public void setRecipientAvatarUrl(String recipientAvatarUrl) {
+        this.recipientAvatarUrl = recipientAvatarUrl;
     }
 
     public String getLastMessage() {
@@ -68,9 +68,9 @@ public class Conversation implements Serializable {
     public String toString() {
         return "Conversation{" +
                 "id=" + id +
-                ", partnerId='" + partnerId + '\'' +
-                ", partnerName='" + partnerName + '\'' +
-                ", partnerAvatarUrl='" + partnerAvatarUrl + '\'' +
+                ", recipientId='" + recipientId + '\'' +
+                ", recipientName='" + recipientName + '\'' +
+                ", recipientAvatarUrl='" + recipientAvatarUrl + '\'' +
                 ", lastMessage='" + lastMessage + '\'' +
                 ", updatedAt='" + updatedAt + '\'' +
                 '}';

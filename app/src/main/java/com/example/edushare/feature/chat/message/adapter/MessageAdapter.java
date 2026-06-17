@@ -19,14 +19,14 @@ import java.util.List;
 public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
     private final List<MessageResponse> messageList;
     private final String currentUserId;
-    private final String receiverAvatarUrl;
+    private final String recipientAvatarUrl;
     private static final int TYPE_SENT = 1;
     private static final int TYPE_RECEIVED = 2;
 
-    public MessageAdapter(List<MessageResponse> messageList, String currentUserId, String receiverAvatarUrl) {
+    public MessageAdapter(List<MessageResponse> messageList, String currentUserId, String recipientAvatarUrl) {
         this.messageList = messageList;
         this.currentUserId = currentUserId;
-        this.receiverAvatarUrl = receiverAvatarUrl;
+        this.recipientAvatarUrl = recipientAvatarUrl;
     }
 
     public int getItemViewType(int position) {
@@ -63,7 +63,7 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
             receivedMessageViewHolder.tvTime.setText(message.getCreatedAt().toString());
 
             Glide.with(holder.itemView.getContext())
-                    .load(receiverAvatarUrl)
+                    .load(recipientAvatarUrl)
                     .placeholder(android.R.drawable.ic_menu_report_image)
                     .circleCrop()
                     .into(receivedMessageViewHolder.ivAvatar);
