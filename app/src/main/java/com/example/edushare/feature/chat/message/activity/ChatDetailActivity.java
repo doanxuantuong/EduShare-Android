@@ -21,6 +21,7 @@ import com.example.edushare.feature.chat.ChatRepository;
 import com.example.edushare.feature.chat.message.adapter.MessageAdapter;
 import com.example.edushare.feature.chat.message.dto.MessageRequest;
 import com.example.edushare.feature.chat.message.dto.MessageResponse;
+import com.example.edushare.feature.chat.message.dto.MessageStatusResponse;
 import com.example.edushare.feature.chat.message.model.Message;
 import com.google.gson.Gson;
 
@@ -54,7 +55,7 @@ public class ChatDetailActivity extends AppCompatActivity {
     private String recipientName;
     private String recipientAvatarUrl;
     private String senderId;
-//    private int recipientId;
+    private String recipientId;
 
     // =======================================
     // PHẦN 3: Thanh soạn tin nhắn và gửi tin nhắn
@@ -136,7 +137,7 @@ public class ChatDetailActivity extends AppCompatActivity {
         if (intent != null) {
             conversationId = intent.getIntExtra("CONVERSATION_ID", -1);
             senderId = intent.getStringExtra("SENDER_ID");
-//            recipientId = intent.getIntExtra("recipient_ID", -1);
+            recipientId = intent.getStringExtra("RECIPIENT_ID");
             recipientName = intent.getStringExtra("RECIPIENT_NAME");
             recipientAvatarUrl = intent.getStringExtra("RECIPIENT_AVATAR");
 
@@ -205,7 +206,7 @@ public class ChatDetailActivity extends AppCompatActivity {
     }
 
     private void markConversationAsRead() {
-        chatRepository.markMessageAsRead(conversationId, senderId, new OnActionCallback<Integer>() {
+        chatRepository.markMessageAsRead(conversationId, senderId, recipientId, new OnActionCallback<Integer>() {
             @Override
             public void onSuccess(Integer data) {
 
@@ -235,6 +236,28 @@ public class ChatDetailActivity extends AppCompatActivity {
         rvMessages.scrollToPosition(oldSize);
     }
 
+    @SuppressLint("NotifyDataSetChanged")
+    public void updateLastMessageStatus() {
+        boolean isUpdated = false;
+
+        // Duyệt ngược từ dưới lên (vì thường chỉ có vài tin nhắn cuối là chưa xem)
+        for (int i = messageList.size() - 1; i >= 0; i--) {
+            MessageResponse messageResponse = messageList.get(i);
+
+            boolean isRead = messageResponse.getRead();
+            if (!isRead) {
+                messageResponse.setRead(true);
+                isUpdated = true;
+            } else if (isRead) {
+                break;
+            }
+        }
+
+        if (isUpdated) {
+            messageAdapter.notifyDataSetChanged();
+        }
+    }
+
     @SuppressLint("CheckResult")
     private void connectWebSocket() {
         // 1. Tạo URL kết nối (Nhớ đổi 10.0.2.2 thành IP LAN nếu test trên điện thoại thật)
@@ -261,10 +284,19 @@ public class ChatDetailActivity extends AppCompatActivity {
 
         // 3. Đăng ký nhận tin nhắn từ kênh của riêng mình (Dùng ID đăng nhập của user hiện tại)
         String myTopic = "/topic/messages/" + senderId;
+
+        receiveNewMessage(myTopic);
+
+        String destinationStatus = "/topic/receipts/" + senderId;
+        receiveNewMessageStatus(destinationStatus);
+
+    }
+
+    @SuppressLint("CheckResult")
+    private void receiveNewMessage(String myTopic) {
         stompClient.topic(myTopic).subscribe(stompMessage -> {
             // Xử lý tin nhắn nhận được
             String jsonPayload = stompMessage.getPayload();
-            Log.d("SOCKET", "Nhận được data: " + jsonPayload);
 
             // Parse JSON thành Object MessageResponse bằng Gson
             Gson gson = new Gson();
@@ -274,9 +306,30 @@ public class ChatDetailActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 // Kiểm tra xem tin nhắn này có thuộc về cuộc hội thoại đang mở không
                 if (newMessage.getConversationId() == conversationId) {
-                   addNewMessage(newMessage);
+                    addNewMessage(newMessage);
                 }
             });
         });
     }
+
+    @SuppressLint("CheckResult")
+    private void receiveNewMessageStatus(String receiptTopic) {
+        stompClient.topic(receiptTopic).subscribe(stompMessage -> {
+            // Xử lý tin nhắn nhận được
+            String jsonPayload = stompMessage.getPayload();
+
+            // Parse JSON thành Object MessageResponse bằng Gson
+            Gson gson = new Gson();
+            MessageStatusResponse newMessage = gson.fromJson(jsonPayload, MessageStatusResponse.class);
+
+            // BẮT BUỘC: Android quy định chỉ Main Thread mới được phép cập nhật Giao diện
+            runOnUiThread(() -> {
+                // Kiểm tra xem tin nhắn này có thuộc về cuộc hội thoại đang mở không
+                if (conversationId == newMessage.getConversationId() && newMessage.getRead()) {
+                    updateLastMessageStatus();
+                }
+            });
+        });
+    }
+
 }

@@ -99,8 +99,8 @@ public class ChatRepository {
         }
     }
 
-    public void markMessageAsRead(int conversationId, String userId, OnActionCallback<Integer> callback) {
-        chatApi.markMessageAsRead(conversationId, userId).enqueue(new Callback<Integer>() {
+    public void markMessageAsRead(int conversationId, String userId, String recipientId, OnActionCallback<Integer> callback) {
+        chatApi.markMessageAsRead(conversationId, userId, recipientId).enqueue(new Callback<Integer>() {
             @Override
             public void onResponse(Call<Integer> call, Response<Integer> response) {
                 if (response.isSuccessful()) {

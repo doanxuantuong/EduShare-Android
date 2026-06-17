@@ -36,5 +36,5 @@ public interface ChatApi {
     Call<MessageResponse> sendMessage(@Body MessageRequest messageRequest);
 
     @PUT("/conversations/messages/{conversationId}/read")
-    Call<Integer> markMessageAsRead(@Path("conversationId") int conversationId, @Query("userId") String userId);
+    Call<Integer> markMessageAsRead(@Path("conversationId") int conversationId, @Query("userId") String userId, @Query("recipientId") String recipientId);
 }
