@@ -2,7 +2,10 @@ package com.example.edushare.feature.chat.conversation.activity;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -40,15 +43,18 @@ public class ConversationActivity extends AppCompatActivity {
     private RecyclerView rvChatList;
     private ConversationAdapter adapter;
     private List<Conversation> conversationList;
+    private List<Conversation> originalConversationList;
     private ChatRepository chatRepository;
     private String currentUserId = "fire-base-uid-test-12";
     private int currentPage = 0;
-    private final int PAGE_SIZE = 10;
+    private final int PAGE_SIZE = 8;
     private boolean isLoading = false; // Đang call API thì không cho call đè
     private boolean isLastPage = false; // Hết tin cũ rồi thì không gọi API nữa
     private boolean isFirstOpen = true;
 
     private StompClient stompClient;
+
+    private EditText edtSearchChat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +73,8 @@ public class ConversationActivity extends AppCompatActivity {
         fetchConversationsFromApi(currentPage);
 
         connectWebSocket();
+
+        setupSearch();
     }
 
     @Override
@@ -88,11 +96,14 @@ public class ConversationActivity extends AppCompatActivity {
 
     private void initViews() {
         rvChatList = findViewById(R.id.rvChatList);
+        edtSearchChat = findViewById(R.id.etSearch);
     }
 
     private void setupRecyclerView() {
         // Tạo danh sách các đoạn hội thoại (conversationList)
         conversationList = new ArrayList<>();
+        originalConversationList = new ArrayList<>();
+
         // Thêm dữ liệu qua bên Adapter cho Adapter load lên
         adapter = new ConversationAdapter(conversationList);
         rvChatList.setLayoutManager(new LinearLayoutManager(this));
@@ -143,6 +154,7 @@ public class ConversationActivity extends AppCompatActivity {
                         // Xóa danh sách cũ và thêm dữ liệu mới từ API
                         conversationList.clear();
                         conversationList.addAll(newConversations);
+                        originalConversationList.addAll(newConversations);
 
                         // Thông báo cho adapter cập nhật giao diện
                         adapter.notifyDataSetChanged();
@@ -237,4 +249,44 @@ public class ConversationActivity extends AppCompatActivity {
             });
         });
     }
+
+    // Tìm kiếm đoạn chat dựa vào tên của người nhận
+    private void findConversationsByReceiverName(String receiverName) {
+        conversationList.clear();
+
+        if (receiverName == null || receiverName.trim().isEmpty()) {
+            conversationList.addAll(originalConversationList);
+        } else {
+            String keyword = receiverName.trim().toLowerCase();
+
+            for (Conversation conversation : originalConversationList) {
+                String name = conversation.getRecipientName();
+
+                if (name != null && name.toLowerCase().contains(keyword)) {
+                    conversationList.add(conversation);
+                }
+            }
+        }
+
+        adapter.notifyDataSetChanged();
+    }
+
+    //Code setup cho việc tìm kiếm
+    private void setupSearch() {
+        edtSearchChat.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                findConversationsByReceiverName(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
+    }
+
 }
