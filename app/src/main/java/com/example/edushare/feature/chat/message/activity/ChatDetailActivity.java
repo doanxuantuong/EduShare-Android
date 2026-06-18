@@ -11,6 +11,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,10 +23,13 @@ import com.example.edushare.feature.chat.message.adapter.MessageAdapter;
 import com.example.edushare.feature.chat.message.dto.MessageRequest;
 import com.example.edushare.feature.chat.message.dto.MessageResponse;
 import com.example.edushare.feature.chat.message.dto.MessageStatusResponse;
+import com.example.edushare.feature.chat.message.dto.PageResponse;
 import com.example.edushare.feature.chat.message.model.Message;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import ua.naiksoftware.stomp.Stomp;
@@ -56,6 +60,12 @@ public class ChatDetailActivity extends AppCompatActivity {
     private String recipientAvatarUrl;
     private String senderId;
     private String recipientId;
+
+    // Biến cho Phân trang
+    private int currentPage = 0;
+    private final int PAGE_SIZE = 20;
+    private boolean isLoading = false; // Đang call API thì không cho call đè
+    private boolean isLastPage = false; // Hết tin cũ rồi thì không gọi API nữa
 
     // =======================================
     // PHẦN 3: Thanh soạn tin nhắn và gửi tin nhắn
@@ -101,7 +111,7 @@ public class ChatDetailActivity extends AppCompatActivity {
                 messageRequest.setConversationId(conversationId);
                 messageRequest.setSenderId(senderId);
 
-                fetchCreateMessageFromApi(messageRequest);
+                fetchCreateMessageFromApi(conversationId, messageRequest);
 
                 etMessage.setText("");
             }
@@ -109,7 +119,7 @@ public class ChatDetailActivity extends AppCompatActivity {
 
         // Call API lấy danh sách đoạn tin nhắn của conversation
         chatRepository = new ChatRepository();
-        fetchMessagesByConversationIdFromApi(conversationId);
+        fetchMessagesByConversationIdFromApi(currentPage);
         // Kết nối WebSocket
         connectWebSocket();
 
@@ -163,26 +173,73 @@ public class ChatDetailActivity extends AppCompatActivity {
         // Gắn layoutManager đã cấu hình vào RecyclerView
         rvMessages.setLayoutManager(layoutManager);
 
+        // Bắt sự kiện vuốt lên trên cùng để load tin nhắn cũ
+        rvMessages.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                if (layoutManager != null) {
+                    // Lấy vị trí của item đang hiển thị ở vị trí trên cùng của màn hình
+                    int firstVisibleItem = layoutManager.findFirstVisibleItemPosition();
+
+                    // Nếu vị trí đó là 0 (nghĩa là người dùng đã cuộn chạm nóc trên cùng)
+                    if (firstVisibleItem == 0) {
+                        // Kiểm tra xem có đang load dở không, và đã hết trang chưa
+                        if (!isLoading && !isLastPage) {
+                            currentPage++;
+                            fetchMessagesByConversationIdFromApi(currentPage);
+                        }
+                    }
+                }
+            }
+        });
+
     }
 
 
-    private void fetchMessagesByConversationIdFromApi(int conversationId) {
+    private void fetchMessagesByConversationIdFromApi(int page) {
+        // Bên Server đang trả về theo thứ tự là DESC tức là mới nhất
+        // Và chỉ lấy 20 tin nhắn
         try {
-            chatRepository.getMessages(conversationId, new OnActionCallback<List<MessageResponse>>() {
+            isLoading = true;
+            chatRepository.getMessages(conversationId, page, PAGE_SIZE, new OnActionCallback<PageResponse<MessageResponse>>() {
                 @SuppressLint("NotifyDataSetChanged")
                 @Override
-                public void onSuccess(List<MessageResponse> data) {
-                    messageList.clear();
-                    messageList.addAll(data);
+                public void onSuccess(PageResponse<MessageResponse> data) {
+                    isLoading = false;
+                    isLastPage = data.isLast();
 
-                    messageAdapter.notifyDataSetChanged();
+                    List<MessageResponse> newMessages = data.getContent();
 
-                    // Đánh dấu là đã đọc tin nhắn cuối cùng
-                    markConversationAsRead();
+                    if (newMessages != null && !newMessages.isEmpty()) {
+                        // Cái API cũ lấy theo ngày tạo ASC nhưng khi làm phân trang
+                        // API đổi lại theo DESC ngày tạo (để lấy tin nhắn mới nhất)
+                        // Do cách hiển thị cũ đang xếp theo ASC nên cần đảo lại
+                        Collections.reverse(newMessages);
+                        if (page == 0) {
+                            messageList.clear();
+                            messageList.addAll(newMessages);
+
+                            messageAdapter.notifyDataSetChanged();
+
+                            // Đánh dấu là đã đọc tin nhắn cuối cùng
+                            markConversationAsRead();
+                            // Kéo xuống vị trí cuối
+                            rvMessages.scrollToPosition(messageList.size() - 1);
+                        } else {
+                            // Chèn mảng tin cũ vào vị trí trên cùng (index 0) của danh sách hiện tại
+                            messageList.addAll(0, newMessages);
+                            // Báo cho Adapter biết có 1 cụm mới được nhét vào đầu
+                            messageAdapter.notifyItemRangeInserted(0, newMessages.size());
+                        }
+                    }
                 }
 
                 @Override
                 public void onFailure(String error) {
+                    isLoading = false;
                     Toast.makeText(ChatDetailActivity.this, error, Toast.LENGTH_SHORT).show();
                 }
             });
@@ -191,8 +248,8 @@ public class ChatDetailActivity extends AppCompatActivity {
         }
     }
 
-    private void fetchCreateMessageFromApi(MessageRequest messageRequest) {
-        chatRepository.sendMessage(messageRequest, new OnActionCallback<MessageResponse>() {
+    private void fetchCreateMessageFromApi(int conversationId,MessageRequest messageRequest) {
+        chatRepository.sendMessage(conversationId, messageRequest, new OnActionCallback<MessageResponse>() {
             @Override
             public void onSuccess(MessageResponse data) {
                 addNewMessage(data);
