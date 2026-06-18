@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import com.example.edushare.common.base.OnActionCallback;
 import com.example.edushare.common.base.RetrofitClient;
+import com.example.edushare.feature.chat.conversation.dto.request.ConversationCreateRequest;
 import com.example.edushare.feature.chat.conversation.model.Conversation;
 import com.example.edushare.feature.chat.message.dto.MessageRequest;
 import com.example.edushare.feature.chat.message.dto.MessageResponse;
@@ -132,6 +133,24 @@ public class ChatRepository {
             @Override
             public void onFailure(Call<PostSummaryResponse> call, Throwable t) {
                 callback.onFailure("Lỗi kết nối: " + t.getMessage());
+            }
+        });
+    }
+
+    public void sendFirstMessage(ConversationCreateRequest conversationCreateRequest, OnActionCallback<MessageResponse> callback) {
+        chatApi.sendFirstMessage(conversationCreateRequest).enqueue(new Callback<MessageResponse>() {
+            @Override
+            public void onResponse(Call<MessageResponse> call, Response<MessageResponse> response) {
+                if (response.isSuccessful()) {
+                    callback.onSuccess(response.body());
+                } else {
+                    callback.onFailure("Lỗi Server: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<MessageResponse> call, Throwable t) {
+                callback.onFailure("Lỗi kết nối mạng: " + t.getMessage());
             }
         });
     }

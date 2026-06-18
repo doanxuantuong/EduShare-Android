@@ -1,6 +1,7 @@
 package com.example.edushare.feature.chat;
 
 
+import com.example.edushare.feature.chat.conversation.dto.request.ConversationCreateRequest;
 import com.example.edushare.feature.chat.conversation.model.Conversation;
 import com.example.edushare.feature.chat.message.dto.MessageRequest;
 import com.example.edushare.feature.chat.message.dto.MessageResponse;
@@ -49,4 +50,7 @@ public interface ChatApi {
 
     @GET("/posts/{postId}/summary")
     Call<PostSummaryResponse> getPostSummary(@Path("postId") int conversationId);
+
+    @POST("/conversations")
+    Call<MessageResponse> sendFirstMessage(@Body ConversationCreateRequest conversationCreateRequest);
 }

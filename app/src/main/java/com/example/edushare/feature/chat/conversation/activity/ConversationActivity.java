@@ -1,10 +1,12 @@
 package com.example.edushare.feature.chat.conversation.activity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -18,6 +20,7 @@ import com.example.edushare.common.base.OnActionCallback;
 import com.example.edushare.feature.chat.ChatRepository;
 import com.example.edushare.feature.chat.conversation.adapter.ConversationAdapter;
 import com.example.edushare.feature.chat.conversation.model.Conversation;
+import com.example.edushare.feature.chat.message.activity.ChatDetailActivity;
 import com.example.edushare.feature.chat.message.dto.MessageResponse;
 import com.example.edushare.feature.chat.message.dto.PageResponse;
 import com.google.gson.Gson;
@@ -227,6 +230,7 @@ public class ConversationActivity extends AppCompatActivity {
             switch (lifecycleEvent.getType()) {
                 case OPENED:
                     Log.d("WebSocket", "Connection opened");
+                    subscribeChatTopic();
                     break;
                 case ERROR:
                     Log.d("WebSocket", "Lỗi kết nối", lifecycleEvent.getException());
@@ -236,7 +240,10 @@ public class ConversationActivity extends AppCompatActivity {
                     break;
             }
         });
+    }
 
+    @SuppressLint("CheckResult")
+    private void subscribeChatTopic() {
         String myTopic = "/topic/messages/" + currentUserId;
         stompClient.topic(myTopic).subscribe(stompMessage -> {
             String jsonPayload = stompMessage.getPayload();
@@ -247,6 +254,8 @@ public class ConversationActivity extends AppCompatActivity {
             runOnUiThread(() -> {
                 updateConversationList(newMessage);
             });
+        }, throwable -> {
+            Log.e("WebSocket", "Subscribe chat topic error", throwable);
         });
     }
 
