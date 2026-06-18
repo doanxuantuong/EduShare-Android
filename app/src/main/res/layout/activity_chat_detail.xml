@@ -43,7 +43,85 @@
             app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- PHẦN 2: Chat Messages - Nội dung của đoạn hội thoại -->
+    <!--  PHẦN 2: Món đồ đang thảo luận  -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layoutProductHeader"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#F5F5F5"
+        android:padding="8dp"
+        android:elevation="2dp"
+        app:layout_constraintTop_toBottomOf="@id/layoutHeader">
+
+        <ImageView
+            android:id="@+id/ivProductThumbnail"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/ic_avatar"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            app:layout_constraintStart_toEndOf="@id/ivProductThumbnail"
+            app:layout_constraintEnd_toStartOf="@id/btnViewProduct"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
+
+            <TextView
+                android:id="@+id/tvProductTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tên đồ án / Tài liệu"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end"
+                android:textSize="14sp"
+                android:textColor="#333333"/>
+
+            <TextView
+                android:id="@+id/tvProductPrice"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="50,000 VNĐ"
+                android:textColor="#E53935"
+                android:textSize="12sp" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/btnViewProduct"
+            style="@style/Widget.MaterialComponents.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="0dp"
+            android:minWidth="0dp"
+            android:padding="4dp"
+            android:text="Xem"
+            android:textSize="12sp"
+            app:layout_constraintEnd_toStartOf="@id/btnCloseProduct"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+
+        <ImageButton
+            android:id="@+id/btnCloseProduct"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_marginStart="4dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_close_clear_cancel"
+            app:tint="#888888"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <!-- PHẦN 3: DANH SÁCH TIN NHẮN -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rvMessages"
         android:layout_width="0dp"
@@ -53,10 +131,10 @@
         app:layout_constraintBottom_toTopOf="@+id/layoutInput"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/layoutHeader"
+        app:layout_constraintTop_toBottomOf="@+id/layoutProductHeader"
         tools:listitem="@layout/item_message_sent" />
 
-    <!-- PHẦN 3: Thanh soạn tin nhắn và gửi tin nhắn-->
+    <!-- PHẦN 4: Thanh soạn tin nhắn và gửi tin nhắn-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layoutInput"
         android:layout_width="match_parent"

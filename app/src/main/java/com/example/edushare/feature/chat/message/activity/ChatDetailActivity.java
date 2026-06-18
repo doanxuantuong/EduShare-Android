@@ -6,19 +6,27 @@ import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.edushare.R;
 import com.example.edushare.common.base.OnActionCallback;
 import com.example.edushare.feature.chat.ChatRepository;
+import com.example.edushare.feature.chat.PostSummaryResponse;
+import com.example.edushare.feature.chat.conversation.dto.request.ConversationCreateRequest;
 import com.example.edushare.feature.chat.message.adapter.MessageAdapter;
 import com.example.edushare.feature.chat.message.dto.MessageRequest;
 import com.example.edushare.feature.chat.message.dto.MessageResponse;
@@ -27,11 +35,14 @@ import com.example.edushare.feature.chat.message.dto.PageResponse;
 import com.example.edushare.feature.chat.message.model.Message;
 import com.google.gson.Gson;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
+import retrofit2.Call;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
 
@@ -45,7 +56,15 @@ public class ChatDetailActivity extends AppCompatActivity {
 //    private ImageView ivPartnerAvatar;
 
     // =======================================
-    // PHẦN 2:  Nội dung của đoạn hội thoại
+    // PHẦN 2:  Tóm tắt thông tin của bài đăng
+    private ConstraintLayout layoutProductHeader; // Sửa tên biến cho giống XML
+    private ImageView imgPost;
+    private TextView tvPostTitle, tvPostPrice;
+    private ImageButton btnCloseProduct; // Thêm khai báo nút X
+    private int postId;
+
+    // =======================================
+    // PHẦN 3:  Nội dung của đoạn hội thoại
     private RecyclerView rvMessages;
     private TextView tvMessage, tvTime;
     private ChatRepository chatRepository;
@@ -68,12 +87,15 @@ public class ChatDetailActivity extends AppCompatActivity {
     private boolean isLastPage = false; // Hết tin cũ rồi thì không gọi API nữa
 
     // =======================================
-    // PHẦN 3: Thanh soạn tin nhắn và gửi tin nhắn
+    // PHẦN 4: Thanh soạn tin nhắn và gửi tin nhắn
     private EditText etMessage;
 
     private ImageButton btnSend;
 
     private StompClient stompClient;
+
+    private Button btnViewProduct;
+
 
     // Hủy kết nối WebSocket khi Activity bị hủy
     // Tránh tốn RAM nếu WebSocket vẫn còn mở
@@ -106,23 +128,68 @@ public class ChatDetailActivity extends AppCompatActivity {
         btnSend.setOnClickListener(l -> {
             String message = etMessage.getText().toString();
             if (!message.isEmpty()) {
-                MessageRequest messageRequest = new MessageRequest();
-                messageRequest.setContent(message);
-                messageRequest.setConversationId(conversationId);
-                messageRequest.setSenderId(senderId);
 
-                fetchCreateMessageFromApi(conversationId, messageRequest);
+                if (conversationId == -1) {
+                    ConversationCreateRequest conversationCreateRequest = new ConversationCreateRequest();
+                    conversationCreateRequest.setSenderId(senderId);
+                    conversationCreateRequest.setRecipientId(recipientId);
+                    conversationCreateRequest.setPostId(postId);
+                    conversationCreateRequest.setContent(message);
+                    fetchSendFirstMessage(conversationCreateRequest);
 
-                etMessage.setText("");
+                    etMessage.setText("");
+                } else {
+                    MessageRequest messageRequest = new MessageRequest();
+                    messageRequest.setContent(message);
+                    messageRequest.setConversationId(conversationId);
+                    messageRequest.setSenderId(senderId);
+
+                    fetchCreateMessageFromApi(conversationId, messageRequest);
+
+                    etMessage.setText("");
+                }
             }
         });
 
         // Call API lấy danh sách đoạn tin nhắn của conversation
         chatRepository = new ChatRepository();
-        fetchMessagesByConversationIdFromApi(currentPage);
+
+        if (postId != -1) {
+            fetchPostSummaryFromApi(postId);
+        }
+
+        // ==========================================
+        // LOGIC XỬ LÝ PHÒNG CHAT ẢO
+        // ==========================================
+        if (conversationId != -1) {
+            // NẾU LÀ PHÒNG THẬT: Lấy tin nhắn cũ
+            fetchMessagesByConversationIdFromApi(currentPage);
+        } else {
+            // NẾU LÀ PHÒNG ẢO (Từ chi tiết sản phẩm qua):
+            // KHÔNG LÀM GÌ CẢ, để danh sách rỗng chờ người dùng nhắn tin đầu tiên.
+        }
+
+        btnViewProduct.setOnClickListener(v -> {
+            Intent intent = new Intent(this, ChatDetailActivity.class);
+
+            // 1. Dữ liệu đánh dấu phòng chat ảo
+            intent.putExtra("CONVERSATION_ID", -1);
+
+            // 2. Dữ liệu giả của người bán (Lấy 1 mail có sẵn trong DB để lát nữa gửi tin nhắn thật được)
+            intent.putExtra("RECIPIENT_ID", "sjdhhdsf-dai@gmail.com");
+            intent.putExtra("SENDER_ID", "fire-base-uid-test-12");
+            intent.putExtra("RECIPIENT_NAME", "Trần Thành Đại");
+
+            // 3. Dữ liệu giả của Sản phẩm (Đồ án)
+            intent.putExtra("POST_ID", 2); // ID ảo
+            intent.putExtra("POST_TITLE", "Source code quản lý KTX (Spring Boot + Android)");
+            intent.putExtra("POST_PRICE", "150,000 VNĐ");
+            intent.putExtra("POST_IMAGE_URL", "https://via.placeholder.com/150");
+
+            startActivity(intent);
+        });
         // Kết nối WebSocket
         connectWebSocket();
-
     }
 
     private void initViews() {
@@ -131,6 +198,19 @@ public class ChatDetailActivity extends AppCompatActivity {
         tvPartnerName = findViewById(R.id.tvPartnerName);
 
         //ivPartnerAvatar = findViewById(R.id.ivPartnerAvatar);
+
+        // PHẦN 3:  Thông tin cơ bản của Post
+        layoutProductHeader = findViewById(R.id.layoutProductHeader);
+        imgPost = findViewById(R.id.ivProductThumbnail);
+        tvPostTitle = findViewById(R.id.tvProductTitle);
+        tvPostPrice = findViewById(R.id.tvProductPrice);
+        btnCloseProduct = findViewById(R.id.btnCloseProduct); // Ánh xạ nút X
+        btnViewProduct = findViewById(R.id.btnViewProduct);
+
+        // Xử lý nút "Dấu X"
+        btnCloseProduct.setOnClickListener(v -> {
+            layoutProductHeader.setVisibility(View.GONE);
+        });
 
         // PHẦN 2:  Nội dung của đoạn hội thoại
         rvMessages = findViewById(R.id.rvMessages);
@@ -150,6 +230,26 @@ public class ChatDetailActivity extends AppCompatActivity {
             recipientId = intent.getStringExtra("RECIPIENT_ID");
             recipientName = intent.getStringExtra("RECIPIENT_NAME");
             recipientAvatarUrl = intent.getStringExtra("RECIPIENT_AVATAR");
+            postId = intent.getIntExtra("POST_ID", -1);
+
+            if (postId != -1) {
+                // TRƯỜNG HỢP: ĐI TỪ SẢN PHẨM VÀO -> Hiện Header và set dữ liệu
+                layoutProductHeader.setVisibility(View.VISIBLE);
+
+                String title = getIntent().getStringExtra("POST_TITLE");
+                String price = getIntent().getStringExtra("POST_PRICE");
+                String imageUrl = getIntent().getStringExtra("POST_IMAGE_URL");
+
+                tvPostTitle.setText(title);
+                tvPostPrice.setText(price);
+
+                // Load ảnh bằng Glide (Nhớ import thư viện)
+                Glide.with(this).load(imageUrl).into(imgPost);
+
+            } else {
+                // TRƯỜNG HỢP: ĐI TỪ DANH SÁCH CHAT BÌNH THƯỜNG -> Giấu Header đi
+                layoutProductHeader.setVisibility(View.GONE);
+            }
 
             if (recipientName != null) {
                 tvPartnerName.setText(recipientName);
@@ -248,7 +348,7 @@ public class ChatDetailActivity extends AppCompatActivity {
         }
     }
 
-    private void fetchCreateMessageFromApi(int conversationId,MessageRequest messageRequest) {
+    private void fetchCreateMessageFromApi(int conversationId, MessageRequest messageRequest) {
         chatRepository.sendMessage(conversationId, messageRequest, new OnActionCallback<MessageResponse>() {
             @Override
             public void onSuccess(MessageResponse data) {
@@ -258,6 +358,36 @@ public class ChatDetailActivity extends AppCompatActivity {
             @Override
             public void onFailure(String error) {
                 Toast.makeText(ChatDetailActivity.this, error, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void fetchPostSummaryFromApi(int postId) {
+        chatRepository.getPostSummary(postId, new OnActionCallback<PostSummaryResponse>() {
+
+            @Override
+            public void onSuccess(PostSummaryResponse data) {
+
+                tvPostTitle.setText(data.getTitle());
+
+                if (data.getPrice() != null) {
+                    NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
+                    tvPostPrice.setText(formatter.format(data.getPrice()) + "đ");
+                } else {
+                    tvPostPrice.setText("Liên hệ");
+                }
+
+                Glide.with(ChatDetailActivity.this)
+                        .load(data.getImageUrl())
+                        .placeholder(android.R.drawable.ic_menu_report_image)
+                        .error(android.R.drawable.ic_menu_report_image)
+                        .centerCrop()
+                        .into(imgPost);
+            }
+
+            @Override
+            public void onFailure(String error) {
+
             }
         });
     }
@@ -276,20 +406,44 @@ public class ChatDetailActivity extends AppCompatActivity {
         });
     }
 
+    private void fetchSendFirstMessage(ConversationCreateRequest conversationCreateRequest) {
+        // Gọi API đặc biệt (Bạn nhớ thêm hàm sendFirstMessage bên ChatRepository nhé)
+        chatRepository.sendFirstMessage(conversationCreateRequest, new OnActionCallback<MessageResponse>() {
+            @Override
+            public void onSuccess(MessageResponse data) {
+                // Cập nhật lại ID phòng thật từ Server trả về
+                conversationId = data.getConversationId();
+                addNewMessage(data);
+            }
+
+            @Override
+            public void onFailure(String error) {
+                Toast.makeText(ChatDetailActivity.this, "Lỗi tạo phòng: " + error, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     // Khi có 1 tin nhắn mới được thêm vào list
     public void addNewMessage(MessageResponse newMessage) {
+        //1. KIỂM TRA TRÙNG LẶP: Quét xem tin nhắn này đã tồn tại trên giao diện chưa
+        for (MessageResponse msg : messageList) {
+            if (msg.getId() == newMessage.getId()) {
+                return; // Đã có rồi thì thoát ngay, không add thêm nữa!
+            }
+        }
+
         int oldSize = messageList.size();
         messageList.add(newMessage);
 
         if (oldSize > 0) {
-            // 1. Cập nhật lại tin nhắn ngay trước đó (để nó ẩn thời gian/avatar đi vì không còn là tin cuối)
+            // 2. Cập nhật lại tin nhắn ngay trước đó (để nó ẩn thời gian/avatar đi vì không còn là tin cuối)
             messageAdapter.notifyItemChanged(oldSize - 1);
         }
 
-        // 2. Thông báo thêm tin nhắn mới
+        // 3. Thông báo thêm tin nhắn mới
         messageAdapter.notifyItemInserted(oldSize);
 
-        // 3. Cuộn xuống cuối cùng
+        // 4. Cuộn xuống cuối cùng
         rvMessages.scrollToPosition(oldSize);
     }
 

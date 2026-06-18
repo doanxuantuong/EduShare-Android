@@ -7,6 +7,7 @@ import java.io.Serializable;
 public class Conversation implements Serializable {
     @SerializedName("conversationId")
     private Integer id;
+    private Integer postId;
     private String recipientId;
     private String recipientName;
     private String recipientAvatarUrl;
@@ -16,6 +17,14 @@ public class Conversation implements Serializable {
     private Long unreadCount;
 
     public Conversation() {
+    }
+
+    public Integer getPostId() {
+        return postId;
+    }
+
+    public void setPostId(Integer postId) {
+        this.postId = postId;
     }
 
     public Integer getId() {
