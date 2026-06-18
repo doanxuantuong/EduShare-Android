@@ -46,4 +46,7 @@ public interface ChatApi {
 
     @PUT("/conversations/{conversationId}/messages/read")
     Call<Integer> markMessageAsRead(@Path("conversationId") int conversationId, @Query("userId") String userId, @Query("recipientId") String recipientId);
+
+    @GET("/posts/{postId}/summary")
+    Call<PostSummaryResponse> getPostSummary(@Path("postId") int conversationId);
 }

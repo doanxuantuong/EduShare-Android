@@ -117,4 +117,22 @@ public class ChatRepository {
             }
         });
     }
+
+    public void getPostSummary(int postId, OnActionCallback<PostSummaryResponse> callback) {
+        chatApi.getPostSummary(postId).enqueue(new Callback<PostSummaryResponse>() {
+            @Override
+            public void onResponse(Call<PostSummaryResponse> call, Response<PostSummaryResponse> response) {
+                if (response.isSuccessful()) {
+                    callback.onSuccess(response.body());
+                } else {
+                    callback.onFailure("Lỗi Server: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<PostSummaryResponse> call, Throwable t) {
+                callback.onFailure("Lỗi kết nối: " + t.getMessage());
+            }
+        });
+    }
 }

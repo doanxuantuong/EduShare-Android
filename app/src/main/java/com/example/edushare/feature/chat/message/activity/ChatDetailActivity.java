@@ -8,17 +8,22 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.edushare.R;
 import com.example.edushare.common.base.OnActionCallback;
 import com.example.edushare.feature.chat.ChatRepository;
+import com.example.edushare.feature.chat.PostSummaryResponse;
 import com.example.edushare.feature.chat.message.adapter.MessageAdapter;
 import com.example.edushare.feature.chat.message.dto.MessageRequest;
 import com.example.edushare.feature.chat.message.dto.MessageResponse;
@@ -27,11 +32,14 @@ import com.example.edushare.feature.chat.message.dto.PageResponse;
 import com.example.edushare.feature.chat.message.model.Message;
 import com.google.gson.Gson;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
+import retrofit2.Call;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
 
@@ -45,7 +53,14 @@ public class ChatDetailActivity extends AppCompatActivity {
 //    private ImageView ivPartnerAvatar;
 
     // =======================================
-    // PHẦN 2:  Nội dung của đoạn hội thoại
+    // PHẦN 2:  Tóm tắt thông tin của bài đăng
+    private ConstraintLayout layoutPostSummary;
+    private ImageView imgPost;
+    private TextView tvPostTitle, tvPostPrice;
+    private int postId;
+
+    // =======================================
+    // PHẦN 3:  Nội dung của đoạn hội thoại
     private RecyclerView rvMessages;
     private TextView tvMessage, tvTime;
     private ChatRepository chatRepository;
@@ -68,7 +83,7 @@ public class ChatDetailActivity extends AppCompatActivity {
     private boolean isLastPage = false; // Hết tin cũ rồi thì không gọi API nữa
 
     // =======================================
-    // PHẦN 3: Thanh soạn tin nhắn và gửi tin nhắn
+    // PHẦN 4: Thanh soạn tin nhắn và gửi tin nhắn
     private EditText etMessage;
 
     private ImageButton btnSend;
@@ -120,6 +135,9 @@ public class ChatDetailActivity extends AppCompatActivity {
         // Call API lấy danh sách đoạn tin nhắn của conversation
         chatRepository = new ChatRepository();
         fetchMessagesByConversationIdFromApi(currentPage);
+        if (postId != -1) {
+            fetchPostSummaryFromApi(postId);
+        }
         // Kết nối WebSocket
         connectWebSocket();
 
@@ -131,6 +149,12 @@ public class ChatDetailActivity extends AppCompatActivity {
         tvPartnerName = findViewById(R.id.tvPartnerName);
 
         //ivPartnerAvatar = findViewById(R.id.ivPartnerAvatar);
+
+        // PHẦN 3:  Thông tin cơ bản của Post
+        layoutPostSummary = findViewById(R.id.layoutProductHeader);
+        imgPost = findViewById(R.id.ivProductThumbnail);
+        tvPostTitle = findViewById(R.id.tvProductTitle);
+        tvPostPrice = findViewById(R.id.tvProductPrice);
 
         // PHẦN 2:  Nội dung của đoạn hội thoại
         rvMessages = findViewById(R.id.rvMessages);
@@ -150,6 +174,7 @@ public class ChatDetailActivity extends AppCompatActivity {
             recipientId = intent.getStringExtra("RECIPIENT_ID");
             recipientName = intent.getStringExtra("RECIPIENT_NAME");
             recipientAvatarUrl = intent.getStringExtra("RECIPIENT_AVATAR");
+            postId = intent.getIntExtra("POST_ID", -1);
 
             if (recipientName != null) {
                 tvPartnerName.setText(recipientName);
@@ -258,6 +283,36 @@ public class ChatDetailActivity extends AppCompatActivity {
             @Override
             public void onFailure(String error) {
                 Toast.makeText(ChatDetailActivity.this, error, Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void fetchPostSummaryFromApi(int postId) {
+        chatRepository.getPostSummary(postId, new OnActionCallback<PostSummaryResponse>() {
+
+            @Override
+            public void onSuccess(PostSummaryResponse data) {
+
+                tvPostTitle.setText(data.getTitle());
+
+                if (data.getPrice() != null) {
+                    NumberFormat formatter = NumberFormat.getInstance(new Locale("vi", "VN"));
+                    tvPostPrice.setText(formatter.format(data.getPrice()) + "đ");
+                } else {
+                    tvPostPrice.setText("Liên hệ");
+                }
+
+                Glide.with(ChatDetailActivity.this)
+                        .load(data.getImageUrl())
+                        .placeholder(android.R.drawable.ic_menu_report_image)
+                        .error(android.R.drawable.ic_menu_report_image)
+                        .centerCrop()
+                        .into(imgPost);
+            }
+
+            @Override
+            public void onFailure(String error) {
+
             }
         });
     }
