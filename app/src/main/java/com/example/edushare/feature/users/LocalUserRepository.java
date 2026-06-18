@@ -7,6 +7,7 @@ import androidx.room.RoomDatabase;
 
 import com.example.edushare.common.base.OnActionCallback;
 import com.example.edushare.common.roomdatabase.AppDatabase;
+import com.example.edushare.feature.auth.request.RegisterRequest;
 import com.example.edushare.feature.users.entity.UserEntity;
 
 public class LocalUserRepository {
@@ -17,7 +18,7 @@ public class LocalUserRepository {
         db = Room.databaseBuilder(context, AppDatabase.class, "edushare_db").allowMainThreadQueries().build();
     }
 
-    public void register(User user, String password, OnActionCallback callback) {
+    public void register(RegisterRequest user, String password, OnActionCallback callback) {
         UserEntity existingUser = db.userDao().findByEmail(user.getEmail());
 
         // check email tồn tại

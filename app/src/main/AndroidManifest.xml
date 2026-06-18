@@ -23,7 +23,7 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".feature.home.activity.HomeActivity"
+            android:name=".feature.auth.activity.RegisterActivity"
             android:exported="true"
             android:theme="@style/Theme.EduShare.Home">
             <intent-filter>
@@ -35,7 +35,7 @@
         <activity
             android:name=".feature.chat.message.activity.ChatDetailActivity"
             android:exported="false" />
-        <activity android:name=".feature.users.activity.RegisterActivity" />
+        <activity android:name=".feature.home.activity.HomeActivity" />
 <!--        <activity android:name=".feature.chat.activity.ConversationActivity" />-->
         <activity android:name=".feature.users.activity.ProfileActivity" />
         <activity android:name=".feature.chat.conversation.activity.ConversationActivity" />
