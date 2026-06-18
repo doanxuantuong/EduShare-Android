@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -15,6 +16,7 @@ import com.example.edushare.feature.chat.ChatRepository;
 import com.example.edushare.feature.chat.conversation.adapter.ConversationAdapter;
 import com.example.edushare.feature.chat.conversation.model.Conversation;
 import com.example.edushare.feature.chat.message.dto.MessageResponse;
+import com.example.edushare.feature.chat.message.dto.PageResponse;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -40,6 +42,11 @@ public class ConversationActivity extends AppCompatActivity {
     private List<Conversation> conversationList;
     private ChatRepository chatRepository;
     private String currentUserId = "fire-base-uid-test-12";
+    private int currentPage = 0;
+    private final int PAGE_SIZE = 10;
+    private boolean isLoading = false; // Đang call API thì không cho call đè
+    private boolean isLastPage = false; // Hết tin cũ rồi thì không gọi API nữa
+    private boolean isFirstOpen = true;
 
     private StompClient stompClient;
 
@@ -57,7 +64,7 @@ public class ConversationActivity extends AppCompatActivity {
         chatRepository = new ChatRepository();
 
         // Gọi API lấy dữ liệu thực
-        fetchConversationsFromApi(currentUserId);
+        fetchConversationsFromApi(currentPage);
 
         connectWebSocket();
     }
@@ -66,9 +73,16 @@ public class ConversationActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         // Mỗi khi màn hình này hiện lên (kể cả lúc từ phòng chat quay ra),
-        // bắt buộc phải gọi lại API để lấy danh sách lastMessage mới nhất.
+        // gọi lại API để lấy danh sách lastMessage mới nhất.
         if (currentUserId != null) {
-            fetchConversationsFromApi(currentUserId);
+            // Nếu là lần đầu tiên mở Activity (onCreate đã gọi API rồi)
+            if (isFirstOpen) {
+                isFirstOpen = false; // Đánh dấu lần sau quay lại không phải lần đầu nữa
+            } else {
+                currentPage = 0;
+                isLastPage = false;
+                fetchConversationsFromApi(currentPage);
+            }
         }
     }
 
@@ -84,23 +98,70 @@ public class ConversationActivity extends AppCompatActivity {
         rvChatList.setLayoutManager(new LinearLayoutManager(this));
         //Gắn Adapter vào RecyclerView để hiển thị danh sách
         rvChatList.setAdapter(adapter);
+
+        rvChatList.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (dy > 0) {
+                    LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+                    if (layoutManager != null) {
+                        int lastVisibleItem = layoutManager.findLastVisibleItemPosition();
+                        int totalItemCount = conversationList.size();
+
+                        // nếu item cuối đã chạm đáy
+                        if (lastVisibleItem == conversationList.size() - 1) {
+                            if (!isLoading && !isLastPage) {
+                                currentPage++;
+                                fetchConversationsFromApi(currentPage);
+                            }
+                        }
+                    }
+                }
+
+            }
+
+        });
     }
 
-    private void fetchConversationsFromApi(String currentUserId) {
-        chatRepository.getConversations(currentUserId, new OnActionCallback<List<Conversation>>() {
+    private void fetchConversationsFromApi(int page) {
+        isLoading = true;
+        chatRepository.getConversations(currentUserId, page, PAGE_SIZE, new OnActionCallback<PageResponse<Conversation>>() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
-            public void onSuccess(List<Conversation> data) {
-                // Xóa danh sách cũ và thêm dữ liệu mới từ API
-                conversationList.clear();
-                conversationList.addAll(data);
+            public void onSuccess(PageResponse<Conversation> data) {
 
-                // Thông báo cho adapter cập nhật giao diện
-                adapter.notifyDataSetChanged();
+                // Kiểm tra xem có đang load dở không, và đã hết trang chưa
+                isLoading = false;
+                isLastPage = data.isLast();
+                List<Conversation> newConversations = data.getContent();
+                int sizeReceived = (newConversations != null) ? newConversations.size() : 0;
+
+                if (newConversations != null && !newConversations.isEmpty()) {
+                    if (page == 0) {
+                        // Xóa danh sách cũ và thêm dữ liệu mới từ API
+                        conversationList.clear();
+                        conversationList.addAll(newConversations);
+
+                        // Thông báo cho adapter cập nhật giao diện
+                        adapter.notifyDataSetChanged();
+                    } else {
+                        // TÌM VỊ TRÍ CUỐI CÙNG ĐỂ CHÈN
+                        int insertIndex = conversationList.size();
+
+                        // THÊM VÀO CUỐI DANH SÁCH
+                        conversationList.addAll(newConversations);
+
+                        // VẼ TỪ VỊ TRÍ CUỐI ĐÓ
+                        adapter.notifyItemRangeInserted(insertIndex, newConversations.size());
+                    }
+                }
             }
 
             @Override
             public void onFailure(String error) {
-                // Hiển thị thông báo lỗi bằng Toast
+                isLoading = false;
                 Toast.makeText(ConversationActivity.this, error, Toast.LENGTH_SHORT).show();
             }
         });
@@ -129,7 +190,7 @@ public class ConversationActivity extends AppCompatActivity {
                 conversationList.add(0, conversation);
                 adapter.notifyItemMoved(existingIndex, 0);
                 adapter.notifyItemChanged(0);
-            }else {
+            } else {
                 // Đã ở sẵn trên đầu rồi thì chỉ cần vẽ lại vị trí 0
                 adapter.notifyItemChanged(0);
             }
@@ -138,7 +199,9 @@ public class ConversationActivity extends AppCompatActivity {
             rvChatList.smoothScrollToPosition(0);
 
         } else {
-            fetchConversationsFromApi(currentUserId);
+            currentPage = 0;
+            isLastPage = false;
+            fetchConversationsFromApi(currentPage);
         }
     }
 

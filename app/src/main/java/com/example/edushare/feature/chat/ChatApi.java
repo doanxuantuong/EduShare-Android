@@ -28,7 +28,11 @@ public interface ChatApi {
 
     // @Query("userId"): Tham số truyền trên URL (?userId=...).
     // Tương đương với request.getParameter("userId") trong Servlet hoặc @RequestParam trong Spring.
-    Call<List<Conversation>> getConversations(@Query("userId") String userId);
+    Call<PageResponse<Conversation>> getConversations(
+            @Query("userId") String userId,
+            @Query("page") int page,
+            @Query("size") int size
+    );
 
     @GET("/conversations/{conversationId}/messages")
     Call<PageResponse<MessageResponse>> getMessages(
