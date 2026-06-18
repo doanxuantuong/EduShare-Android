@@ -1,0 +1,76 @@
+package com.example.edushare.feature.auth.activity;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.edushare.R;
+import com.example.edushare.common.base.OnActionCallback;
+import com.example.edushare.feature.auth.request.LoginRequest;
+import com.example.edushare.feature.auth.response.LoginResponse;
+import com.example.edushare.feature.home.activity.HomeActivity;
+import com.example.edushare.feature.users.UserRepository;
+
+public class LoginActivity extends AppCompatActivity {
+
+    private EditText edtEmail, edtPassword;
+    private Button btnVerify;
+    private UserRepository userRepository;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
+
+        edtEmail = findViewById(R.id.edt_email);
+        edtPassword = findViewById(R.id.edt_password);
+        btnVerify = findViewById(R.id.btn_verify);
+
+        userRepository = new UserRepository();
+
+        btnVerify.setOnClickListener(v -> {
+            String email = edtEmail.getText().toString().trim();
+            String password = edtPassword.getText().toString().trim();
+
+            if (email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(LoginActivity.this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            LoginRequest request = new LoginRequest();
+            request.setEmail(email);
+            request.setPassword(password);
+
+            userRepository.login(request, new OnActionCallback<LoginResponse>() {
+                @Override
+                public void onSuccess(LoginResponse response) {
+                    Toast.makeText(LoginActivity.this, response.getMessage(), Toast.LENGTH_SHORT).show();
+                    if (response.isSuccess()) {
+                        // Lưu token
+                        getSharedPreferences("auth", MODE_PRIVATE)
+                                .edit()
+                                .putString("token", response.getToken())
+                                .apply();
+
+                        // Chuyển sang HomeActivity
+                        Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
+                        startActivity(intent);
+                        finish(); // đóng LoginActivity để không quay lại khi bấm back
+                    }
+                }
+
+                @Override
+                public void onFailure(String error) {
+                    Toast.makeText(LoginActivity.this, error, Toast.LENGTH_LONG).show();
+                }
+            });
+        });
+    }
+}
+
+
+
