@@ -2,11 +2,19 @@ package com.example.edushare.feature.chat;
 
 
 import com.example.edushare.feature.chat.conversation.model.Conversation;
+import com.example.edushare.feature.chat.message.dto.MessageRequest;
+import com.example.edushare.feature.chat.message.dto.MessageResponse;
+import com.example.edushare.feature.chat.message.dto.PageResponse;
 import com.example.edushare.feature.chat.message.model.Message;
 
 import java.util.List;
+
 import retrofit2.Call;
+import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.PUT;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface ChatApi {
@@ -22,6 +30,16 @@ public interface ChatApi {
     // Tương đương với request.getParameter("userId") trong Servlet hoặc @RequestParam trong Spring.
     Call<List<Conversation>> getConversations(@Query("userId") String userId);
 
-    @GET("/conversations/messages")
-    Call<List<Message>> getMessages(@Query("conversationId") int conversationId);
+    @GET("/conversations/{conversationId}/messages")
+    Call<PageResponse<MessageResponse>> getMessages(
+            @Path("conversationId") int conversationId,
+            @Query("page") int page,
+            @Query("size") int size
+    );
+
+    @POST("/conversations/{conversationId}/messages")
+    Call<MessageResponse> sendMessage(@Path("conversationId") int conversationId, @Body MessageRequest messageRequest);
+
+    @PUT("/conversations/{conversationId}/messages/read")
+    Call<Integer> markMessageAsRead(@Path("conversationId") int conversationId, @Query("userId") String userId, @Query("recipientId") String recipientId);
 }

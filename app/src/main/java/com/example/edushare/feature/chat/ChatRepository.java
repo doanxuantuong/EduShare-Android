@@ -5,6 +5,9 @@ import androidx.annotation.NonNull;
 import com.example.edushare.common.base.OnActionCallback;
 import com.example.edushare.common.base.RetrofitClient;
 import com.example.edushare.feature.chat.conversation.model.Conversation;
+import com.example.edushare.feature.chat.message.dto.MessageRequest;
+import com.example.edushare.feature.chat.message.dto.MessageResponse;
+import com.example.edushare.feature.chat.message.dto.PageResponse;
 import com.example.edushare.feature.chat.message.model.Message;
 
 import java.util.List;
@@ -51,11 +54,11 @@ public class ChatRepository {
         });
     }
 
-    public void getMessages(int conversationId, OnActionCallback<List<Message>> callback) {
+    public void getMessages(int conversationId, int page, int size ,OnActionCallback<PageResponse<MessageResponse>> callback) {
         try {
-            chatApi.getMessages(conversationId).enqueue(new Callback<List<Message>>() {
+            chatApi.getMessages(conversationId, page, size).enqueue(new Callback<PageResponse<MessageResponse>>() {
                 @Override
-                public void onResponse(@NonNull Call<List<Message>> call, @NonNull Response<List<Message>> response) {
+                public void onResponse(@NonNull Call<PageResponse<MessageResponse>> call, @NonNull Response<PageResponse<MessageResponse>> response) {
                     if (response.isSuccessful() && response.body() != null) {
                         callback.onSuccess(response.body());
                     } else {
@@ -64,7 +67,7 @@ public class ChatRepository {
                 }
 
                 @Override
-                public void onFailure(@NonNull Call<List<Message>> call,@NonNull Throwable t) {
+                public void onFailure(@NonNull Call<PageResponse<MessageResponse>> call, @NonNull Throwable t) {
                     callback.onFailure("Lỗi kết nối: " + t.getMessage());
                 }
             });
@@ -72,5 +75,46 @@ public class ChatRepository {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    public void sendMessage(int conversationId, MessageRequest messageRequest, OnActionCallback<MessageResponse> callback) {
+        try {
+            chatApi.sendMessage(conversationId, messageRequest).enqueue(new Callback<MessageResponse>() {
+                @Override
+                public void onResponse(@NonNull Call<MessageResponse> call, @NonNull Response<MessageResponse> response) {
+                    if (response.isSuccessful() && response.body() != null) {
+                        callback.onSuccess(response.body());
+                    } else {
+                        callback.onFailure("Lỗi Server: " + response.code());
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<MessageResponse> call, @NonNull Throwable t) {
+                    callback.onFailure("Lỗi kết nối: " + t.getMessage());
+                }
+            });
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void markMessageAsRead(int conversationId, String userId, String recipientId, OnActionCallback<Integer> callback) {
+        chatApi.markMessageAsRead(conversationId, userId, recipientId).enqueue(new Callback<Integer>() {
+            @Override
+            public void onResponse(Call<Integer> call, Response<Integer> response) {
+                if (response.isSuccessful()) {
+                    callback.onSuccess(response.body());
+                } else {
+                    callback.onFailure("Lỗi Server: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Integer> call, Throwable t) {
+                callback.onFailure("Lỗi kết nối: " + t.getMessage());
+            }
+        });
     }
 }
