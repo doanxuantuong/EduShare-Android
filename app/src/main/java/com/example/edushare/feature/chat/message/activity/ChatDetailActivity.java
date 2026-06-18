@@ -284,7 +284,6 @@ public class ChatDetailActivity extends AppCompatActivity {
 
         // 3. Đăng ký nhận tin nhắn từ kênh của riêng mình (Dùng ID đăng nhập của user hiện tại)
         String myTopic = "/topic/messages/" + senderId;
-
         receiveNewMessage(myTopic);
 
         String destinationStatus = "/topic/receipts/" + senderId;

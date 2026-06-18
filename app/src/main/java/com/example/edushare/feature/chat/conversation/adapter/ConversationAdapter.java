@@ -66,6 +66,10 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
             holder.tvBadge.setVisibility(View.GONE);
         }
 
+        if (conversation.getUnreadCount() > 99) {
+            holder.tvBadge.setText("99+");
+        }
+
         // Glide for image loading
         // Glide.with(...) giống như một thẻ <img> của HTML nhưng xịn hơn.
         Glide.with(holder.itemView.getContext())
