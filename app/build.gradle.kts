@@ -1,5 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
+    id("com.google.gms.google-services")
+
 }
 
 android {
@@ -60,4 +62,8 @@ dependencies {
     // RxJava để xử lý các luồng dữ liệu bất đồng bộ của Socket
     implementation("io.reactivex.rxjava2:rxjava:2.2.21")
     implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
+
+    // Firebase
+    implementation(platform("com.google.firebase:firebase-bom:34.15.0"))
+    implementation("com.google.firebase:firebase-messaging")
 }

@@ -1,7 +1,12 @@
 package com.example.edushare.feature.chat.conversation.activity;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.View;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -15,9 +20,9 @@ import com.example.edushare.common.helper.BottomNavigationHelper;
 import com.example.edushare.feature.chat.ChatRepository;
 import com.example.edushare.feature.chat.conversation.adapter.ConversationAdapter;
 import com.example.edushare.feature.chat.conversation.model.Conversation;
-import com.example.edushare.feature.chat.message.activity.ChatDetailActivity;
 import com.example.edushare.feature.chat.message.dto.MessageResponse;
 import com.example.edushare.feature.chat.message.dto.PageResponse;
+import com.example.edushare.feature.notification.firebase.manager.FcmTokenManager;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
@@ -50,10 +55,9 @@ public class ConversationActivity extends AppCompatActivity {
     private boolean isLoading = false; // Đang call API thì không cho call đè
     private boolean isLastPage = false; // Hết tin cũ rồi thì không gọi API nữa
     private boolean isFirstOpen = true;
-
     private StompClient stompClient;
-
     private EditText edtSearchChat;
+    private FcmTokenManager fcmTokenManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +78,9 @@ public class ConversationActivity extends AppCompatActivity {
         connectWebSocket();
 
         setupSearch();
+
+        fcmTokenManager = new FcmTokenManager(this);
+        fcmTokenManager.getAndSaveFcmToken(currentUserId);
     }
 
     @Override
