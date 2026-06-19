@@ -2,6 +2,7 @@ package com.example.edushare.feature.chat.conversation.activity;
 
 import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.view.View;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.edushare.R;
 import com.example.edushare.common.base.OnActionCallback;
+import com.example.edushare.common.helper.BottomNavigationHelper;
 import com.example.edushare.feature.chat.ChatRepository;
 import com.example.edushare.feature.chat.conversation.adapter.ConversationAdapter;
 import com.example.edushare.feature.chat.conversation.model.Conversation;
@@ -30,22 +32,23 @@ import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
 
 /*
- * Tưởng tượng bạn (file Activity) là một vị Giám đốc.
- * - RecyclerView là anh Quản đốc xưởng trực tiếp điều hành công việc.
- * - File Adapter chính là một "Cuốn sổ tay quy trình" mà bạn viết ra để hướng dẫn Quản đốc làm việc.
- * Trong cuốn sổ này có 2 trang quan trọng:
- *   + Trang 1: Cách tạo ra cái hộp (onCreateViewHolder).
- *   + Trang 2: Cách nhét dữ liệu vào hộp (onBindViewHolder).
- * - Khi bạn viết dòng code này trong Activity: rvChatList.setAdapter(adapter);
- *   + Ném cuốn sổ tay (adapter) cho anh Quản đốc (rvChatList)
- *   + Và bảo: "Làm việc đi, quy trình tôi ghi hết trong sổ rồi đấy!"
- * */
+* Tưởng tượng bạn (file Activity) là một vị Giám đốc.
+* - RecyclerView là anh Quản đốc xưởng trực tiếp điều hành công việc.
+* - File Adapter chính là một "Cuốn sổ tay quy trình" mà bạn viết ra để hướng dẫn Quản đốc làm việc.
+* Trong cuốn sổ này có 2 trang quan trọng:
+*   + Trang 1: Cách tạo ra cái hộp (onCreateViewHolder).
+*   + Trang 2: Cách nhét dữ liệu vào hộp (onBindViewHolder).
+* - Khi bạn viết dòng code này trong Activity: rvChatList.setAdapter(adapter);
+*   + Ném cuốn sổ tay (adapter) cho anh Quản đốc (rvChatList)
+*   + Và bảo: "Làm việc đi, quy trình tôi ghi hết trong sổ rồi đấy!"
+* */
 public class ConversationActivity extends AppCompatActivity {
     private RecyclerView rvChatList;
     private ConversationAdapter adapter;
     private List<Conversation> conversationList;
     private List<Conversation> originalConversationList;
     private ChatRepository chatRepository;
+    private View footerLayout;
     private String currentUserId = "fire-base-uid-test-12";
     private int currentPage = 0;
     private final int PAGE_SIZE = 8;
@@ -100,6 +103,12 @@ public class ConversationActivity extends AppCompatActivity {
     private void initViews() {
         rvChatList = findViewById(R.id.rvChatList);
         edtSearchChat = findViewById(R.id.etSearch);
+
+        // 2. Ánh xạ thẻ <include> trong file xml (ID là footer_layout)
+        footerLayout = findViewById(R.id.footer_layout);
+
+        // 3. Kích hoạt bộ Helper: Truyền id của tab Chat (R.id.nav_chat) để nó biết đường làm sáng đèn icon Chat
+        BottomNavigationHelper.setup(this, footerLayout, R.id.nav_chat);
     }
 
     private void setupRecyclerView() {
