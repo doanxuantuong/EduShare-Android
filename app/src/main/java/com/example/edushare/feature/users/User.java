@@ -3,11 +3,10 @@ package com.example.edushare.feature.users;
 import com.google.gson.annotations.SerializedName;
 
 public class User {
-    private String id; // Firebase UID
-    @SerializedName("full_name")
+    private String id;
     private String fullName;
     private String email;
-    @SerializedName("student_code")
+
     private String studentCode;
     private String avatarUrl;
 

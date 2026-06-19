@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.edushare.R;
+import com.example.edushare.common.utils.DateTimeUtils;
 import com.example.edushare.feature.chat.conversation.model.Conversation;
 import com.example.edushare.feature.chat.message.activity.ChatDetailActivity;
 
@@ -52,15 +53,28 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Conversation conversation = conversationList.get(position);
 
-        holder.tvName.setText(conversation.getPartnerName());
+        holder.tvName.setText(conversation.getRecipientName());
         holder.tvLastMessage.setText(conversation.getLastMessage());
-        holder.tvTime.setText(conversation.getUpdatedAt());
+        holder.tvTime.setText(DateTimeUtils.getRelativeTime(conversation.getUpdatedAt()));
+
+        Long unreadCount = conversation.getUnreadCount();
+
+        if (unreadCount != null && unreadCount > 0) {
+            holder.tvBadge.setVisibility(View.VISIBLE);
+            holder.tvBadge.setText(String.valueOf(unreadCount));
+        } else {
+            holder.tvBadge.setVisibility(View.GONE);
+        }
+
+        if (conversation.getUnreadCount() > 99) {
+            holder.tvBadge.setText("99+");
+        }
 
         // Glide for image loading
         // Glide.with(...) giống như một thẻ <img> của HTML nhưng xịn hơn.
         Glide.with(holder.itemView.getContext())
                 //Đưa nó một URL (đường dẫn ảnh),
-                .load(conversation.getPartnerAvatarUrl())
+                .load(conversation.getRecipientAvatarUrl())
                 //Ảnh mặc định
                 .placeholder(android.R.drawable.ic_menu_report_image) // Default avatar placeholder
                 //Nó tự tải ảnh từ mạng về, tự bóp méo thành hình tròn (circleCrop())
@@ -80,22 +94,16 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
                 Intent intent = new Intent(v.getContext(), ChatDetailActivity.class);
 
                 intent.putExtra("CONVERSATION_ID", currentConversation.getId());
-                intent.putExtra("RECEIVER_NAME", currentConversation.getPartnerName());
-                intent.putExtra("RECEIVER_ID", currentConversation.getPartnerId());
-                intent.putExtra("RECEIVER_AVATAR", currentConversation.getPartnerAvatarUrl());
+                intent.putExtra("RECIPIENT_NAME", currentConversation.getRecipientName());
+                intent.putExtra("RECIPIENT_ID", currentConversation.getRecipientId());
+                intent.putExtra("RECIPIENT_AVATAR", currentConversation.getRecipientAvatarUrl());
+                intent.putExtra("SENDER_ID", "fire-base-uid-test-12");
+                intent.putExtra("POST_ID", currentConversation.getPostId());
 
                 // Khởi hành chuyển sang màn hình ChatDetailActivity
                 v.getContext().startActivity(intent);
             }
         });
-
-        // Optional: Badge logic (showing it for some items as requested)
-        if (position % 2 == 0) {
-            holder.tvBadge.setVisibility(View.VISIBLE);
-            holder.tvBadge.setText(String.valueOf(position + 1));
-        } else {
-            holder.tvBadge.setVisibility(View.GONE);
-        }
     }
 
     @Override

@@ -53,4 +53,11 @@ dependencies {
     // Glide for image loading
     implementation("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+
+    // Thư viện STOMP cho Android
+    implementation("com.github.NaikSoftware:StompProtocolAndroid:1.6.6")
+
+    // RxJava để xử lý các luồng dữ liệu bất đồng bộ của Socket
+    implementation("io.reactivex.rxjava2:rxjava:2.2.21")
+    implementation("io.reactivex.rxjava2:rxandroid:2.1.1")
 }
