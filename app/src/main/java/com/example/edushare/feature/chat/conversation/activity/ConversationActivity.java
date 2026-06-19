@@ -1,12 +1,10 @@
 package com.example.edushare.feature.chat.conversation.activity;
 
 import android.annotation.SuppressLint;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -20,11 +18,9 @@ import com.example.edushare.common.base.OnActionCallback;
 import com.example.edushare.feature.chat.ChatRepository;
 import com.example.edushare.feature.chat.conversation.adapter.ConversationAdapter;
 import com.example.edushare.feature.chat.conversation.model.Conversation;
-import com.example.edushare.feature.chat.message.activity.ChatDetailActivity;
 import com.example.edushare.feature.chat.message.dto.MessageResponse;
 import com.example.edushare.feature.chat.message.dto.PageResponse;
-import com.example.edushare.feature.notification.manager.FcmTokenManager;
-import com.google.firebase.messaging.FirebaseMessaging;
+import com.example.edushare.feature.notification.firebase.manager.FcmTokenManager;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;

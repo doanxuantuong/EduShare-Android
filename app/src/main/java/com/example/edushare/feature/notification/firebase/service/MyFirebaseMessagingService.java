@@ -1,12 +1,15 @@
-package com.example.edushare.feature.notification.service;
+package com.example.edushare.feature.notification.firebase.service;
 
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.edushare.feature.notification.manager.FcmTokenManager;
+import com.example.edushare.feature.notification.firebase.manager.FcmTokenManager;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class MyFirebaseMessagingService extends FirebaseMessagingService {
     @Override
@@ -34,15 +37,25 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
     public void onMessageReceived(@NonNull RemoteMessage message) {
         super.onMessageReceived(message);
 
-        Log.d("FCM_MESSAGE", "Có notification mới");
+        Log.e("FCM_TOKEN", "New token: " + message);
 
-        if (message.getNotification() != null) {
-            Log.d("FCM_MESSAGE", "Title: " + message.getNotification().getTitle());
-            Log.d("FCM_MESSAGE", "Body: " + message.getNotification().getBody());
-        }
+        Map<String, String> data = new HashMap<>();
+        if (!data.isEmpty()) {
+            String notificationType = data.get("type");
 
-        if (!message.getData().isEmpty()) {
-            Log.d("FCM_MESSAGE", "Data: " + message.getData());
+            if (notificationType != null) {
+                switch (notificationType) {
+                    case "CHAT":
+                        String conversationId = data.get("conversationId");
+                        Log.d("FCM", "Xử lý logic hiện thông báo Chat cho phòng: " + conversationId);
+                        // Vẽ thông báo Chat, bấm vào mở màn hình ChatDetailActivity
+                        break;
+
+                    case "SYSTEM":
+                        // Xử lý thông báo từ nhà trường / admin hệ thống...
+                        break;
+                }
+            }
         }
     }
 }

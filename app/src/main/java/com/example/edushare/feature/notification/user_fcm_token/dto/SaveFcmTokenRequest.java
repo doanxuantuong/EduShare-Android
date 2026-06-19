@@ -1,4 +1,4 @@
-package com.example.edushare.feature.notification.dto.request;
+package com.example.edushare.feature.notification.user_fcm_token.dto;
 
 import java.io.Serializable;
 

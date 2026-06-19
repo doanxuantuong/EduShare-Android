@@ -1,11 +1,11 @@
-package com.example.edushare.feature.notification.manager;
+package com.example.edushare.feature.notification.firebase.manager;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.example.edushare.common.base.OnActionCallback;
-import com.example.edushare.feature.notification.repository.NotificationRepository;
+import com.example.edushare.feature.notification.user_fcm_token.repository.UserFcmTokenRepository;
 import com.google.firebase.messaging.FirebaseMessaging;
 
 public class FcmTokenManager {
@@ -17,11 +17,11 @@ public class FcmTokenManager {
 
     private final Context context;
     // => Môi trường hoạt động của android, phải có nó thì mới mở được SharedPreferences
-    private final NotificationRepository notificationRepository;
+    private final UserFcmTokenRepository notificationRepository;
 
     public FcmTokenManager(Context context) {
         this.context = context.getApplicationContext();
-        this.notificationRepository = new NotificationRepository();
+        this.notificationRepository = new UserFcmTokenRepository();
     }
 
     // ==============================================================================
