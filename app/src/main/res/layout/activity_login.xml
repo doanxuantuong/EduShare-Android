@@ -116,6 +116,15 @@
                 style="@style/LoginButton"
                 />
 
+            <Button
+                android:id="@+id/btn_ocr"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:text="Quét mã OCR"
+                style="@style/OcrButton"
+                />
+
+
             <TextView android:id="@+id/tv_sub_sign_up"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

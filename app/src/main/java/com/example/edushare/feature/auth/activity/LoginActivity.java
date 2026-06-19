@@ -34,6 +34,7 @@ public class LoginActivity extends AppCompatActivity {
 
         userRepository = new UserRepository();
 
+        // nút đăng nhập
         btnVerify.setOnClickListener(v -> {
             String email = edtEmail.getText().toString().trim();
             String password = edtPassword.getText().toString().trim();
@@ -66,6 +67,14 @@ public class LoginActivity extends AppCompatActivity {
                 }
             });
         });
+
+        // nút ocr
+        Button btnOcr = findViewById(R.id.btn_ocr);
+        btnOcr.setOnClickListener(v -> {
+            Intent intent = new Intent(LoginActivity.this, OcrActivity.class);
+            startActivity(intent);
+        });
+
     }
 }
 
