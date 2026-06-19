@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.edushare.R;
 import com.example.edushare.common.base.OnActionCallback;
+import com.example.edushare.common.helper.AuthManager;
+import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.feature.auth.request.LoginRequest;
 import com.example.edushare.feature.auth.response.LoginResponse;
 import com.example.edushare.feature.home.activity.HomeActivity;
@@ -48,19 +50,14 @@ public class LoginActivity extends AppCompatActivity {
             userRepository.login(request, new OnActionCallback<LoginResponse>() {
                 @Override
                 public void onSuccess(LoginResponse response) {
-                    Toast.makeText(LoginActivity.this, response.getMessage(), Toast.LENGTH_SHORT).show();
-                    if (response.isSuccess()) {
-                        // Lưu token
-                        getSharedPreferences("auth", MODE_PRIVATE)
-                                .edit()
-                                .putString("token", response.getToken())
-                                .apply();
-
-                        // Chuyển sang HomeActivity
-                        Intent intent = new Intent(LoginActivity.this, HomeActivity.class);
-                        startActivity(intent);
-                        finish(); // đóng LoginActivity để không quay lại khi bấm back
-                    }
+                    UserSessionHelper.saveSession(LoginActivity.this,
+                            response.getToken(),
+                            response.getUserId(),
+                            response.getFullName(),
+                            response.getEmail()
+                    );
+                    startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+                    finish();
                 }
 
                 @Override
