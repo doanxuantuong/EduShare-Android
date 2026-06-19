@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -35,7 +36,7 @@ public class HomeActivity extends AppCompatActivity {
     private TextView tvCategoryLabEquipment;
     private TextView tvCategoryElectronics;
     private String selectedCategory = "All";
-
+    private View footerLayout;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -56,12 +57,11 @@ public class HomeActivity extends AppCompatActivity {
         tvCategoryLabEquipment = findViewById(R.id.tvCategoryLabEquipment);
         tvCategoryElectronics = findViewById(R.id.tvCategoryElectronics);
 
+        footerLayout = findViewById(R.id.footer_layout);
+
         findViewById(R.id.btnLocation).setOnClickListener(view ->
                 startActivity(new Intent(this, MapActivity.class)));
-        findViewById(R.id.postNavigationCard).setOnClickListener(view ->
-                Toast.makeText(this, R.string.home_post_coming_soon, Toast.LENGTH_SHORT).show());
     }
-
     private void setupMarketplaceItems() {
         allItems.add(new MarketplaceItem(
                 R.drawable.img_organic_chemistry_textbook,
@@ -147,9 +147,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void setupBottomNavigation() {
-        BottomNavigationView bottomNavigation = findViewById(R.id.bottomNavigation);
-
-        // Gọi hàm dùng chung, truyền R.id.nav_home để nó biết đang ở màn hình Home
-        BottomNavigationHelper.setup(this, bottomNavigation, R.id.nav_home);
+        // Truyền cả cụm footerLayout và làm sáng đèn nút Home (R.id.nav_home)
+        BottomNavigationHelper.setup(this, footerLayout, R.id.nav_home);
     }
 }
