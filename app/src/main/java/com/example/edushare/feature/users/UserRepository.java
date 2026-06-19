@@ -58,4 +58,23 @@ public class UserRepository {
         });
     }
 
+    // này là làm để được như session bên web bay chỉ việc lấy ra dùng
+    public void getCurrentUser(String token, OnActionCallback<User> callback) {
+        userApi.getCurrentUser("Bearer " + token).enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    callback.onSuccess(response.body());
+                } else {
+                    callback.onFailure("Lỗi Server: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
+                callback.onFailure("Lỗi kết nối: " + t.getMessage());
+            }
+        });
+    }
+
 }
