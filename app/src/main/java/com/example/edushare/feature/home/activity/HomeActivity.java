@@ -51,7 +51,7 @@ public class HomeActivity extends AppCompatActivity {
 
     private void initViews() {
         edtHomeSearch = findViewById(R.id.edtHomeSearch);
-        tvItemCount = findViewById(R.id.tvItemCount);
+//        tvItemCount = findViewById(R.id.tvItemCount);
         tvCategoryAll = findViewById(R.id.tvCategoryAll);
         tvCategoryTextbooks = findViewById(R.id.tvCategoryTextbooks);
         tvCategoryLabEquipment = findViewById(R.id.tvCategoryLabEquipment);

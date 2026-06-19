@@ -26,11 +26,11 @@ public class ProfileActivity extends AppCompatActivity {
         loadSession();
     }
 
-    private void initViews() {
-        tvName = findViewById(R.id.tvName);
-        tvEmail = findViewById(R.id.tvEmail);
-        ivAvatar = findViewById(R.id.ivAvatar);
-    }
+//    private void initViews() {
+//        tvName = findViewById(R.id.tvName);
+//        tvEmail = findViewById(R.id.tvEmail);
+//        ivAvatar = findViewById(R.id.ivAvatar);
+//    }
 
     private void loadSession() {
         tvName.setText(UserSessionHelper.getFullName(this));
@@ -43,7 +43,9 @@ public class ProfileActivity extends AppCompatActivity {
     private void initViews() {
         // Ánh xạ thẻ include từ file activity_profile.xml
         footerLayout = findViewById(R.id.footer_layout);
-
+        tvName = findViewById(R.id.tvName);
+        tvEmail = findViewById(R.id.tvEmail);
+        ivAvatar = findViewById(R.id.ivAvatar);
         // Thiết lập sáng đèn cho icon Profile (R.id.nav_profile)
         BottomNavigationHelper.setup(this, footerLayout, R.id.nav_profile);
     }
