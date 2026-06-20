@@ -47,7 +47,7 @@
 <!--        <activity android:name=".feature.chat.activity.ConversationActivity" />-->
         <activity android:name=".feature.users.activity.ProfileActivity" />
         <activity android:name=".feature.chat.conversation.activity.ConversationActivity" />
-<!--        <activity android:name=".feature.locations.MapActivity" />-->
+        <activity android:name=".feature.locations.MapActivity" />
 
         <service
             android:name=".feature.notification.firebase.service.MyFirebaseMessagingService"
