@@ -157,7 +157,8 @@
         android:id="@+id/btnMyLocation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="100dp"
         android:src="@android:drawable/ic_menu_mylocation"
         android:contentDescription="Vị trí của tôi"
         app:backgroundTint="@android:color/white"
@@ -303,5 +304,13 @@
 
         </LinearLayout>
     </androidx.cardview.widget.CardView>
+    <include
+    android:id="@+id/footer"
+    layout="@layout/layout_footer"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

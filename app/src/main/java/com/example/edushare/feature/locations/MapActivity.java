@@ -30,6 +30,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.card.MaterialCardView;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -44,6 +45,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+
 public class MapActivity extends AppCompatActivity {
 
     private static final int LOCATION_REQUEST = 100;
@@ -57,6 +59,7 @@ public class MapActivity extends AppCompatActivity {
     private AutoCompleteTextView edtSearch;
     private ImageButton btnSearch;
     private FloatingActionButton btnMyLocation;
+    private MaterialCardView btnBack;
 
     // Info card (hiện sau khi search)
     private CardView infoCard;
@@ -127,6 +130,10 @@ public class MapActivity extends AppCompatActivity {
         bindViews();
         setupMap();
 
+        btnBack.setOnClickListener(v -> {
+            finish();
+        });
+
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         osrmHelper = new OsrmRouteHelper();
 
@@ -154,6 +161,8 @@ public class MapActivity extends AppCompatActivity {
         edtSearch     = findViewById(R.id.edtSearch);
         btnSearch     = findViewById(R.id.btnSearch);
         btnMyLocation = findViewById(R.id.btnMyLocation);
+        btnBack       = findViewById(R.id.btnBack);
+
 
         infoCard      = findViewById(R.id.infoCard);
         txtItemName   = findViewById(R.id.txtItemName);
