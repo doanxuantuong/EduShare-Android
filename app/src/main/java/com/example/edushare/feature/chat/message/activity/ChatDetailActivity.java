@@ -152,7 +152,7 @@ public class ChatDetailActivity extends AppCompatActivity {
         });
 
         // Call API lấy danh sách đoạn tin nhắn của conversation
-        chatRepository = new ChatRepository();
+        chatRepository = new ChatRepository(this);
 
         if (postId != -1) {
             fetchPostSummaryFromApi(postId);
@@ -476,13 +476,19 @@ public class ChatDetailActivity extends AppCompatActivity {
         String wsUrl = "ws://10.0.2.2:8080/ws-edushare/websocket";
 
         stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, wsUrl);
-        stompClient.connect();
 
         // 2. Lắng nghe trạng thái kết nối (Để debug xem có dính lỗi mạng không)
         stompClient.lifecycle().subscribe(lifecycleEvent -> {
             switch (lifecycleEvent.getType()) {
                 case OPENED:
                     Log.d("WebSocket", "Connection opened");
+                    Log.d("WebSocket", "Connection opened");
+
+                    String myTopic = "/topic/messages/" + senderId;
+                    receiveNewMessage(myTopic);
+
+                    String destinationStatus = "/topic/receipts/" + senderId;
+                    receiveNewMessageStatus(destinationStatus);
                     break;
                 case ERROR:
                     Log.d("WebSocket", "Lỗi kết nối", lifecycleEvent.getException());
@@ -491,14 +497,11 @@ public class ChatDetailActivity extends AppCompatActivity {
                     Log.d("SOCKET", "Đã ngắt kết nối");
                     break;
             }
+        }, throwable -> {
+            Log.e("WebSocket", "Lifecycle subscribe error", throwable);
         });
 
-        // 3. Đăng ký nhận tin nhắn từ kênh của riêng mình (Dùng ID đăng nhập của user hiện tại)
-        String myTopic = "/topic/messages/" + senderId;
-        receiveNewMessage(myTopic);
-
-        String destinationStatus = "/topic/receipts/" + senderId;
-        receiveNewMessageStatus(destinationStatus);
+        stompClient.connect();
 
     }
 

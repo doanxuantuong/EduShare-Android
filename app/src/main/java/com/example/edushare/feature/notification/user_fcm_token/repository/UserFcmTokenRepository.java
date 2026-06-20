@@ -1,5 +1,7 @@
 package com.example.edushare.feature.notification.user_fcm_token.repository;
 
+import android.content.Context;
+
 import com.example.edushare.common.base.OnActionCallback;
 import com.example.edushare.common.base.RetrofitClient;
 import com.example.edushare.feature.notification.user_fcm_token.api.UserFcmTokenApi;
@@ -12,11 +14,11 @@ import retrofit2.Response;
 public class UserFcmTokenRepository {
     private final UserFcmTokenApi notificationApi;
 
-    public UserFcmTokenRepository() {
+    public UserFcmTokenRepository(Context context) {
         // RetrofitClient.createService: Sử dụng kỹ thuật Dynamic Proxy.
         // Retrofit sẽ tự tạo ra một class thực thi cho interface ChatApi lúc Runtime.
         // Giống như việc Spring tự tạo Implementation cho các JpaRepository.
-        this.notificationApi = RetrofitClient.createService(UserFcmTokenApi.class);
+        this.notificationApi = RetrofitClient.createService(UserFcmTokenApi.class, context);
     }
 
     public void saveFcmToken(String userId, String fcmToken, OnActionCallback<Void> callback) {

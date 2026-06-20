@@ -17,6 +17,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.edushare.R;
 import com.example.edushare.common.base.OnActionCallback;
 import com.example.edushare.common.helper.BottomNavigationHelper;
+import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.feature.chat.ChatRepository;
 import com.example.edushare.feature.chat.conversation.adapter.ConversationAdapter;
 import com.example.edushare.feature.chat.conversation.model.Conversation;
@@ -32,16 +33,16 @@ import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
 
 /*
-* Tưởng tượng bạn (file Activity) là một vị Giám đốc.
-* - RecyclerView là anh Quản đốc xưởng trực tiếp điều hành công việc.
-* - File Adapter chính là một "Cuốn sổ tay quy trình" mà bạn viết ra để hướng dẫn Quản đốc làm việc.
-* Trong cuốn sổ này có 2 trang quan trọng:
-*   + Trang 1: Cách tạo ra cái hộp (onCreateViewHolder).
-*   + Trang 2: Cách nhét dữ liệu vào hộp (onBindViewHolder).
-* - Khi bạn viết dòng code này trong Activity: rvChatList.setAdapter(adapter);
-*   + Ném cuốn sổ tay (adapter) cho anh Quản đốc (rvChatList)
-*   + Và bảo: "Làm việc đi, quy trình tôi ghi hết trong sổ rồi đấy!"
-* */
+ * Tưởng tượng bạn (file Activity) là một vị Giám đốc.
+ * - RecyclerView là anh Quản đốc xưởng trực tiếp điều hành công việc.
+ * - File Adapter chính là một "Cuốn sổ tay quy trình" mà bạn viết ra để hướng dẫn Quản đốc làm việc.
+ * Trong cuốn sổ này có 2 trang quan trọng:
+ *   + Trang 1: Cách tạo ra cái hộp (onCreateViewHolder).
+ *   + Trang 2: Cách nhét dữ liệu vào hộp (onBindViewHolder).
+ * - Khi bạn viết dòng code này trong Activity: rvChatList.setAdapter(adapter);
+ *   + Ném cuốn sổ tay (adapter) cho anh Quản đốc (rvChatList)
+ *   + Và bảo: "Làm việc đi, quy trình tôi ghi hết trong sổ rồi đấy!"
+ * */
 public class ConversationActivity extends AppCompatActivity {
     private RecyclerView rvChatList;
     private ConversationAdapter adapter;
@@ -49,7 +50,7 @@ public class ConversationActivity extends AppCompatActivity {
     private List<Conversation> originalConversationList;
     private ChatRepository chatRepository;
     private View footerLayout;
-    private String currentUserId = "fire-base-uid-test-12";
+    private String currentUserId;
     private int currentPage = 0;
     private final int PAGE_SIZE = 8;
     private boolean isLoading = false; // Đang call API thì không cho call đè
@@ -57,7 +58,6 @@ public class ConversationActivity extends AppCompatActivity {
     private boolean isFirstOpen = true;
     private StompClient stompClient;
     private EditText edtSearchChat;
-    private FcmTokenManager fcmTokenManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,8 +69,10 @@ public class ConversationActivity extends AppCompatActivity {
         initViews();
         setupRecyclerView();
 
+        loadSession();
+
         // Khởi tạo Repository
-        chatRepository = new ChatRepository();
+        chatRepository = new ChatRepository(this);
 
         // Gọi API lấy dữ liệu thực
         fetchConversationsFromApi(currentPage);
@@ -79,8 +81,13 @@ public class ConversationActivity extends AppCompatActivity {
 
         setupSearch();
 
-        fcmTokenManager = new FcmTokenManager(this);
+        FcmTokenManager fcmTokenManager = new FcmTokenManager(this);
         fcmTokenManager.getAndSaveFcmToken(currentUserId);
+    }
+
+    private void loadSession() {
+        // Khởi tạo và thiết lập cụm điều hướng dùng chung
+        currentUserId = UserSessionHelper.getUserId(this);
     }
 
     @Override

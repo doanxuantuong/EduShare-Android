@@ -1,5 +1,7 @@
 package com.example.edushare.feature.chat;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 
 import com.example.edushare.common.base.OnActionCallback;
@@ -20,11 +22,11 @@ import retrofit2.Response;
 public class ChatRepository {
     private final ChatApi chatApi;
 
-    public ChatRepository() {
+    public ChatRepository(Context context) {
         // RetrofitClient.createService: Sử dụng kỹ thuật Dynamic Proxy.
         // Retrofit sẽ tự tạo ra một class thực thi cho interface ChatApi lúc Runtime.
         // Giống như việc Spring tự tạo Implementation cho các JpaRepository.
-        this.chatApi = RetrofitClient.createService(ChatApi.class);
+        this.chatApi = RetrofitClient.createService(ChatApi.class, context);
     }
 
     public void getConversations(String userId, int currentPage, int size, OnActionCallback<PageResponse<Conversation>> callback) {

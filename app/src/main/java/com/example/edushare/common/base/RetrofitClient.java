@@ -1,6 +1,8 @@
 package com.example.edushare.common.base;
 
-import com.example.edushare.feature.users.UserApi;
+import android.content.Context;
+
+import com.example.edushare.common.helper.AuthInterceptor;
 
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -13,7 +15,7 @@ public class RetrofitClient {
     private static Retrofit retrofit = null;
 
     //ĐÂY LÀ 1 DẠNG DYNAMIC PROXY
-    public static <T> T createService(Class<T> serviceClass) {
+    public static <T> T createService(Class<T> serviceClass, Context context) {
         if (retrofit == null) {
             // Tạo logging để soi JSON
             HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
@@ -24,6 +26,9 @@ public class RetrofitClient {
             //Do muốn có logging (HttpLoggingInterceptor) nên tạo ra để thêm HttpLoggingInterceptor
             //1 cái OkHttpClient sẽ không có logging
             OkHttpClient client = new OkHttpClient.Builder()
+                    // Tự động gắn JWT vào request
+                    .addInterceptor(new AuthInterceptor(context.getApplicationContext()))
+
                     .addInterceptor(logging)
                     .build();
 

@@ -30,7 +30,7 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".feature.locations.MapActivity"
+            android:name=".feature.auth.activity.LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.EduShare.Home">
             <intent-filter>

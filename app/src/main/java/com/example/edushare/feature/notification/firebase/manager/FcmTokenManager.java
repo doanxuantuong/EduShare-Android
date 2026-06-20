@@ -21,7 +21,7 @@ public class FcmTokenManager {
 
     public FcmTokenManager(Context context) {
         this.context = context.getApplicationContext();
-        this.notificationRepository = new UserFcmTokenRepository();
+        this.notificationRepository = new UserFcmTokenRepository(this.context);
     }
 
     // ==============================================================================

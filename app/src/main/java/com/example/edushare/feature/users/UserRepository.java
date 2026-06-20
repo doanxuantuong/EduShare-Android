@@ -1,5 +1,7 @@
 package com.example.edushare.feature.users;
 
+import android.content.Context;
+
 import androidx.annotation.NonNull;
 
 import com.example.edushare.common.base.OnActionCallback;
@@ -16,8 +18,8 @@ import retrofit2.Response;
 public class UserRepository {
     private final UserApi userApi;
 
-    public UserRepository() {
-        this.userApi = RetrofitClient.createService(UserApi.class);
+    public UserRepository(Context context) {
+        this.userApi = RetrofitClient.createService(UserApi.class, context);
     }
 
     public void register(RegisterRequest request, OnActionCallback<String> callback) {
