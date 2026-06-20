@@ -39,7 +39,7 @@ public class RegisterActivity extends AppCompatActivity {
         btnCreate = findViewById(R.id.btn_creaedt_account);
 
         localUserRepository = new LocalUserRepository(this);
-        userRepository = new UserRepository();
+        userRepository = new UserRepository(this);
 
         btnCreate.setOnClickListener(v -> {
             if (RegisterValidator.validate(teFullname, teEmail, teStudentCode, tePhone, tePassword, teRewritePassword)) {

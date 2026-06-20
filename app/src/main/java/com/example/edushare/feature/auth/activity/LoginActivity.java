@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.edushare.R;
 import com.example.edushare.common.base.OnActionCallback;
-import com.example.edushare.common.helper.AuthManager;
 import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.feature.auth.request.LoginRequest;
 import com.example.edushare.feature.auth.response.LoginResponse;
@@ -32,7 +31,7 @@ public class LoginActivity extends AppCompatActivity {
         edtPassword = findViewById(R.id.edt_password);
         btnVerify = findViewById(R.id.btn_verify);
 
-        userRepository = new UserRepository();
+        userRepository = new UserRepository(this);
 
         // nút đăng nhập
         btnVerify.setOnClickListener(v -> {

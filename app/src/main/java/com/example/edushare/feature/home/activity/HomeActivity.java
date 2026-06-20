@@ -30,7 +30,7 @@ public class HomeActivity extends AppCompatActivity {
     private final List<MarketplaceItem> allItems = new ArrayList<>();
     private MarketplaceItemAdapter itemAdapter;
     private EditText edtHomeSearch;
-    private TextView tvItemCount;
+//    private TextView tvItemCount;
     private TextView tvCategoryAll;
     private TextView tvCategoryTextbooks;
     private TextView tvCategoryLabEquipment;
@@ -139,11 +139,11 @@ public class HomeActivity extends AppCompatActivity {
         }
 
         itemAdapter.replaceItems(filteredItems);
-        tvItemCount.setText(getResources().getQuantityString(
-                R.plurals.home_item_count_format,
-                filteredItems.size(),
-                filteredItems.size()
-        ));
+//        tvItemCount.setText(getResources().getQuantityString(
+//                R.plurals.home_item_count_format,
+//                filteredItems.size(),
+//                filteredItems.size()
+//        ));
     }
 
     private void setupBottomNavigation() {
