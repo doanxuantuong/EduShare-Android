@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-
 <androidx.constraintlayout.widget.ConstraintLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <!-- MAP -->
+    <!--MAP (full screen)-->
     <org.osmdroid.views.MapView
         android:id="@+id/mapView"
         android:layout_width="0dp"
@@ -16,176 +15,293 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <!-- HEADER -->
+    <!--HEADER-->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:padding="16dp"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="12dp"
         android:background="@android:color/white"
+        android:elevation="4dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- Back button -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/btnBack"
             android:layout_width="40dp"
             android:layout_height="40dp"
             app:cardCornerRadius="20dp"
-            app:cardBackgroundColor="@color/bg_map_gray"
+            app:cardBackgroundColor="#F0F0F0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="10dp"
                 android:src="@android:drawable/ic_menu_revert"
-                app:tint="@color/black_text"/>
-
+                app:tint="#1A1A1A"/>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Title -->
         <TextView
             android:id="@+id/txtTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="ViewMap"
+            android:text="Bản đồ đồ vật"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="@color/black_text"
-            app:layout_constraintTop_toTopOf="@id/btnBack"
-            app:layout_constraintBottom_toBottomOf="@id/btnBack"
+            android:textColor="#1A1A1A"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"/>
 
+        <!-- Filter button -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/btnFilter"
             android:layout_width="40dp"
             android:layout_height="40dp"
             app:cardCornerRadius="20dp"
-            app:cardBackgroundColor="@color/bg_map_gray"
+            app:cardBackgroundColor="#F0F0F0"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:padding="10dp"
                 android:src="@android:drawable/ic_menu_sort_by_size"
-                app:tint="@color/black_text"/>
-
+                app:tint="#1A1A1A"/>
         </com.google.android.material.card.MaterialCardView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <!-- SEARCH -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/searchCard"
+    <!-- Searchbar-->
+    <!--
+        Dùng FrameLayout bọc ngoài để dropdown của AutoCompleteTextView
+        hiện đúng ngay bên dưới search bar, không bị clip bởi CardView.
+    -->
+    <FrameLayout
+        android:id="@+id/searchWrapper"
         android:layout_width="0dp"
-        android:layout_height="56dp"
+        android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="10dp"
         android:layout_marginEnd="16dp"
-        app:cardCornerRadius="28dp"
-        app:cardElevation="8dp"
         app:layout_constraintTop_toBottomOf="@id/header"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/searchCard"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            app:cardCornerRadius="26dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="@android:color/white">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingStart="16dp"
+                android:paddingEnd="4dp">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@android:drawable/ic_menu_search"
+                    app:tint="#888888"/>
+                <!--android:dropDownAnchor trỏ về searchWrapper → dropdown hiện bên dưới toàn bộ search bar, không bị CardView clip-->
+                <AutoCompleteTextView
+                    android:id="@+id/edtSearch"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="10dp"
+                    android:background="@null"
+                    android:hint="Tìm đồ vật, khu vực..."
+                    android:maxLines="1"
+                    android:inputType="text"
+                    android:imeOptions="actionSearch"
+                    android:completionThreshold="1"
+                    android:dropDownAnchor="@id/searchWrapper"
+                    android:dropDownWidth="match_parent"
+                    android:dropDownHeight="wrap_content"
+                    android:popupBackground="@android:color/white"
+                    android:textColor="#1A1A1A"
+                    android:textColorHint="#AAAAAA"
+                    android:textSize="15sp"/>
+
+                <ImageButton
+                    android:id="@+id/btnSearch"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:background="@null"
+                    android:src="@android:drawable/ic_menu_search"
+                    app:tint="#2196F3"/>
+
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+    </FrameLayout>
+
+<!--gps-->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnMyLocation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:src="@android:drawable/ic_menu_mylocation"
+        android:contentDescription="Vị trí của tôi"
+        app:backgroundTint="@android:color/white"
+        app:tint="#2196F3"
+        app:fabSize="normal"
+        app:layout_constraintBottom_toTopOf="@id/infoCard"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+<!--info card-->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/infoCard"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="10dp"
+        app:cardBackgroundColor="@android:color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:paddingHorizontal="16dp">
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <ImageView
-                android:layout_width="20dp"
-                android:layout_height="20dp"
-                android:src="@android:drawable/ic_menu_search"
-                app:tint="@color/black_text"/>
-
-            <EditText
-                android:id="@+id/edtSearch"
-                android:layout_width="0dp"
+            <TextView
+                android:id="@+id/txtItemName"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="12dp"
-                android:background="@null"
-                android:hint="Tìm đồ vật..."
-                android:maxLines="1"
-                android:textColor="@color/black_text"/>
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="#1A1A1A"/>
 
-            <ImageButton
-                android:id="@+id/btnSearch"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="@android:color/transparent"
-                android:src="@android:drawable/ic_menu_search"
-                app:tint="@color/black_text"/>
+            <TextView
+                android:id="@+id/txtItemArea"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textSize="13sp"
+                android:textColor="#666666"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="12dp"
+                android:background="#EEEEEE"/>
+
+            <!-- Row: thông tin route + nút Bắt đầu -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/txtRouteInfo"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="📍 Đang tính đường đi..."
+                    android:textSize="13sp"
+                    android:textColor="#2196F3"
+                    android:textStyle="bold"/>
+
+                <!-- Nút Bắt đầu — ẩn cho đến khi có route -->
+                <Button
+                    android:id="@+id/btnStartNav"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:layout_marginStart="12dp"
+                    android:text="Bắt đầu"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/white"
+                    android:backgroundTint="#2196F3"
+                    android:visibility="gone"
+                    style="@style/Widget.MaterialComponents.Button"/>
+
+            </LinearLayout>
 
         </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
-    </com.google.android.material.card.MaterialCardView>
-
-    <!-- FILTER -->
-    <HorizontalScrollView
-        android:id="@+id/scrollFilters"
+    <!-- ═══════════════════════════ NAV CARD (hiện khi đang điều hướng) ════ -->
+    <androidx.cardview.widget.CardView
+        android:id="@+id/navCard"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:scrollbars="none"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        app:layout_constraintTop_toBottomOf="@id/searchCard"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:visibility="gone"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="12dp"
+        app:cardBackgroundColor="#1565C0"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/chipGroupFilter"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:singleLine="true">
+            android:orientation="vertical"
+            android:padding="16dp">
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipAll"
+            <!-- Bước hiện tại: icon + chỉ dẫn -->
+            <TextView
+                android:id="@+id/txtNavStep"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="⬆️  Đi thẳng 200m"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@android:color/white"
+                android:lineSpacingExtra="4dp"/>
+
+            <!-- Khoảng cách còn lại đến đích -->
+            <TextView
+                android:id="@+id/txtNavDistance"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="All"
-                android:checked="true"/>
+                android:layout_marginTop="6dp"
+                android:text="350m đến nơi"
+                android:textSize="13sp"
+                android:textColor="#B3E5FC"/>
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipDormA"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Dorm A"/>
+            <!-- Nút Dừng -->
+            <Button
+                android:id="@+id/btnStopNav"
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_marginTop="12dp"
+                android:text="Dừng điều hướng"
+                android:textSize="14sp"
+                android:textColor="#1565C0"
+                android:backgroundTint="@android:color/white"
+                style="@style/Widget.MaterialComponents.Button"/>
 
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipDormB"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Dorm B"/>
-
-            <com.google.android.material.chip.Chip
-                android:id="@+id/chipCanteen"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Canteen"/>
-
-        </com.google.android.material.chip.ChipGroup>
-
-    </HorizontalScrollView>
-
-    <!-- GPS BUTTON -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/btnMyLocation"
-        android:layout_width="56dp"
-        android:layout_height="56dp"
-        android:layout_margin="16dp"
-        android:src="@android:drawable/ic_menu_mylocation"
-        app:backgroundTint="@android:color/white"
-        app:tint="@color/black_text"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
