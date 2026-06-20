@@ -1,5 +1,7 @@
 package com.example.edushare.feature.users;
 
+import android.util.Log;
+
 import android.content.Context;
 
 import androidx.annotation.NonNull;
@@ -7,6 +9,7 @@ import androidx.annotation.NonNull;
 import com.example.edushare.common.base.OnActionCallback;
 import com.example.edushare.common.base.RetrofitClient;
 import com.example.edushare.feature.auth.request.LoginRequest;
+import com.example.edushare.feature.auth.request.OcrLoginRequest;
 import com.example.edushare.feature.auth.request.RegisterRequest;
 import com.example.edushare.feature.auth.response.LoginResponse;
 import com.example.edushare.feature.auth.response.RegisterResponse;
@@ -78,5 +81,24 @@ public class UserRepository {
             }
         });
     }
+
+    public void loginUserByOcr(OcrLoginRequest request, OnActionCallback<LoginResponse> callback) {
+        userApi.loginUserByOcr(request).enqueue(new Callback<LoginResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<LoginResponse> call,@NonNull Response<LoginResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    callback.onSuccess(response.body());
+                } else {
+                    callback.onFailure("Đăng nhập OCR thất bại");
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<LoginResponse> call, @NonNull Throwable t) {
+                callback.onFailure("Không thể kết nối đến máy chủ");
+            }
+        });
+    }
+
 
 }
