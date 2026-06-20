@@ -59,6 +59,16 @@ public class ConversationActivity extends AppCompatActivity {
     private StompClient stompClient;
     private EditText edtSearchChat;
 
+    // Hủy kết nối WebSocket khi Activity bị hủy
+    // Tránh tốn RAM nếu WebSocket vẫn còn mở
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (stompClient != null && stompClient.isConnected()) {
+            stompClient.disconnect();
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -240,13 +250,13 @@ public class ConversationActivity extends AppCompatActivity {
     private void connectWebSocket() {
         String wsUrl = "ws://10.0.2.2:8080/ws-edushare/websocket";
         stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, wsUrl);
-        stompClient.connect();
+
+        subscribeChatTopic();
 
         stompClient.lifecycle().subscribe(lifecycleEvent -> {
             switch (lifecycleEvent.getType()) {
                 case OPENED:
                     Log.d("WebSocket", "Connection opened");
-                    subscribeChatTopic();
                     break;
                 case ERROR:
                     Log.d("WebSocket", "Lỗi kết nối", lifecycleEvent.getException());
@@ -255,21 +265,30 @@ public class ConversationActivity extends AppCompatActivity {
                     Log.d("SOCKET", "Đã ngắt kết nối");
                     break;
             }
+        }, throwable -> {
+            Log.e("WebSocket", "Lỗi lifecycle Conversation", throwable);
         });
+
+        stompClient.connect();
     }
 
     @SuppressLint("CheckResult")
     private void subscribeChatTopic() {
         String myTopic = "/topic/messages/" + currentUserId;
         stompClient.topic(myTopic).subscribe(stompMessage -> {
-            String jsonPayload = stompMessage.getPayload();
+            try {
+                String jsonPayload = stompMessage.getPayload();
+                Log.d("SOCKET_DATA", "ChatList nhận JSON: " + jsonPayload);
 
-            Gson gson = new Gson();
-            MessageResponse newMessage = gson.fromJson(jsonPayload, MessageResponse.class);
+                Gson gson = new Gson();
+                MessageResponse newMessage = gson.fromJson(jsonPayload, MessageResponse.class);
 
-            runOnUiThread(() -> {
-                updateConversationList(newMessage);
-            });
+                runOnUiThread(() -> {
+                    updateConversationList(newMessage);
+                });
+            } catch (Exception e) {
+                Log.e("SOCKET_DATA", "Lỗi Parse JSON ở ChatList", e);
+            }
         }, throwable -> {
             Log.e("WebSocket", "Subscribe chat topic error", throwable);
         });

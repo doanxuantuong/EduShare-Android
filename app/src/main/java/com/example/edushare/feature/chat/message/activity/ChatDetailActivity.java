@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.edushare.R;
 import com.example.edushare.common.base.OnActionCallback;
+import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.feature.chat.ChatRepository;
 import com.example.edushare.feature.chat.PostSummaryResponse;
 import com.example.edushare.feature.chat.conversation.dto.request.ConversationCreateRequest;
@@ -177,7 +178,7 @@ public class ChatDetailActivity extends AppCompatActivity {
 
             // 2. Dữ liệu giả của người bán (Lấy 1 mail có sẵn trong DB để lát nữa gửi tin nhắn thật được)
             intent.putExtra("RECIPIENT_ID", "sjdhhdsf-dai@gmail.com");
-            intent.putExtra("SENDER_ID", "fire-base-uid-test-12");
+            intent.putExtra("SENDER_ID", senderId);
             intent.putExtra("RECIPIENT_NAME", "Trần Thành Đại");
 
             // 3. Dữ liệu giả của Sản phẩm (Đồ án)
@@ -226,7 +227,7 @@ public class ChatDetailActivity extends AppCompatActivity {
 
         if (intent != null) {
             conversationId = intent.getIntExtra("CONVERSATION_ID", -1);
-            senderId = intent.getStringExtra("SENDER_ID");
+            senderId = UserSessionHelper.getUserId(this);
             recipientId = intent.getStringExtra("RECIPIENT_ID");
             recipientName = intent.getStringExtra("RECIPIENT_NAME");
             recipientAvatarUrl = intent.getStringExtra("RECIPIENT_AVATAR");
@@ -477,18 +478,17 @@ public class ChatDetailActivity extends AppCompatActivity {
 
         stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, wsUrl);
 
+        String myTopic = "/topic/messages/" + senderId;
+        receiveNewMessage(myTopic);
+
+        String destinationStatus = "/topic/receipts/" + senderId;
+        receiveNewMessageStatus(destinationStatus);
+
         // 2. Lắng nghe trạng thái kết nối (Để debug xem có dính lỗi mạng không)
         stompClient.lifecycle().subscribe(lifecycleEvent -> {
             switch (lifecycleEvent.getType()) {
                 case OPENED:
                     Log.d("WebSocket", "Connection opened");
-                    Log.d("WebSocket", "Connection opened");
-
-                    String myTopic = "/topic/messages/" + senderId;
-                    receiveNewMessage(myTopic);
-
-                    String destinationStatus = "/topic/receipts/" + senderId;
-                    receiveNewMessageStatus(destinationStatus);
                     break;
                 case ERROR:
                     Log.d("WebSocket", "Lỗi kết nối", lifecycleEvent.getException());
@@ -508,40 +508,56 @@ public class ChatDetailActivity extends AppCompatActivity {
     @SuppressLint("CheckResult")
     private void receiveNewMessage(String myTopic) {
         stompClient.topic(myTopic).subscribe(stompMessage -> {
-            // Xử lý tin nhắn nhận được
-            String jsonPayload = stompMessage.getPayload();
+            try {
+                // 1. IN RA CHUỖI JSON GỐC
+                String jsonPayload = stompMessage.getPayload();
+                Log.d("SOCKET_DATA", "Dữ liệu thô nhận được: " + jsonPayload);
 
-            // Parse JSON thành Object MessageResponse bằng Gson
-            Gson gson = new Gson();
-            MessageResponse newMessage = gson.fromJson(jsonPayload, MessageResponse.class);
+                // 2. Ép kiểu JSON
+                Gson gson = new Gson();
+                MessageResponse newMessage = gson.fromJson(jsonPayload, MessageResponse.class);
 
-            // BẮT BUỘC: Android quy định chỉ Main Thread mới được phép cập nhật Giao diện
-            runOnUiThread(() -> {
-                // Kiểm tra xem tin nhắn này có thuộc về cuộc hội thoại đang mở không
-                if (newMessage.getConversationId() == conversationId) {
-                    addNewMessage(newMessage);
-                }
-            });
+                runOnUiThread(() -> {
+                    // Nhận tin nhắn nếu nó khớp ID phòng, HOẶC nếu phòng hiện tại đang là phòng ảo (-1)
+                    if (newMessage.getConversationId() == conversationId || conversationId == -1) {
+
+                        // Nếu là phòng ảo mà nhận được tin đầu tiên, phải cập nhật lại ID phòng thật ngay!
+                        if (conversationId == -1) {
+                            conversationId = newMessage.getConversationId();
+                        }
+
+                        addNewMessage(newMessage);
+                    }
+                });
+            } catch (Exception e) {
+                // Nếu Gson đọc không được, nó chỉ báo lỗi ở đây
+                Log.e("SOCKET_DATA", "Lỗi Parse JSON tin nhắn mới", e);
+            }
+        }, throwable -> {
+            Log.e("WebSocket", "Lỗi đường truyền tin nhắn mới", throwable);
         });
     }
 
     @SuppressLint("CheckResult")
     private void receiveNewMessageStatus(String receiptTopic) {
         stompClient.topic(receiptTopic).subscribe(stompMessage -> {
-            // Xử lý tin nhắn nhận được
-            String jsonPayload = stompMessage.getPayload();
+            try {
+                String jsonPayload = stompMessage.getPayload();
+                Log.d("SOCKET_DATA", "Trạng thái nhận được: " + jsonPayload);
 
-            // Parse JSON thành Object MessageResponse bằng Gson
-            Gson gson = new Gson();
-            MessageStatusResponse newMessage = gson.fromJson(jsonPayload, MessageStatusResponse.class);
+                Gson gson = new Gson();
+                MessageStatusResponse newMessage = gson.fromJson(jsonPayload, MessageStatusResponse.class);
 
-            // BẮT BUỘC: Android quy định chỉ Main Thread mới được phép cập nhật Giao diện
-            runOnUiThread(() -> {
-                // Kiểm tra xem tin nhắn này có thuộc về cuộc hội thoại đang mở không
-                if (conversationId == newMessage.getConversationId() && newMessage.getRead()) {
-                    updateLastMessageStatus();
-                }
-            });
+                runOnUiThread(() -> {
+                    if (conversationId == newMessage.getConversationId() && newMessage.getRead()) {
+                        updateLastMessageStatus();
+                    }
+                });
+            } catch (Exception e) {
+                Log.e("SOCKET_DATA", "Lỗi Parse JSON trạng thái", e);
+            }
+        }, throwable -> {
+            Log.e("WebSocket", "Lỗi đường truyền trạng thái", throwable);
         });
     }
 
