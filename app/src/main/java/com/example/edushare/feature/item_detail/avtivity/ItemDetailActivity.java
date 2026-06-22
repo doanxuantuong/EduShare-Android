@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.edushare.R;
-import com.example.edushare.feature.detail.adapter.TagAdapter;
+import com.example.edushare.feature.item_detail.adapter.TagAdapter;
 import com.example.edushare.feature.home.model.MarketplaceItem;
 import java.util.ArrayList;
 import java.util.List;

@@ -7,7 +7,6 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,12 +14,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.edushare.R;
 import com.example.edushare.common.helper.BottomNavigationHelper;
-import com.example.edushare.feature.chat.conversation.activity.ConversationActivity;
 import com.example.edushare.feature.home.adapter.MarketplaceItemAdapter;
 import com.example.edushare.feature.home.model.MarketplaceItem;
-import com.example.edushare.feature.locations.MapActivity;
-import com.example.edushare.feature.users.activity.ProfileActivity;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.example.edushare.feature.locations.activity.MapActivity;
 
 import java.util.ArrayList;
 import java.util.List;

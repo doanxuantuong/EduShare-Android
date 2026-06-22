@@ -39,15 +39,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-    <!--        <activity android:name=".feature.auth.activity.RegisterActivity" />-->
+        <!--        <activity android:name=".feature.auth.activity.RegisterActivity" />-->
         <activity
             android:name=".feature.chat.message.activity.ChatDetailActivity"
             android:exported="false" />
         <activity android:name=".feature.home.activity.HomeActivity" />
-<!--        <activity android:name=".feature.chat.activity.ConversationActivity" />-->
+        <!--        <activity android:name=".feature.chat.activity.ConversationActivity" />-->
         <activity android:name=".feature.users.activity.ProfileActivity" />
         <activity android:name=".feature.chat.conversation.activity.ConversationActivity" />
-        <activity android:name=".feature.locations.MapActivity" />
+        <activity android:name=".feature.locations.activity.MapActivity" />
 
         <service
             android:name=".feature.notification.firebase.service.MyFirebaseMessagingService"
