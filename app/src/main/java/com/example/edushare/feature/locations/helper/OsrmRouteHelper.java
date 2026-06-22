@@ -1,4 +1,4 @@
-package com.example.edushare.feature.locations;
+package com.example.edushare.feature.locations.helper;
 
 import android.os.Handler;
 import android.os.Looper;

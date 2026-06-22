@@ -1,4 +1,4 @@
-package com.example.edushare.feature.locations;
+package com.example.edushare.feature.locations.activity;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
@@ -22,6 +22,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.edushare.R;
+import com.example.edushare.feature.locations.adapter.SearchSuggestionAdapter;
+import com.example.edushare.feature.locations.helper.*;
+import com.example.edushare.feature.locations.model.ItemLocation;
 import com.google.android.gms.location.CurrentLocationRequest;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -93,7 +96,7 @@ public class MapActivity extends AppCompatActivity {
     private List<ItemLocation> allItems = new ArrayList<>();
     private List<ItemLocation> filteredItems = new ArrayList<>();
 
-//sample dataa
+    //sample dataa
     private void loadSampleData() {
         allItems.add(new ItemLocation(1, "Laptop Dell", "Dorm A",
                 10.8715, 106.7928, "Laptop Dell 15 inch màu đen", ""));
