@@ -32,8 +32,10 @@ public class RegisterValidator {
             teEmail.requestFocus();
             return false;
         }
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            teEmail.setError("Email không hợp lệ");
+
+        String emailRegex = "^[0-9]{8}@st\\.hcmuaf\\.edu\\.vn$";
+        if (!email.matches(emailRegex)) {
+            teEmail.setError("Email phải có dạng MSSV@st.hcmuaf.edu.vn (VD: 23130192@st.hcmuaf.edu.vn)");
             teEmail.requestFocus();
             return false;
         }
@@ -63,8 +65,10 @@ public class RegisterValidator {
             tePassword.requestFocus();
             return false;
         }
-        if (password.length() < 6) {
-            tePassword.setError("Mật khẩu tối thiểu 6 ký tự");
+
+        String passwordRegex = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&.#_\\-])[A-Za-z\\d@$!%*?&.#_\\-]{8,25}$";
+        if (!password.matches(passwordRegex)) {
+            tePassword.setError("Mật khẩu phải từ 8 đến 25 ký tự, gồm chữ hoa, chữ thường, số và ký tự đặc biệt");
             tePassword.requestFocus();
             return false;
         }

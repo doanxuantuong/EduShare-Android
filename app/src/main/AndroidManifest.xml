@@ -30,7 +30,7 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".feature.auth.activity.LoginActivity"
+            android:name=".feature.auth.activity.RegisterActivity"
             android:exported="true"
             android:theme="@style/Theme.EduShare.Home">
             <intent-filter>

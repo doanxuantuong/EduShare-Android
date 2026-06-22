@@ -166,6 +166,12 @@
                     android:inputType="textPassword"
                     style="@style/EmailTextEdit"
                     />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mật khẩu phải từ 8 đến 25 ký tự gồm số và chữ cái, trong đó có ít nhất 1 chữ cái viết hoa, 1 chữ viết thuòng và ký tự đặc biệt!"
+                    style="@style/EmailTextView"
+                    />
 
                 <TextView
                     android:id="@+id/tv_register_password_rewrite"
