@@ -1,4 +1,4 @@
-package com.example.edushare.feature.locations;
+package com.example.edushare.feature.locations.model;
 
 public class ItemLocation {
     private int id;

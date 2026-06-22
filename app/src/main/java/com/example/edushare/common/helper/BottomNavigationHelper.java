@@ -8,7 +8,7 @@ import android.widget.Toast;
 import com.example.edushare.R;
 import com.example.edushare.feature.chat.conversation.activity.ConversationActivity;
 import com.example.edushare.feature.home.activity.HomeActivity;
-import com.example.edushare.feature.locations.MapActivity;
+import com.example.edushare.feature.locations.activity.MapActivity;
 import com.example.edushare.feature.users.activity.ProfileActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.card.MaterialCardView;

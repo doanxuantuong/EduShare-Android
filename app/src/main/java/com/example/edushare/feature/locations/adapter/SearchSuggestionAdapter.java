@@ -1,4 +1,4 @@
-package com.example.edushare.feature.locations;
+package com.example.edushare.feature.locations.adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -10,6 +10,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.example.edushare.feature.locations.model.ItemLocation;
 
 import java.util.ArrayList;
 import java.util.List;
