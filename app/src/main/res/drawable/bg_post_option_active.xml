@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Nền trạng thái đã chọn của lựa chọn Item Type. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/post_primary" />
+    <corners android:radius="10dp" />
+</shape>
