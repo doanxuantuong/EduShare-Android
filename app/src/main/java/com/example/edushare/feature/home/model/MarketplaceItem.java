@@ -1,6 +1,7 @@
 package com.example.edushare.feature.home.model;
 
 public class MarketplaceItem {
+    private int id;
     private final int imageResource;
     private final String imageUrl;
     private final String condition;
@@ -11,6 +12,7 @@ public class MarketplaceItem {
     private final boolean verified;
 
     public MarketplaceItem(
+            int id,
             int imageResource,
             String imageUrl,
             String condition,
@@ -20,6 +22,7 @@ public class MarketplaceItem {
             String category,
             boolean verified
     ) {
+        this.id = id;
         this.imageResource = imageResource;
         this.imageUrl = imageUrl;
         this.condition = condition;
@@ -29,7 +32,7 @@ public class MarketplaceItem {
         this.category = category;
         this.verified = verified;
     }
-
+    public int getId() { return id; }
     public int getImageResource() {
         return imageResource;
     }
