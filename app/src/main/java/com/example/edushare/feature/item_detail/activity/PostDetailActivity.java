@@ -22,7 +22,8 @@ import com.example.edushare.feature.item_detail.model.PostDetailResponseDTO;
 public class PostDetailActivity extends AppCompatActivity {
     private PostDetailRepository postDetailRepository;
     private ImageView ivProductImage;
-    private TextView tvProductTitle, tvProductPrice, tvShortLocation;
+    private TextView tvProductTitle, tvProductPrice, tvShortLocation,tvFreeBadge;
+
 
     @Override // Bổ sung @Override cho đúng vòng đời Activity
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,6 +37,8 @@ public class PostDetailActivity extends AppCompatActivity {
         tvProductTitle = findViewById(R.id.tvProductTitle);
         tvProductPrice = findViewById(R.id.tvProductPrice);
         tvShortLocation = findViewById(R.id.tvShortLocation);
+        tvFreeBadge = findViewById(R.id.tvFreeBadge);
+
         RecyclerView rvTags = findViewById(R.id.rvTags);
 
         int postId = getIntent().getIntExtra("POST_ID", -1);
@@ -64,7 +67,33 @@ public class PostDetailActivity extends AppCompatActivity {
                 tvProductTitle.setText(data.getTitle());
                 tvProductPrice.setText(data.getPrice() + "đ");
                 tvShortLocation.setText(data.getLocationName());
+                String type = data.getTransactionType();
+                if (type != null && !type.isEmpty()) {
+                    // 1. Gán chữ trực tiếp từ DB lên badge (Viết hoa toàn bộ cho đẹp)
+                    tvFreeBadge.setText(type.toUpperCase());
+                    tvFreeBadge.setVisibility(View.VISIBLE);
 
+                    // 2. Tùy biến màu sắc một chút cho phân biệt giữa các loại (Optional - Nhìn cho chuyên nghiệp)
+                    switch (type.toUpperCase()) {
+                        case "FREE":
+                            tvFreeBadge.setBackgroundColor(android.graphics.Color.parseColor("#059669")); // Màu xanh lá
+                            tvProductPrice.setText("Miễn phí"); // Nếu FREE thì ghi đè chữ giá tiền thành Miễn phí luôn
+                            break;
+                        case "EXCHANGE":
+                            tvFreeBadge.setBackgroundColor(android.graphics.Color.parseColor("#3B82F6")); // Màu xanh dương
+                            tvProductPrice.setText("Trao đổi đồ");
+                            break;
+                        case "SALE":
+                            tvFreeBadge.setBackgroundColor(android.graphics.Color.parseColor("#EF4444")); // Màu đỏ
+                            break;
+                        default:
+                            tvFreeBadge.setBackgroundColor(android.graphics.Color.parseColor("#6B7280")); // Màu xám mặc định nếu có loại khác
+                            break;
+                    }
+                } else {
+                    // Nếu không có transaction type thì ẩn badge đi
+                    tvFreeBadge.setVisibility(View.GONE);
+                }
                 // Load hình ảnh từ URL server bằng Glide
                 if (data.getImageUrl() != null && !data.getImageUrl().isEmpty()) {
                     Glide.with(PostDetailActivity.this)
