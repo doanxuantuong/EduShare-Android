@@ -1,145 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout android:id="@+id/layout_login_main"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    style="@style/MainLayout"
-    >
+    android:fillViewport="true">
 
-    <LinearLayout android:id="@+id/layout_login"
+    <LinearLayout android:id="@+id/layout_login_main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        style="@style/LoginLayout"
-        >
+        style="@style/MainLayout">
 
-        <ImageView android:id="@+id/iv_logo"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:src="@drawable/img"
-            style="@style/LogoImage"
-            />
-
-        <TextView android:id="@+id/tv_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Chào mừng đến EduShare"
-            style="@style/TitleText"
-            />
-
-        <TextView android:id="@+id/tv_sub_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Sàn giao dịch tài nguyên học thuật dành cho sinh viên"
-            style="@style/SubTitleText"
-            />
-
-        <LinearLayout android:id="@+id/layout_login_form"
+        <LinearLayout android:id="@+id/layout_login"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            style="@style/LoginFormLayout"
-            >
+            style="@style/LoginLayout">
 
-            <LinearLayout android:id="@+id/layout_toggle"
+            <ImageView android:id="@+id/iv_logo"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:src="@drawable/img"
+                style="@style/LogoImage" />
+
+            <TextView android:id="@+id/tv_title"
                 android:layout_width="match_parent"
-                android:layout_height="45dp"
-                android:orientation="horizontal"
-                style="@style/ToggleLayout"
-                >
+                android:layout_height="wrap_content"
+                android:text="Chào mừng đến EduShare"
+                style="@style/TitleText" />
 
-                <TextView android:id="@+id/tv_login"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
+            <TextView android:id="@+id/tv_sub_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sàn giao dịch tài nguyên học thuật dành cho sinh viên"
+                style="@style/SubTitleText" />
+
+            <LinearLayout android:id="@+id/layout_login_form"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                style="@style/LoginFormLayout">
+
+                <LinearLayout android:id="@+id/layout_toggle"
+                    android:layout_width="match_parent"
+                    android:layout_height="45dp"
+                    android:orientation="horizontal"
+                    style="@style/ToggleLayout">
+
+                    <TextView android:id="@+id/tv_login"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:text="Đăng nhập"
+                        style="@style/LoginBox" />
+
+                    <TextView android:id="@+id/tv_sign_up"
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:text="Đăng ký"
+                        style="@style/SignUpBox" />
+                </LinearLayout>
+
+                <TextView android:id="@+id/tv_email"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tài khoản Sinh viên"
+                    style="@style/EmailTextView" />
+
+                <EditText android:id="@+id/edt_email"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="student@university.edu"
+                    style="@style/EmailTextEdit" />
+
+                <TextView android:id="@+id/tv_note"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Sử dụng email sinh viên chính thức!"
+                    style="@style/Note" />
+
+                <TextView android:id="@+id/tv_password"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mật khẩu"
+                    style="@style/EmailTextView" />
+
+                <EditText android:id="@+id/edt_password"
+                    android:layout_width="match_parent"
+                    android:layout_height="48dp"
+                    android:hint="Nhập mật khẩu"
+                    android:inputType="textPassword"
+                    style="@style/EmailTextEdit" />
+
+                <TextView android:id="@+id/tv_forgot"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Quên mật khẩu?"
+                    style="@style/Forgot" />
+
+                <Button android:id="@+id/btn_verify"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
                     android:text="Đăng nhập"
-                    style="@style/LoginBox"
-                    />
+                    style="@style/LoginButton" />
 
-                <TextView android:id="@+id/tv_sign_up"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:text="Đăng ký"
-                    style="@style/SignUpBox"
-                    />
+                <Button
+                    android:id="@+id/btn_ocr"
+                    android:layout_width="match_parent"
+                    android:layout_height="40dp"
+                    android:text="Quét mã OCR"
+                    style="@style/OcrButton" />
+
+                <TextView android:id="@+id/tv_sub_sign_up"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Bạn chưa có tài khoản? Đăng ký"
+                    style="@style/SubSignUp" />
             </LinearLayout>
 
-            <TextView android:id="@+id/tv_email"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Tài khoản Sinh viên"
-                style="@style/EmailTextView"
-                />
-
-            <EditText android:id="@+id/edt_email"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:hint="student@university.edu"
-                style="@style/EmailTextEdit"
-                />
-
-            <TextView android:id="@+id/tv_note"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Sử dụng email sinh viên chính thức!"
-                style="@style/Note"
-                />
-
-            <TextView android:id="@+id/tv_password"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Mật khẩu"
-                style="@style/EmailTextView"
-                />
-
-            <EditText android:id="@+id/edt_password"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:hint="Nhập mật khẩu"
-                android:inputType="textPassword"
-                style="@style/EmailTextEdit"
-                />
-
-            <TextView android:id="@+id/tv_forgot"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Quên mật khẩu?"
-                style="@style/Forgot"
-                />
-
-            <Button android:id="@+id/btn_verify"
-                android:layout_width="match_parent"
-                android:layout_height="50dp"
-                android:text="Đăng nhập"
-                style="@style/LoginButton"
-                />
-
-            <Button
-                android:id="@+id/btn_ocr"
-                android:layout_width="match_parent"
-                android:layout_height="40dp"
-                android:text="Quét mã OCR"
-                style="@style/OcrButton"
-                />
-
-
-            <TextView android:id="@+id/tv_sub_sign_up"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Bạn chưa có tài khoản? Đăng ký"
-                style="@style/SubSignUp"
-                />
         </LinearLayout>
-
-    </LinearLayout>
 
         <TextView android:id="@+id/tv_made_by"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Tạo bởi Nguyễn Ngọc Minh Đẹp Trai Số 1"
-            style="@style/MadeBy"
-            />
+            style="@style/MadeBy" />
 
-</LinearLayout>
+    </LinearLayout>
+
+</ScrollView>

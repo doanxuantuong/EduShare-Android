@@ -52,7 +52,7 @@
         <activity android:name=".feature.users.activity.ProfileActivity" />
         <activity android:name=".feature.chat.conversation.activity.ConversationActivity" />
         <activity android:name=".feature.locations.activity.MapActivity" />
-
+        <activity android:name=".feature.item_detail.activity.PostDetailActivity" />
         <service
             android:name=".feature.notification.firebase.service.MyFirebaseMessagingService"
             android:exported="false">
