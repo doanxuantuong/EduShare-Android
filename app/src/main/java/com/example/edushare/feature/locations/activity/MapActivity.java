@@ -24,6 +24,8 @@ import androidx.core.content.ContextCompat;
 import com.example.edushare.R;
 import com.example.edushare.feature.locations.adapter.SearchSuggestionAdapter;
 import com.example.edushare.feature.locations.helper.*;
+import com.example.edushare.feature.locations.model.PostMapDto;
+import com.example.edushare.feature.locations.network.RetrofitClient;
 import com.google.android.gms.location.CurrentLocationRequest;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -103,66 +105,100 @@ public class MapActivity extends AppCompatActivity {
 
 
     // Sample data
-    private void loadSampleData() {
-        // Dorm A
-        allItems.add(new ItemLocation(1, "Laptop Dell", "Dorm A",
-                10.8715, 106.7928, "Laptop Dell 15 inch màu đen", ""));
-        allItems.add(new ItemLocation(2, "Laptop Asus", "Dorm A",
-                10.8714, 106.7929, "Laptop Asus VivoBook", ""));
-        allItems.add(new ItemLocation(3, "Balo Nike", "Dorm A",
-                10.8712, 106.7931, "Balo Nike màu xanh", ""));
-        allItems.add(new ItemLocation(4, "Tai nghe Sony", "Dorm A",
-                10.8713, 106.7930, "Tai nghe chống ồn", ""));
+//    private void loadSampleData() {
+//        // Dorm A
+//        allItems.add(new ItemLocation(1, "Laptop Dell", "Dorm A",
+//                10.8715, 106.7928, "Laptop Dell 15 inch màu đen", ""));
+//        allItems.add(new ItemLocation(2, "Laptop Asus", "Dorm A",
+//                10.8714, 106.7929, "Laptop Asus VivoBook", ""));
+//        allItems.add(new ItemLocation(3, "Balo Nike", "Dorm A",
+//                10.8712, 106.7931, "Balo Nike màu xanh", ""));
+//        allItems.add(new ItemLocation(4, "Tai nghe Sony", "Dorm A",
+//                10.8713, 106.7930, "Tai nghe chống ồn", ""));
+//
+//        // Dorm B
+//        allItems.add(new ItemLocation(5, "Laptop HP", "Dorm B",
+//                10.8720, 106.7940, "Laptop HP Pavilion", ""));
+//        allItems.add(new ItemLocation(6, "Laptop Dell", "Dorm B",
+//                10.8719, 106.7941, "Laptop Dell Inspiron", ""));
+//        allItems.add(new ItemLocation(7, "Tai nghe Sony", "Dorm B",
+//                10.8721, 106.7942, "Sony WH-1000XM4", ""));
+//        allItems.add(new ItemLocation(8, "Sạc dự phòng", "Dorm B",
+//                10.8718, 106.7943, "Pin dự phòng 20000mAh", ""));
+//
+//        // Canteen
+//        allItems.add(new ItemLocation(9, "Xe đạp", "Canteen",
+//                10.8708, 106.7925, "Xe đạp gấp màu đỏ", ""));
+//        allItems.add(new ItemLocation(10, "Laptop Lenovo", "Canteen",
+//                10.8707, 106.7926, "Laptop Lenovo ThinkPad", ""));
+//        allItems.add(new ItemLocation(11, "Áo mưa", "Canteen",
+//                10.8705, 106.7922, "Áo mưa 2 lớp size M", ""));
+//        allItems.add(new ItemLocation(12, "Balo Adidas", "Canteen",
+//                10.8706, 106.7924, "Balo Adidas màu đen", ""));
+//
+//        // Library
+//        allItems.add(new ItemLocation(13, "Laptop Acer", "Library",
+//                10.8722, 106.7935, "Laptop Acer Aspire", ""));
+//        allItems.add(new ItemLocation(14, "Laptop Dell", "Library",
+//                10.8723, 106.7936, "Laptop Dell Latitude", ""));
+//        allItems.add(new ItemLocation(15, "Giày thể thao", "Library",
+//                10.8724, 106.7937, "Nike Air Force 1 size 42", ""));
+//        allItems.add(new ItemLocation(16, "Cặp sách", "Library",
+//                10.8725, 106.7938, "Cặp da màu nâu", ""));
+//
+//        // Hall A
+//        allItems.add(new ItemLocation(17, "Laptop MacBook", "Hall A",
+//                10.8730, 106.7930, "MacBook Air M2", ""));
+//        allItems.add(new ItemLocation(18, "Tai nghe AirPods", "Hall A",
+//                10.8731, 106.7931, "AirPods Pro", ""));
+//        allItems.add(new ItemLocation(19, "Sạc dự phòng", "Hall A",
+//                10.8732, 106.7932, "Pin dự phòng Anker", ""));
+//
+//        // Hall B
+//        allItems.add(new ItemLocation(20, "Laptop Dell", "Hall B",
+//                10.8735, 106.7945, "Dell XPS 13", ""));
+//        allItems.add(new ItemLocation(21, "Balo Nike", "Hall B",
+//                10.8736, 106.7946, "Balo Nike thể thao", ""));
+//        allItems.add(new ItemLocation(22, "Tai nghe Sony", "Hall B",
+//                10.8737, 106.7947, "Sony XB910N", ""));
+//    }
 
-        // Dorm B
-        allItems.add(new ItemLocation(5, "Laptop HP", "Dorm B",
-                10.8720, 106.7940, "Laptop HP Pavilion", ""));
-        allItems.add(new ItemLocation(6, "Laptop Dell", "Dorm B",
-                10.8719, 106.7941, "Laptop Dell Inspiron", ""));
-        allItems.add(new ItemLocation(7, "Tai nghe Sony", "Dorm B",
-                10.8721, 106.7942, "Sony WH-1000XM4", ""));
-        allItems.add(new ItemLocation(8, "Sạc dự phòng", "Dorm B",
-                10.8718, 106.7943, "Pin dự phòng 20000mAh", ""));
+    // Thêm method này vào MapActivity
+    private void loadPostsFromApi() {
+        RetrofitClient.getApiService()
+                .getPostsForMap(null, null)
+                .enqueue(new retrofit2.Callback<List<PostMapDto>>() {
 
-        // Canteen
-        allItems.add(new ItemLocation(9, "Xe đạp", "Canteen",
-                10.8708, 106.7925, "Xe đạp gấp màu đỏ", ""));
-        allItems.add(new ItemLocation(10, "Laptop Lenovo", "Canteen",
-                10.8707, 106.7926, "Laptop Lenovo ThinkPad", ""));
-        allItems.add(new ItemLocation(11, "Áo mưa", "Canteen",
-                10.8705, 106.7922, "Áo mưa 2 lớp size M", ""));
-        allItems.add(new ItemLocation(12, "Balo Adidas", "Canteen",
-                10.8706, 106.7924, "Balo Adidas màu đen", ""));
+                    @Override
+                    public void onResponse(retrofit2.Call<List<PostMapDto>> call,
+                                           retrofit2.Response<List<PostMapDto>> response) {
+                        if (!response.isSuccessful() || response.body() == null) {
+                            Toast.makeText(MapActivity.this,
+                                    "Lỗi: " + response.code(), Toast.LENGTH_SHORT).show();
+                            return;
+                        }
 
-        // Library
-        allItems.add(new ItemLocation(13, "Laptop Acer", "Library",
-                10.8722, 106.7935, "Laptop Acer Aspire", ""));
-        allItems.add(new ItemLocation(14, "Laptop Dell", "Library",
-                10.8723, 106.7936, "Laptop Dell Latitude", ""));
-        allItems.add(new ItemLocation(15, "Giày thể thao", "Library",
-                10.8724, 106.7937, "Nike Air Force 1 size 42", ""));
-        allItems.add(new ItemLocation(16, "Cặp sách", "Library",
-                10.8725, 106.7938, "Cặp da màu nâu", ""));
+                        allItems.clear();
+                        for (PostMapDto dto : response.body()) {
+                            allItems.add(dto.toItemLocation());
+                        }
 
-        // Hall A
-        allItems.add(new ItemLocation(17, "Laptop MacBook", "Hall A",
-                10.8730, 106.7930, "MacBook Air M2", ""));
-        allItems.add(new ItemLocation(18, "Tai nghe AirPods", "Hall A",
-                10.8731, 106.7931, "AirPods Pro", ""));
-        allItems.add(new ItemLocation(19, "Sạc dự phòng", "Hall A",
-                10.8732, 106.7932, "Pin dự phòng Anker", ""));
+                        // Refresh UI trên main thread (đã ở main thread do Retrofit)
+                        suggestionAdapter.updateData(allItems);
+                        setupAreaFilters();
 
-        // Hall B
-        allItems.add(new ItemLocation(20, "Laptop Dell", "Hall B",
-                10.8735, 106.7945, "Dell XPS 13", ""));
-        allItems.add(new ItemLocation(21, "Balo Nike", "Hall B",
-                10.8736, 106.7946, "Balo Nike thể thao", ""));
-        allItems.add(new ItemLocation(22, "Tai nghe Sony", "Hall B",
-                10.8737, 106.7947, "Sony XB910N", ""));
+                        Toast.makeText(MapActivity.this,
+                                "Đã tải " + allItems.size() + " items", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onFailure(retrofit2.Call<List<PostMapDto>> call, Throwable t) {
+                        Toast.makeText(MapActivity.this,
+                                "Lỗi kết nối: " + t.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
     }
-
     //Lifecycle
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -185,7 +221,8 @@ public class MapActivity extends AppCompatActivity {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         osrmHelper = new OsrmRouteHelper();
 
-        loadSampleData();
+//        loadSampleData();
+        loadPostsFromApi();
 
         setupSearch();
         setupAreaFilters();
