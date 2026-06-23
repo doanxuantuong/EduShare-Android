@@ -6,13 +6,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
+import android.content.Intent;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.edushare.R;
 import com.example.edushare.feature.home.model.MarketplaceItem;
+import com.example.edushare.feature.item_detail.activity.PostDetailActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +62,12 @@ public class MarketplaceItemAdapter extends RecyclerView.Adapter<MarketplaceItem
         holder.tvItemLocation.setText(item.getLocation());
         holder.tvItemPrice.setText(item.getPrice());
         holder.ivVerified.setVisibility(item.isVerified() ? View.VISIBLE : View.GONE);
+
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(v.getContext(), PostDetailActivity.class);
+            intent.putExtra("POST_ID", item.getId());
+            v.getContext().startActivity(intent);
+        });
     }
 
     @Override

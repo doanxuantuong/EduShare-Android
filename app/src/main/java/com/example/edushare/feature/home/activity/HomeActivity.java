@@ -101,6 +101,7 @@ public class HomeActivity extends AppCompatActivity {
         String title = safeText(post.getTitle(), "Untitled item");
 
         return new MarketplaceItem(
+                post.getId(),
                 R.drawable.img_organic_chemistry_textbook,
                 post.getImageUrl(),
                 status,
