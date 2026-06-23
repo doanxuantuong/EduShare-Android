@@ -4,6 +4,8 @@ import android.content.Context;
 
 import com.example.edushare.common.helper.AuthInterceptor;
 
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
@@ -28,6 +30,11 @@ public class RetrofitClient {
             //Do muốn có logging (HttpLoggingInterceptor) nên tạo ra để thêm HttpLoggingInterceptor
             //1 cái OkHttpClient sẽ không có logging
             OkHttpClient client = new OkHttpClient.Builder()
+
+                    .connectTimeout(30, TimeUnit.SECONDS) // Thời gian kết nối tối đa
+                    .readTimeout(30, TimeUnit.SECONDS)    // Thời gian chờ Server phản hồi (rất quan trọng khi gửi mail)
+                    .writeTimeout(30, TimeUnit.SECONDS)
+
                     // Tự động gắn JWT vào request
                     .addInterceptor(new AuthInterceptor(context.getApplicationContext()))
 

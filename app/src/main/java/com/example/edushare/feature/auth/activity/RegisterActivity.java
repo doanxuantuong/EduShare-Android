@@ -1,5 +1,6 @@
 package com.example.edushare.feature.auth.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -10,11 +11,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.edushare.R;
 import com.example.edushare.common.base.OnActionCallback;
 import com.example.edushare.common.helper.RegisterValidator;
+import com.example.edushare.feature.auth.request.SendOtpRequest;
 import com.example.edushare.feature.users.LocalUserRepository;
-import com.example.edushare.feature.users.User;
 import com.example.edushare.feature.users.UserRepository;
-import com.example.edushare.feature.auth.request.RegisterRequest;
-import com.example.edushare.feature.auth.response.RegisterResponse;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -44,42 +43,35 @@ public class RegisterActivity extends AppCompatActivity {
         btnCreate.setOnClickListener(v -> {
             if (RegisterValidator.validate(teFullname, teEmail, teStudentCode, tePhone, tePassword, teRewritePassword)) {
 
-                RegisterRequest registerRequest = new RegisterRequest();
-                registerRequest.setFullName(teFullname.getText().toString().trim());
-                registerRequest.setEmail(teEmail.getText().toString().trim());
-                registerRequest.setStudentCode(teStudentCode.getText().toString().trim());
-                registerRequest.setPhone(tePhone.getText().toString().trim());
-                registerRequest.setPassword(tePassword.getText().toString().trim());
-                registerRequest.setConfirmPassword(teRewritePassword.getText().toString().trim());
+                String email = teEmail.getText().toString().trim();
+                btnCreate.setEnabled(false); // Tránh spam click
 
-
-                // Gọi BE để đăng ký
-                userRepository.register(registerRequest, new OnActionCallback<String>() {
+                // Bước 1: Gọi API gửi OTP ngay tại trang Đăng Ký
+                userRepository.sendOtp(new SendOtpRequest(email), new OnActionCallback<String>() {
                     @Override
                     public void onSuccess(String message) {
-                        Toast.makeText(RegisterActivity.this, message, Toast.LENGTH_SHORT).show();
+                        btnCreate.setEnabled(true);
+                        Toast.makeText(RegisterActivity.this, "Mã OTP đã gửi đến Mail của bạn!", Toast.LENGTH_SHORT).show();
 
-                        // Sau khi đăng ký thành công BE, lưu local bằng Room
-                        localUserRepository.register(registerRequest, tePassword.getText().toString().trim(),
-                                new OnActionCallback<String>() {
-                                    @Override
-                                    public void onSuccess(String msg) {
-                                        Toast.makeText(RegisterActivity.this, msg, Toast.LENGTH_SHORT).show();
-                                    }
-
-                                    @Override
-                                    public void onFailure(String error) {
-                                        Toast.makeText(RegisterActivity.this, error, Toast.LENGTH_LONG).show();
-                                    }
-                                });
+                        // Bước 2: Gửi OTP thành công thì mới chuyển sang trang CheckMail
+                        Intent intent = new Intent(RegisterActivity.this, CheckMailActivity.class);
+                        intent.putExtra("fullName", teFullname.getText().toString().trim());
+                        intent.putExtra("email", email);
+                        intent.putExtra("phone", tePhone.getText().toString().trim());
+                        intent.putExtra("studentCode", teStudentCode.getText().toString().trim());
+                        intent.putExtra("password", tePassword.getText().toString().trim());
+                        intent.putExtra("confirmPassword", teRewritePassword.getText().toString().trim());
+                        startActivity(intent);
                     }
 
                     @Override
                     public void onFailure(String error) {
-                        Toast.makeText(RegisterActivity.this, error, Toast.LENGTH_LONG).show();
+                        btnCreate.setEnabled(true);
+                        Toast.makeText(RegisterActivity.this, "Gửi OTP thất bại: " + error, Toast.LENGTH_LONG).show();
                     }
                 });
             }
         });
+
     }
 }
