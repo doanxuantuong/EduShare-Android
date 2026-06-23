@@ -1,6 +1,6 @@
-package com.example.edushare.feature.notification.user_fcm_token.api;
+package com.example.edushare.common.firebase.user_fcm_token.api;
 
-import com.example.edushare.feature.notification.user_fcm_token.dto.SaveFcmTokenRequest;
+import com.example.edushare.common.firebase.user_fcm_token.dto.SaveFcmTokenRequest;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
