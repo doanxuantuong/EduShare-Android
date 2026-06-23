@@ -1,5 +1,6 @@
 package com.example.edushare.feature.home.adapter;
 
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.edushare.R;
 import com.example.edushare.feature.home.model.MarketplaceItem;
 
@@ -45,7 +47,15 @@ public class MarketplaceItemAdapter extends RecyclerView.Adapter<MarketplaceItem
     @Override
     public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
         MarketplaceItem item = items.get(position);
-        holder.ivItemPhoto.setImageResource(item.getImageResource());
+        if (!TextUtils.isEmpty(item.getImageUrl())) {
+            Glide.with(holder.ivItemPhoto.getContext())
+                    .load(item.getImageUrl())
+                    .placeholder(item.getImageResource())
+                    .error(item.getImageResource())
+                    .into(holder.ivItemPhoto);
+        } else {
+            holder.ivItemPhoto.setImageResource(item.getImageResource());
+        }
         holder.tvCondition.setText(item.getCondition());
         holder.tvItemTitle.setText(item.getTitle());
         holder.tvItemLocation.setText(item.getLocation());

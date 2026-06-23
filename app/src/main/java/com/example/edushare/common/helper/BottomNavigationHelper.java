@@ -3,18 +3,18 @@ package com.example.edushare.common.helper;
 import android.app.Activity;
 import android.content.Intent;
 import android.view.View;
-import android.widget.Toast;
 
 import com.example.edushare.R;
 import com.example.edushare.feature.chat.conversation.activity.ConversationActivity;
 import com.example.edushare.feature.home.activity.HomeActivity;
 import com.example.edushare.feature.locations.activity.MapActivity;
+import com.example.edushare.feature.post.activity.PostItemActivity;
 import com.example.edushare.feature.users.activity.ProfileActivity;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.card.MaterialCardView;
 
 public class BottomNavigationHelper {
-    // Hàm dùng chung cho mọi Activity
+    // Hàm dùng chung để gắn điều hướng dưới cho các Activity có layout_footer.
     public static void setup(Activity context, View footerRoot, int currentItemId) {
 
         // 1. Tìm BottomNavigationView và nút Post từ trong layout dùng chung
@@ -57,12 +57,10 @@ public class BottomNavigationHelper {
         // 3. Bắt riêng sự kiện Click cho nút POST tự chế ở giữa
         if (btnPost != null) {
             btnPost.setOnClickListener(v -> {
-                // Xử lý khi bấm nút Post ở đây
-                Toast.makeText(context, context.getString(R.string.home_post_coming_soon), Toast.LENGTH_SHORT).show();
-
-                // Ví dụ sau này muốn mở màn hình tạo bài viết:
-                // Intent intent = new Intent(context, CreatePostActivity.class);
-                // context.startActivity(intent);
+                Intent intent = new Intent(context, PostItemActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+                context.startActivity(intent);
+                context.overridePendingTransition(0, 0);
             });
         }
     }

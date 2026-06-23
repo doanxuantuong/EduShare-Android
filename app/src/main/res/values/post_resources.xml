@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Bảng màu riêng của màn Post, tránh ảnh hưởng màu đang dùng ở feature khác. -->
+    <color name="post_background">#F5F6FA</color>
+    <color name="post_text_primary">#1F2937</color>
+    <color name="post_text_secondary">#6B7280</color>
+    <color name="post_text_hint">#9CA3AF</color>
+    <color name="post_surface_muted">#F8FAFC</color>
+    <color name="post_chip_gray">#E2E6EA</color>
+    <color name="post_primary">#0D9488</color>
+    <color name="post_primary_dark">#0D9488</color>
+
+    <!-- Text chỉ dùng cho màn tạo Post item. -->
+    <string name="post_item_title">Post New Item</string>
+    <string name="post_photos">Photos</string>
+    <string name="post_add_photo">Add</string>
+    <string name="post_photo_limit">Add up to 8 photos</string>
+    <string name="post_item_type">Item Type</string>
+    <string name="post_type_sale">For Sale</string>
+    <string name="post_type_free">Free/Borrow</string>
+    <string name="post_title_label">Title</string>
+    <string name="post_title_hint">e.g., Organic Chemistry Textbook</string>
+    <string name="post_category">Category</string>
+    <string name="post_select_category">Select category</string>
+    <string name="post_condition">Condition</string>
+    <string name="post_condition_new">New</string>
+    <string name="post_condition_like_new">Like New</string>
+    <string name="post_condition_good">Good</string>
+    <string name="post_condition_fair">Fair</string>
+    <string name="post_condition_poor">Poor</string>
+    <string name="post_price">Price (&#273;)</string>
+    <string name="post_price_hint">Enter price</string>
+    <string name="post_location">Location</string>
+    <string name="post_select_location">Select location</string>
+    <string name="post_description">Description</string>
+    <string name="post_description_hint">Describe your item...</string>
+    <string name="post_submit">Post Item</string>
+    <string name="post_photo_picker_message">Photo picker will be added when upload API is ready</string>
+    <string name="post_validation_title_required">Please enter item title</string>
+    <string name="post_validation_category_required">Please select category</string>
+    <string name="post_validation_condition_required">Please select condition</string>
+    <string name="post_validation_price_required">Please enter price</string>
+    <string name="post_validation_location_required">Please select location</string>
+    <string name="post_submit_success">Post item form is ready</string>
+    <string name="desc_back">Back</string>
+    <string name="desc_add_photo">Add photos</string>
+
+    <!-- Option của Popup đặt trong resources để Helper không hardcode dữ liệu UI. -->
+    <string-array name="post_category_options">
+        <item>@string/home_category_textbooks</item>
+        <item>@string/home_category_lab_equipment</item>
+        <item>@string/home_category_electronics</item>
+    </string-array>
+
+    <string-array name="post_location_options">
+        <item>Dorm A - Room 305</item>
+        <item>Dorm B - Room 201</item>
+        <item>Library</item>
+        <item>Canteen</item>
+    </string-array>
+
+    <!-- Theme của màn Post chỉ đổi nền màn hình, không chỉnh theme chung của app. -->
+    <style name="Theme.EduShare.Post" parent="Theme.EduShare">
+        <item name="android:windowBackground">@color/post_background</item>
+    </style>
+
+    <!-- Style dùng lại giúp activity_post_item.xml tập trung vào cấu trúc layout. -->
+    <style name="PostSectionTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textColor">@color/post_text_primary</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="PostTypeButton">
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+    </style>
+
+    <style name="PostFormCard">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_marginTop">16dp</item>
+        <item name="android:background">@drawable/bg_post_card</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:padding">16dp</item>
+    </style>
+
+    <style name="PostInput">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:background">@drawable/bg_post_input</item>
+        <item name="android:importantForAutofill">no</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:textColor">@color/post_text_primary</item>
+        <item name="android:textColorHint">@color/post_text_hint</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="PostSelectInput">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:background">@drawable/bg_post_input</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:textColor">@color/black</item>
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="PostConditionChip">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">40dp</item>
+        <item name="android:background">@drawable/bg_post_chip_inactive</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:gravity">center</item>
+        <item name="android:minWidth">72dp</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:textColor">#4B5563</item>
+        <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="PostDescriptionInput" parent="PostInput">
+        <item name="android:layout_height">120dp</item>
+        <item name="android:paddingTop">16dp</item>
+        <item name="android:paddingBottom">16dp</item>
+        <item name="android:maxLines">6</item>
+    </style>
+</resources>
+
