@@ -7,6 +7,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -41,7 +42,7 @@ public class NotificationActivity extends AppCompatActivity {
         userId = UserSessionHelper.getUserId(this);
 
         if (userId != null && !userId.isEmpty()) {
-            notificationViewModel.loadNotification(userId);
+            notificationViewModel.loadNextPage(userId);
         }
 
         btnBack.setOnClickListener(view -> {
@@ -57,8 +58,36 @@ public class NotificationActivity extends AppCompatActivity {
 
     private void initRecyclerView() {
         notificationAdapter = new NotificationAdapter();
-        rvNotifications.setLayoutManager(new LinearLayoutManager(this));
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        rvNotifications.setLayoutManager(layoutManager);
         rvNotifications.setAdapter(notificationAdapter);
+
+        rvNotifications.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+
+                // dy > 0 nghĩa là người dùng đang vuốt TỪ DƯỚI LÊN (cuộn xuống xem bài cũ)
+                if (dy > 0) {
+                    // Lấy ra số lượng item đang hiển thị trên màn hình
+                    int visibleItemCount = layoutManager.getChildCount();
+                    // Lấy ra tổng số item đang có trong Adapter
+                    int totalItemCount = layoutManager.getItemCount();
+                    // Lấy ra vị trí của item đầu tiên đang hiển thị trên cùng
+                    int pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
+
+                    // CÔNG THỨC KIỂM TRA ĐÁY MÀN HÌNH:
+                    // Nếu (số item nhìn thấy + số item đã cuộn qua) >= tổng số item
+                    // Có nghĩa là đã chạm tới đáy của danh sách!
+                    if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
+                        if (userId != null && !userId.isEmpty()) {
+                            // Gọi ViewModel kéo trang tiếp theo về
+                            notificationViewModel.loadNextPage(userId);
+                        }
+                    }
+                }
+            }
+        });
     }
 
     private void initViewModel() {

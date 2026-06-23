@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.example.edushare.common.base.OnActionCallback;
 import com.example.edushare.common.base.RetrofitClient;
+import com.example.edushare.feature.chat.message.dto.PageResponse;
 import com.example.edushare.feature.notification.dto.NotificationResponseDto;
 
 import java.util.List;
@@ -22,10 +23,10 @@ public class NotificationRepository {
         this.notificationApi = RetrofitClient.createService(NotificationApi.class, context);
     }
 
-    public void getUserNotification(String userId, OnActionCallback<List<NotificationResponseDto>> callback) {
-        notificationApi.getUserNotifications(userId).enqueue(new Callback<List<NotificationResponseDto>>() {
+    public void getUserNotification(String userId, int page, int size, OnActionCallback<PageResponse<NotificationResponseDto>> callback) {
+        notificationApi.getUserNotifications(userId, page, size).enqueue(new Callback<PageResponse<NotificationResponseDto>>() {
             @Override
-            public void onResponse(@NonNull Call<List<NotificationResponseDto>> call,@NonNull Response<List<NotificationResponseDto>> response) {
+            public void onResponse(@NonNull Call<PageResponse<NotificationResponseDto>> call,@NonNull Response<PageResponse<NotificationResponseDto>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     callback.onSuccess(response.body());
                 } else {
@@ -34,7 +35,7 @@ public class NotificationRepository {
             }
 
             @Override
-            public void onFailure(Call<List<NotificationResponseDto>> call, Throwable t) {
+            public void onFailure(Call<PageResponse<NotificationResponseDto>> call, Throwable t) {
                 callback.onFailure("Loi ket noi: " + t.getMessage());
             }
         });
