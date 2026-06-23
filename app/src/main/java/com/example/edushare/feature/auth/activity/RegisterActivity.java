@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,8 +18,9 @@ import com.example.edushare.feature.users.UserRepository;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    EditText teFullname, teEmail, teStudentCode, tePhone, tePassword, teRewritePassword;
-    Button btnCreate;
+    private EditText teFullname, teEmail, teStudentCode, tePhone, tePassword, teRewritePassword;
+    private Button btnCreate;
+    private TextView tvRegisterLogin, tvSubLogin;
 
     private LocalUserRepository localUserRepository;
     private UserRepository userRepository;
@@ -36,6 +38,9 @@ public class RegisterActivity extends AppCompatActivity {
         teRewritePassword = findViewById(R.id.edt_register_password_rewrite);
 
         btnCreate = findViewById(R.id.btn_creaedt_account);
+
+        tvRegisterLogin = findViewById(R.id.tv_register_login);
+        tvSubLogin = findViewById(R.id.tv_sub_login);
 
         localUserRepository = new LocalUserRepository(this);
         userRepository = new UserRepository(this);
@@ -73,5 +78,20 @@ public class RegisterActivity extends AppCompatActivity {
             }
         });
 
+        tvRegisterLogin.setOnClickListener(v -> {
+            navigateToLogin();
+        });
+
+        tvSubLogin.setOnClickListener(v -> {
+            navigateToLogin();
+        });
+
+    }
+
+    private void navigateToLogin() {
+        Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+        startActivity(intent);
+
+        finish();
     }
 }

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,6 +23,8 @@ public class LoginActivity extends AppCompatActivity {
     private Button btnVerify;
     private UserRepository userRepository;
 
+    private TextView tvSignUp, tvSubSignUp;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,6 +33,9 @@ public class LoginActivity extends AppCompatActivity {
         edtEmail = findViewById(R.id.edt_email);
         edtPassword = findViewById(R.id.edt_password);
         btnVerify = findViewById(R.id.btn_verify);
+
+        tvSignUp = findViewById(R.id.tv_sign_up);
+        tvSubSignUp = findViewById(R.id.tv_sub_sign_up);
 
         userRepository = new UserRepository(this);
 
@@ -74,6 +80,22 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        tvSignUp.setOnClickListener(v -> {
+            navigateToSignUp();
+        });
+
+        tvSubSignUp.setOnClickListener(v -> {
+            navigateToSignUp();
+        });
+
+    }
+
+    // Hàm phụ trợ dùng chung để chuyển màn hình sang Đăng ký
+    private void navigateToSignUp() {
+        Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+        startActivity(intent);
+        // Nếu bạn muốn đóng luôn màn hình Login khi sang Register thì bỏ comment dòng dưới:
+        // finish();
     }
 }
 
