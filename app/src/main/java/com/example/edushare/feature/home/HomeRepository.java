@@ -25,8 +25,7 @@ public class HomeRepository {
     public void getPosts(OnActionCallback<List<PostListItemResponse>> callback) {
         homeApi.getPosts().enqueue(new Callback<List<PostListItemResponse>>() {
             @Override
-            public void onResponse(@NonNull Call<List<PostListItemResponse>> call,
-                                   @NonNull Response<List<PostListItemResponse>> response) {
+            public void onResponse(@NonNull Call<List<PostListItemResponse>> call, @NonNull Response<List<PostListItemResponse>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     callback.onSuccess(response.body());
                 } else {

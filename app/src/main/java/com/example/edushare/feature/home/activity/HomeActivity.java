@@ -6,6 +6,8 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +23,7 @@ import com.example.edushare.feature.home.adapter.MarketplaceItemAdapter;
 import com.example.edushare.feature.home.model.MarketplaceItem;
 import com.example.edushare.feature.home.model.PostListItemResponse;
 import com.example.edushare.feature.locations.activity.MapActivity;
+import com.example.edushare.feature.notification.activity.NotificationActivity;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -39,6 +42,8 @@ public class HomeActivity extends AppCompatActivity {
     private TextView tvCategoryElectronics;
     private String selectedCategory = "All";
     private View footerLayout;
+    private FrameLayout btnNotification;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +56,11 @@ public class HomeActivity extends AppCompatActivity {
         setupSearch();
         setupBottomNavigation();
         fetchMarketplaceItems();
+
+        btnNotification.setOnClickListener(item -> {
+            Intent intent = new Intent(this, NotificationActivity.class);
+            startActivity(intent);
+        });
     }
 
     private void initViews() {
@@ -60,6 +70,7 @@ public class HomeActivity extends AppCompatActivity {
         tvCategoryTextbooks = findViewById(R.id.tvCategoryTextbooks);
         tvCategoryLabEquipment = findViewById(R.id.tvCategoryLabEquipment);
         tvCategoryElectronics = findViewById(R.id.tvCategoryElectronics);
+        btnNotification = findViewById(R.id.btnNotification);
 
         footerLayout = findViewById(R.id.footer_layout);
 
