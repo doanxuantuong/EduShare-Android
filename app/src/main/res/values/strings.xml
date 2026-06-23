@@ -28,11 +28,13 @@
         <item quantity="other">%1$d items</item>
     </plurals>
     <string name="home_post_coming_soon">Post feature is coming soon</string>
+    <string name="home_notifications">Notifications feature is coming soon</string>
     <string name="home_condition_good">Good</string>
     <string name="home_sample_item_title">Organic Chemistry Textbook - 5th...</string>
     <string name="home_sample_item_location">Dorm A - Room 305</string>
     <string name="home_sample_item_price">150,000đ</string>
     <string name="desc_edushare_logo">EduShare logo</string>
+    <string name="desc_notifications">Open notifications</string>
     <string name="desc_location">Open map</string>
     <string name="desc_item_photo">Organic Chemistry textbook</string>
     <string name="desc_verified_seller">Verified seller</string>
