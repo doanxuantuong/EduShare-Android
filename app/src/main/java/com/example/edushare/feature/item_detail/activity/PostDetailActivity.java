@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.edushare.R;
 import com.example.edushare.common.base.OnActionCallback;
+import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.feature.item_detail.adapter.TagAdapter;
 import com.example.edushare.feature.item_detail.repository.PostDetailRepository;
 import com.example.edushare.feature.item_detail.model.PostDetailResponseDTO;
@@ -148,13 +149,29 @@ public class PostDetailActivity extends AppCompatActivity {
                     }
                 }
 
+                String currentUserId = UserSessionHelper.getUserId(PostDetailActivity.this);
+
+                String sellerId = data.getAuthorId();
+
                 if (btnMessage != null) {
-                    btnMessage.setOnClickListener(v -> {
-                        String sellerId = data.getAuthorId();
-                        Toast.makeText(PostDetailActivity.this, "Chatting with user ID: " + sellerId, Toast.LENGTH_SHORT).show();
-                    });
+                    if (currentUserId.equals(sellerId)) {
+                        btnMessage.setVisibility(View.GONE);
+                        // Hoặc nếu bạn muốn đổi nút Message thành nút "Sửa bài" thì làm thế này:
+                        // if (btnMessage instanceof androidx.appcompat.widget.AppCompatButton) {
+                        //     ((androidx.appcompat.widget.AppCompatButton) btnMessage).setText("Edit Post");
+                        //     btnMessage.setVisibility(View.VISIBLE);
+                        //     btnMessage.setOnClickListener(v -> { /* Mở màn hình chỉnh sửa bài viết */ });
+                        // }
+                    } else {
+                        // Nếu là người khác xem -> Hiện nút nhắn tin bình thường
+                        btnMessage.setVisibility(View.VISIBLE);
+                        btnMessage.setOnClickListener(v -> {
+                            Toast.makeText(PostDetailActivity.this, "Chatting with user ID: " + sellerId, Toast.LENGTH_SHORT).show();
+                            // Xử lý Intent chuyển qua ChatActivity của bạn ở đây...
+                        });
+                    }
                 }
-            } // FIX LỖI 2: Dọn dẹp đóng ngoặc thừa tại đây
+            }
 
             @Override
             public void onFailure(String message) {
