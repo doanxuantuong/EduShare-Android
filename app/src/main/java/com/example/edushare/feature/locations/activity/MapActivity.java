@@ -24,7 +24,6 @@ import androidx.core.content.ContextCompat;
 import com.example.edushare.R;
 import com.example.edushare.feature.locations.adapter.SearchSuggestionAdapter;
 import com.example.edushare.feature.locations.helper.*;
-import com.example.edushare.feature.locations.model.ItemLocation;
 import com.google.android.gms.location.CurrentLocationRequest;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -32,6 +31,8 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.card.MaterialCardView;
 
@@ -45,37 +46,39 @@ import org.osmdroid.views.overlay.Polyline;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 
+import com.example.edushare.feature.locations.model.ItemLocation;
 
 public class MapActivity extends AppCompatActivity {
 
     private static final int LOCATION_REQUEST = 100;
-    // Khoảng cách (mét) để tự chuyển sang bước tiếp theo
     private static final float STEP_THRESHOLD_METERS = 15f;
-    // Khoảng cách (mét) để báo "Đã đến nơi"
     private static final float ARRIVED_THRESHOLD_METERS = 10f;
 
-    //view
+    // Views
     private MapView map;
     private AutoCompleteTextView edtSearch;
     private ImageButton btnSearch;
     private FloatingActionButton btnMyLocation;
     private MaterialCardView btnBack;
+    private String selectedArea = "All";
+    private ChipGroup chipGroupAreas;
 
-    // Info card (hiện sau khi search)
+    // Info card
     private CardView infoCard;
     private TextView txtItemName, txtItemArea, txtRouteInfo;
     private Button btnStartNav;
 
-    // Navigation card (hiện khi đang điều hướng)
+    // Navigation card
     private CardView navCard;
-    private TextView txtNavStep;      // "Rẽ trái sau 50m"
-    private TextView txtNavDistance;  // khoảng cách còn lại đến đích
+    private TextView txtNavStep;
+    private TextView txtNavDistance;
     private Button btnStopNav;
 
-    //state
+    // State
     private FusedLocationProviderClient fusedLocationClient;
     private OsrmRouteHelper osrmHelper;
     private SearchSuggestionAdapter suggestionAdapter;
@@ -83,38 +86,82 @@ public class MapActivity extends AppCompatActivity {
     private GeoPoint myLocation;
     private Marker myMarker;
     private Marker itemMarker;
+    private final List<Marker> searchMarkers = new ArrayList<>();
     private Polyline routePolyline;
 
     // Navigation state
     private boolean isNavigating = false;
-    private List<GeoPoint> routePoints = new ArrayList<>();  // toàn bộ điểm route
-    private List<OsrmRouteHelper.RouteStep> routeSteps = new ArrayList<>(); // các bước chỉ dẫn
+    private List<GeoPoint> routePoints = new ArrayList<>();
+    private List<OsrmRouteHelper.RouteStep> routeSteps = new ArrayList<>();
     private int currentStepIndex = 0;
     private GeoPoint destination;
-    private LocationCallback navLocationCallback;  // callback GPS tracking
+    private LocationCallback navLocationCallback;
 
-    private List<ItemLocation> allItems = new ArrayList<>();
-    private List<ItemLocation> filteredItems = new ArrayList<>();
+   private final List<ItemLocation> allItems = new ArrayList<>();
 
-    //sample dataa
+    private boolean userInteracting = false;
+
+
+    // Sample data
     private void loadSampleData() {
+        // Dorm A
         allItems.add(new ItemLocation(1, "Laptop Dell", "Dorm A",
                 10.8715, 106.7928, "Laptop Dell 15 inch màu đen", ""));
-        allItems.add(new ItemLocation(2, "Balo Nike", "Dorm A",
+        allItems.add(new ItemLocation(2, "Laptop Asus", "Dorm A",
+                10.8714, 106.7929, "Laptop Asus VivoBook", ""));
+        allItems.add(new ItemLocation(3, "Balo Nike", "Dorm A",
                 10.8712, 106.7931, "Balo Nike màu xanh", ""));
-        allItems.add(new ItemLocation(3, "Tai nghe Sony", "Dorm B",
-                10.8720, 106.7940, "Tai nghe Sony WH-1000XM4", ""));
-        allItems.add(new ItemLocation(4, "Sạc dự phòng", "Dorm B",
+        allItems.add(new ItemLocation(4, "Tai nghe Sony", "Dorm A",
+                10.8713, 106.7930, "Tai nghe chống ồn", ""));
+
+        // Dorm B
+        allItems.add(new ItemLocation(5, "Laptop HP", "Dorm B",
+                10.8720, 106.7940, "Laptop HP Pavilion", ""));
+        allItems.add(new ItemLocation(6, "Laptop Dell", "Dorm B",
+                10.8719, 106.7941, "Laptop Dell Inspiron", ""));
+        allItems.add(new ItemLocation(7, "Tai nghe Sony", "Dorm B",
+                10.8721, 106.7942, "Sony WH-1000XM4", ""));
+        allItems.add(new ItemLocation(8, "Sạc dự phòng", "Dorm B",
                 10.8718, 106.7943, "Pin dự phòng 20000mAh", ""));
-        allItems.add(new ItemLocation(5, "Xe đạp", "Canteen",
+
+        // Canteen
+        allItems.add(new ItemLocation(9, "Xe đạp", "Canteen",
                 10.8708, 106.7925, "Xe đạp gấp màu đỏ", ""));
-        allItems.add(new ItemLocation(6, "Áo mưa", "Canteen",
+        allItems.add(new ItemLocation(10, "Laptop Lenovo", "Canteen",
+                10.8707, 106.7926, "Laptop Lenovo ThinkPad", ""));
+        allItems.add(new ItemLocation(11, "Áo mưa", "Canteen",
                 10.8705, 106.7922, "Áo mưa 2 lớp size M", ""));
-        allItems.add(new ItemLocation(7, "Giày thể thao", "Library",
-                10.8722, 106.7935, "Nike Air Force 1 size 42", ""));
-        allItems.add(new ItemLocation(8, "Cặp sách", "Library",
+        allItems.add(new ItemLocation(12, "Balo Adidas", "Canteen",
+                10.8706, 106.7924, "Balo Adidas màu đen", ""));
+
+        // Library
+        allItems.add(new ItemLocation(13, "Laptop Acer", "Library",
+                10.8722, 106.7935, "Laptop Acer Aspire", ""));
+        allItems.add(new ItemLocation(14, "Laptop Dell", "Library",
+                10.8723, 106.7936, "Laptop Dell Latitude", ""));
+        allItems.add(new ItemLocation(15, "Giày thể thao", "Library",
+                10.8724, 106.7937, "Nike Air Force 1 size 42", ""));
+        allItems.add(new ItemLocation(16, "Cặp sách", "Library",
                 10.8725, 106.7938, "Cặp da màu nâu", ""));
+
+        // Hall A
+        allItems.add(new ItemLocation(17, "Laptop MacBook", "Hall A",
+                10.8730, 106.7930, "MacBook Air M2", ""));
+        allItems.add(new ItemLocation(18, "Tai nghe AirPods", "Hall A",
+                10.8731, 106.7931, "AirPods Pro", ""));
+        allItems.add(new ItemLocation(19, "Sạc dự phòng", "Hall A",
+                10.8732, 106.7932, "Pin dự phòng Anker", ""));
+
+        // Hall B
+        allItems.add(new ItemLocation(20, "Laptop Dell", "Hall B",
+                10.8735, 106.7945, "Dell XPS 13", ""));
+        allItems.add(new ItemLocation(21, "Balo Nike", "Hall B",
+                10.8736, 106.7946, "Balo Nike thể thao", ""));
+        allItems.add(new ItemLocation(22, "Tai nghe Sony", "Hall B",
+                10.8737, 106.7947, "Sony XB910N", ""));
     }
+
+    //Lifecycle
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,17 +180,15 @@ public class MapActivity extends AppCompatActivity {
         bindViews();
         setupMap();
 
-        btnBack.setOnClickListener(v -> {
-            finish();
-        });
+        btnBack.setOnClickListener(v -> finish());
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         osrmHelper = new OsrmRouteHelper();
 
         loadSampleData();
-        filteredItems = new ArrayList<>(allItems);
 
         setupSearch();
+        setupAreaFilters();
 
         btnMyLocation.setOnClickListener(v -> getCurrentLocation());
         btnSearch.setOnClickListener(v -> {
@@ -151,35 +196,35 @@ public class MapActivity extends AppCompatActivity {
             if (!kw.isEmpty()) searchAndNavigate(kw);
         });
 
-        // Nút Bắt đầu → bắt đầu navigation
         btnStartNav.setOnClickListener(v -> startNavigation());
-
-        // Nút Dừng → thoát navigation
         btnStopNav.setOnClickListener(v -> stopNavigation());
     }
 
-    // bind view
+
+    // View binding
+
     private void bindViews() {
-        map           = findViewById(R.id.mapView);
-        edtSearch     = findViewById(R.id.edtSearch);
-        btnSearch     = findViewById(R.id.btnSearch);
-        btnMyLocation = findViewById(R.id.btnMyLocation);
-        btnBack       = findViewById(R.id.btnBack);
+        map            = findViewById(R.id.mapView);
+        edtSearch      = findViewById(R.id.edtSearch);
+        btnSearch      = findViewById(R.id.btnSearch);
+        btnMyLocation  = findViewById(R.id.btnMyLocation);
+        btnBack        = findViewById(R.id.btnBack);
+        chipGroupAreas = findViewById(R.id.chipGroupAreas);
 
+        infoCard       = findViewById(R.id.infoCard);
+        txtItemName    = findViewById(R.id.txtItemName);
+        txtItemArea    = findViewById(R.id.txtItemArea);
+        txtRouteInfo   = findViewById(R.id.txtRouteInfo);
+        btnStartNav    = findViewById(R.id.btnStartNav);
 
-        infoCard      = findViewById(R.id.infoCard);
-        txtItemName   = findViewById(R.id.txtItemName);
-        txtItemArea   = findViewById(R.id.txtItemArea);
-        txtRouteInfo  = findViewById(R.id.txtRouteInfo);
-        btnStartNav   = findViewById(R.id.btnStartNav);
-
-        navCard       = findViewById(R.id.navCard);
-        txtNavStep    = findViewById(R.id.txtNavStep);
+        navCard        = findViewById(R.id.navCard);
+        txtNavStep     = findViewById(R.id.txtNavStep);
         txtNavDistance = findViewById(R.id.txtNavDistance);
-        btnStopNav    = findViewById(R.id.btnStopNav);
+        btnStopNav     = findViewById(R.id.btnStopNav);
     }
 
-    //map
+    // Map setup
+
     private void setupMap() {
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
@@ -190,9 +235,10 @@ public class MapActivity extends AppCompatActivity {
         map.getController().setCenter(nlu);
     }
 
-    // search
+    //Search
+
     private void setupSearch() {
-        suggestionAdapter = new SearchSuggestionAdapter(this, filteredItems);
+        suggestionAdapter = new SearchSuggestionAdapter(this, allItems);
         edtSearch.setAdapter(suggestionAdapter);
         edtSearch.setThreshold(1);
 
@@ -212,13 +258,68 @@ public class MapActivity extends AppCompatActivity {
 
     private void clearSearchResult() {
         if (isNavigating) stopNavigation();
-        if (itemMarker != null) { map.getOverlays().remove(itemMarker); itemMarker = null; }
+        clearSearchMarkers();
+        if (itemMarker != null) {
+            map.getOverlays().remove(itemMarker);
+            itemMarker = null;
+        }
         clearRoute();
         infoCard.setVisibility(View.GONE);
         map.invalidate();
     }
 
-    // focus item sau khi search
+    // Area filter chips
+
+    private void setupAreaFilters() {
+        // FIX: create proper Chip objects (not Button) so ChipGroup single-selection works
+        List<String> areas = Arrays.asList(
+                "All", "Dorm A", "Dorm B", "Canteen", "Library", "Hall A", "Hall B");
+
+        chipGroupAreas.removeAllViews();
+
+        for (String area : areas) {
+            Chip chip = new Chip(this);
+            chip.setText(area);
+            chip.setCheckable(true);
+            chip.setCheckedIconVisible(false);
+            chip.setChipBackgroundColorResource(android.R.color.transparent);
+
+            // Mark "All" as initially checked
+            if ("All".equals(area)) chip.setChecked(true);
+
+            chipGroupAreas.addView(chip);
+        }
+
+        // Single listener on the group — no per-chip onClick needed
+        chipGroupAreas.setOnCheckedStateChangeListener((group, checkedIds) -> {
+            if (checkedIds.isEmpty()) return; // singleSelection keeps at least one checked
+
+            Chip selected = group.findViewById(checkedIds.get(0));
+            if (selected == null) return;
+
+            selectedArea = selected.getText().toString();
+
+            List<ItemLocation> areaItems = getItemsForArea(selectedArea);
+            suggestionAdapter.updateData(areaItems);
+
+            // Re-run current search with new area filter
+            String kw = edtSearch.getText().toString().trim();
+            if (!kw.isEmpty()) searchAndNavigate(kw);
+        });
+    }
+
+    /** Returns items matching the currently selected area. */
+    private List<ItemLocation> getItemsForArea(String area) {
+        if ("All".equals(area)) return new ArrayList<>(allItems);
+        List<ItemLocation> result = new ArrayList<>();
+        for (ItemLocation item : allItems) {
+            if (item.getAreaName().equalsIgnoreCase(area)) result.add(item);
+        }
+        return result;
+    }
+
+    // Item focus
+
     private void focusItem(ItemLocation item) {
         if (isNavigating) stopNavigation();
 
@@ -226,7 +327,7 @@ public class MapActivity extends AppCompatActivity {
         txtItemName.setText(item.getName());
         txtItemArea.setText(item.getAreaName() + " • " + item.getDescription());
         txtRouteInfo.setText("Đang tính đường đi...");
-        btnStartNav.setVisibility(View.GONE); // ẩn nút cho đến khi có route
+        btnStartNav.setVisibility(View.GONE);
 
         destination = new GeoPoint(item.getLatitude(), item.getLongitude());
 
@@ -243,23 +344,73 @@ public class MapActivity extends AppCompatActivity {
         } else {
             txtRouteInfo.setText("Bật GPS để xem đường đi");
             map.getController().animateTo(destination);
-            map.getController().setZoom(19.0);
+            map.getController().setZoom(17.0);
         }
         map.invalidate();
     }
 
+    //Search & show results
+
     private void searchAndNavigate(String keyword) {
-        for (ItemLocation item : filteredItems) {
-            if (item.getName().toLowerCase(Locale.ROOT)
-                    .contains(keyword.toLowerCase(Locale.ROOT))) {
-                focusItem(item);
-                return;
-            }
+        String lowerKeyword = keyword.toLowerCase(Locale.ROOT);
+        List<ItemLocation> results = new ArrayList<>();
+
+        for (ItemLocation item : allItems) {
+            boolean areaMatch = selectedArea.equals("All")
+                    || item.getAreaName().equalsIgnoreCase(selectedArea);
+            if (!areaMatch) continue;
+
+            boolean matchName = item.getName().toLowerCase(Locale.ROOT).contains(lowerKeyword);
+            boolean matchDesc = item.getDescription().toLowerCase(Locale.ROOT).contains(lowerKeyword);
+            if (matchName || matchDesc) results.add(item);
         }
-        Toast.makeText(this, "Không tìm thấy: " + keyword, Toast.LENGTH_SHORT).show();
+
+        showSearchResults(results);
     }
 
-    // vẽ đường
+    private void showSearchResults(List<ItemLocation> results) {
+        clearSearchMarkers();
+
+        if (results.isEmpty()) {
+            Toast.makeText(this, "Không tìm thấy kết quả", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        List<GeoPoint> geoPoints = new ArrayList<>();
+
+        for (ItemLocation item : results) {
+            GeoPoint point = new GeoPoint(item.getLatitude(), item.getLongitude());
+            geoPoints.add(point);
+
+            Marker marker = new Marker(map);
+            marker.setPosition(point);
+            marker.setTitle(item.getName());
+            marker.setSnippet(item.getAreaName());
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            marker.setOnMarkerClickListener((m, mapView) -> {
+                focusItem(item);
+                return true;
+            });
+
+            map.getOverlays().add(marker);
+            searchMarkers.add(marker);
+        }
+
+        if (geoPoints.size() == 1) {
+            map.getController().animateTo(geoPoints.get(0));
+            map.getController().setZoom(16.5);
+        } else {
+            BoundingBox box = BoundingBox.fromGeoPoints(geoPoints);
+            map.zoomToBoundingBox(box.increaseByScale(1.5f), false);
+            if (map.getZoomLevelDouble() > 17.5) {
+                map.getController().setZoom(17.5);
+            }
+        }
+
+        map.invalidate();
+    }
+
+    // Route drawing
     private void drawRoute(GeoPoint from, GeoPoint to) {
         clearRoute();
         osrmHelper.fetchRoute(from, to, new OsrmRouteHelper.RouteCallback() {
@@ -288,7 +439,6 @@ public class MapActivity extends AppCompatActivity {
                 int mins = (int) (durationSeconds / 60);
                 txtRouteInfo.setText("📍 " + dist + "  •  🕐 " + mins + " phút đi bộ");
 
-                // Hiện nút Bắt đầu khi đã có route
                 btnStartNav.setVisibility(View.VISIBLE);
             }
 
@@ -309,7 +459,12 @@ public class MapActivity extends AppCompatActivity {
         }
     }
 
-    // NAVIGATION
+    private void clearSearchMarkers() {
+        for (Marker marker : searchMarkers) map.getOverlays().remove(marker);
+        searchMarkers.clear();
+    }
+
+    // Navigation
 
     private void startNavigation() {
         if (myLocation == null) {
@@ -325,14 +480,10 @@ public class MapActivity extends AppCompatActivity {
         isNavigating = true;
         currentStepIndex = 0;
 
-        // Ẩn info card, hiện nav card
         infoCard.setVisibility(View.GONE);
         navCard.setVisibility(View.VISIBLE);
 
-        // Hiện bước đầu tiên
         showCurrentStep();
-
-        // Bắt đầu tracking GPS liên tục (mỗi 2 giây)
         startLocationTracking();
     }
 
@@ -340,25 +491,22 @@ public class MapActivity extends AppCompatActivity {
         isNavigating = false;
         stopLocationTracking();
         navCard.setVisibility(View.GONE);
-        // Hiện lại info card nếu còn destination
+        // Restore info card if there is a destination selected
         if (destination != null) infoCard.setVisibility(View.VISIBLE);
-        // Reset zoom nhìn toàn route
         if (myLocation != null && destination != null) {
             BoundingBox box = BoundingBox.fromGeoPoints(List.of(myLocation, destination));
             map.zoomToBoundingBox(box.increaseByScale(1.4f), true, 120);
         }
     }
 
-    /** Hiện chỉ dẫn bước hiện tại lên navCard */
     private void showCurrentStep() {
         if (currentStepIndex >= routeSteps.size()) return;
         OsrmRouteHelper.RouteStep step = routeSteps.get(currentStepIndex);
 
-        // Icon hướng + text
         String icon = directionIcon(step.maneuver);
         txtNavStep.setText(icon + "  " + step.instruction);
 
-        // Khoảng cách đến đích
+        // Update remaining distance to destination
         if (destination != null && myLocation != null) {
             float[] result = new float[1];
             Location.distanceBetween(
@@ -373,23 +521,23 @@ public class MapActivity extends AppCompatActivity {
         }
     }
 
-    /** Map maneuver type → emoji icon */
     private String directionIcon(String maneuver) {
         if (maneuver == null) return "⬆️";
         switch (maneuver) {
-            case "turn-left":        return "⬅️";
-            case "turn-right":       return "➡️";
-            case "turn-sharp-left":  return "↩️";
-            case "turn-sharp-right": return "↪️";
-            case "turn-slight-left": return "↖️";
-            case "turn-slight-right":return "↗️";
-            case "uturn":            return "🔄";
-            case "arrive":           return "📍";
-            default:                 return "⬆️";
+            case "turn-left":         return "⬅️";
+            case "turn-right":        return "➡️";
+            case "turn-sharp-left":   return "↩️";
+            case "turn-sharp-right":  return "↪️";
+            case "turn-slight-left":  return "↖️";
+            case "turn-slight-right": return "↗️";
+            case "uturn":             return "🔄";
+            case "arrive":            return "📍";
+            default:                  return "⬆️";
         }
     }
 
-    // ── GPS tracking liên tục khi navigation ──────────────────────────────
+    // GPS tracking
+
     private void startLocationTracking() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -398,7 +546,7 @@ public class MapActivity extends AppCompatActivity {
             return;
         }
 
-        LocationRequest locationRequest = new LocationRequest.Builder(2000) // mỗi 2 giây
+        LocationRequest locationRequest = new LocationRequest.Builder(2000)
                 .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
                 .setMinUpdateIntervalMillis(1000)
                 .build();
@@ -408,8 +556,7 @@ public class MapActivity extends AppCompatActivity {
             public void onLocationResult(LocationResult result) {
                 if (result == null || !isNavigating) return;
                 Location loc = result.getLastLocation();
-                if (loc == null) return;
-                onNavLocationUpdate(loc);
+                if (loc != null) onNavLocationUpdate(loc);
             }
         };
 
@@ -424,11 +571,10 @@ public class MapActivity extends AppCompatActivity {
         }
     }
 
-    /** Gọi mỗi khi GPS cập nhật trong navigation mode */
     private void onNavLocationUpdate(Location location) {
         myLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
 
-        // Cập nhật marker user
+        // Update user marker
         if (myMarker != null) map.getOverlays().remove(myMarker);
         myMarker = new Marker(map);
         myMarker.setPosition(myLocation);
@@ -436,12 +582,13 @@ public class MapActivity extends AppCompatActivity {
         myMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
         map.getOverlays().add(myMarker);
 
-        // Camera theo user
-        map.getController().animateTo(myLocation);
-        map.getController().setZoom(19.0);
+        if (!userInteracting) {
+            map.getController().animateTo(myLocation);
+            map.getController().setZoom(19.0);
+        }
         map.invalidate();
 
-        // Kiểm tra đã đến đích chưa
+        // Check arrival
         if (destination != null) {
             float[] distToDest = new float[1];
             Location.distanceBetween(
@@ -455,7 +602,7 @@ public class MapActivity extends AppCompatActivity {
             }
         }
 
-        // Kiểm tra đã qua bước hiện tại chưa → chuyển bước tiếp
+        // FIX: advance step first, then call showCurrentStep() once
         if (currentStepIndex < routeSteps.size()) {
             OsrmRouteHelper.RouteStep step = routeSteps.get(currentStepIndex);
             if (step.location != null) {
@@ -467,14 +614,11 @@ public class MapActivity extends AppCompatActivity {
                 );
                 if (distToStep[0] <= STEP_THRESHOLD_METERS) {
                     currentStepIndex++;
-                    if (currentStepIndex < routeSteps.size()) {
-                        showCurrentStep();
-                    }
                 }
             }
         }
 
-        // Cập nhật khoảng cách còn lại
+        // Single call — always reflects the (possibly just advanced) step
         showCurrentStep();
     }
 
@@ -482,13 +626,18 @@ public class MapActivity extends AppCompatActivity {
         stopLocationTracking();
         isNavigating = false;
         navCard.setVisibility(View.GONE);
-        Toast.makeText(this, "🎉 Đã đến nơi!", Toast.LENGTH_LONG).show();
-        // Hiện lại marker đích nổi bật
+
+        // FIX: restore info card on arrival (was missing; stopNavigation() has the same logic
+        // but onArrived() bypassed it)
+        if (destination != null) infoCard.setVisibility(View.VISIBLE);
+
+        Toast.makeText(this, "Đã đến nơi!", Toast.LENGTH_LONG).show();
         if (itemMarker != null) itemMarker.showInfoWindow();
         map.invalidate();
     }
 
-    //gps lần đầu
+    // One-shot GPS
+
     private void getCurrentLocation() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -503,8 +652,8 @@ public class MapActivity extends AppCompatActivity {
         fusedLocationClient.getCurrentLocation(request, null)
                 .addOnSuccessListener(this, location -> {
                     if (location != null) onLocationReceived(location);
-                    else Toast.makeText(this, "Không lấy được vị trí. Hãy bật GPS.",
-                            Toast.LENGTH_SHORT).show();
+                    else Toast.makeText(this,
+                            "Không lấy được vị trí. Hãy bật GPS.", Toast.LENGTH_SHORT).show();
                 });
     }
 
@@ -516,9 +665,13 @@ public class MapActivity extends AppCompatActivity {
         myMarker.setPosition(myLocation);
         myMarker.setTitle("Vị trí của bạn");
         myMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        myMarker.setIcon(getResources().getDrawable(R.drawable.ic_marker_red));
         map.getOverlays().add(myMarker);
-        map.getController().animateTo(myLocation);
-        map.getController().setZoom(18.0);
+
+        if (!isNavigating) {
+            map.getController().animateTo(myLocation);
+            map.getController().setZoom(18.0);
+        }
         map.invalidate();
 
         Toast.makeText(this, "Đã cập nhật vị trí!", Toast.LENGTH_SHORT).show();
@@ -528,7 +681,8 @@ public class MapActivity extends AppCompatActivity {
         }
     }
 
-    //permission
+    // Permissions
+
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String[] permissions, int[] grantResults) {
