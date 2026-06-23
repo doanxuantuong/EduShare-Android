@@ -11,8 +11,12 @@ import com.example.edushare.common.base.RetrofitClient;
 import com.example.edushare.feature.auth.request.LoginRequest;
 import com.example.edushare.feature.auth.request.OcrLoginRequest;
 import com.example.edushare.feature.auth.request.RegisterRequest;
+import com.example.edushare.feature.auth.request.SendOtpRequest;
+import com.example.edushare.feature.auth.request.VerifyOtpRequest;
 import com.example.edushare.feature.auth.response.LoginResponse;
 import com.example.edushare.feature.auth.response.RegisterResponse;
+import com.example.edushare.feature.auth.response.SendOtpResponse;
+import com.example.edushare.feature.auth.response.VerifyOtpResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -28,12 +32,30 @@ public class UserRepository {
     public void register(RegisterRequest request, OnActionCallback<String> callback) {
         userApi.registerUser(request).enqueue(new Callback<RegisterResponse>() {
             @Override
-            public void onResponse(@NonNull Call<RegisterResponse> call,
-                                   @NonNull Response<RegisterResponse> response) {
+            public void onResponse(@NonNull Call<RegisterResponse> call, @NonNull Response<RegisterResponse> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     callback.onSuccess(response.body().getMessage());
                 } else {
                     callback.onFailure("Lỗi đăng ký: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<RegisterResponse> call, @NonNull Throwable t) {
+                callback.onFailure("Lỗi kết nối: " + t.getMessage());
+            }
+        });
+    }
+
+    public void sendOtp(SendOtpRequest request, OnActionCallback<String> callback) {
+        userApi.sendOtp(request).enqueue(new Callback<RegisterResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<RegisterResponse> call, @NonNull Response<RegisterResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    // Đọc chuỗi message từ JSON hợp lệ gửi về
+                    callback.onSuccess(response.body().getMessage());
+                } else {
+                    callback.onFailure("Lỗi gửi OTP: " + response.code());
                 }
             }
 

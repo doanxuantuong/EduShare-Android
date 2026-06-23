@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_check_mail_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    style="@style/MainLayout">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="20dp">
+
+        <ImageView
+            android:id="@+id/iv_check_mail_logo"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/img"
+            style="@style/LogoImage"/>
+
+        <TextView
+            android:id="@+id/tv_check_mail_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Xác thực tài khoản EduShare"
+            style="@style/TitleText"/>
+
+        <TextView
+            android:id="@+id/tv_check_mail_sub_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Nhập mã xác thực gồm 6 ký tự được gửi đến email sinh viên của bạn"
+            style="@style/SubTitleText"/>
+
+        <LinearLayout
+            android:id="@+id/layout_check_mail_form"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            style="@style/LoginFormLayout">
+
+            <LinearLayout
+                android:id="@+id/layout_code_boxes"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="20dp">
+
+                <EditText android:id="@+id/edt_code_1" android:layout_width="40dp" android:layout_height="50dp" android:maxLength="1" android:gravity="center" android:inputType="textCapCharacters" style="@style/CodeBox"/>
+                <EditText android:id="@+id/edt_code_2" android:layout_width="40dp" android:layout_height="50dp" android:maxLength="1" android:gravity="center" android:inputType="textCapCharacters" style="@style/CodeBox"/>
+                <EditText android:id="@+id/edt_code_3" android:layout_width="40dp" android:layout_height="50dp" android:maxLength="1" android:gravity="center" android:inputType="textCapCharacters" style="@style/CodeBox"/>
+                <EditText android:id="@+id/edt_code_4" android:layout_width="40dp" android:layout_height="50dp" android:maxLength="1" android:gravity="center" android:inputType="textCapCharacters" style="@style/CodeBox"/>
+                <EditText android:id="@+id/edt_code_5" android:layout_width="40dp" android:layout_height="50dp" android:maxLength="1" android:gravity="center" android:inputType="textCapCharacters" style="@style/CodeBox"/>
+                <EditText android:id="@+id/edt_code_6" android:layout_width="40dp" android:layout_height="50dp" android:maxLength="1" android:gravity="center" android:inputType="textCapCharacters" style="@style/CodeBox"/>
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/btn_confirm_code"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:text="Xác nhận"
+                style="@style/LoginButton"
+                android:layout_marginTop="20dp"/>
+
+            <LinearLayout
+                android:id="@+id/layout_resend_code"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="10dp">
+
+                <TextView
+                    android:id="@+id/tv_no_code"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Không nhận được mã?"
+                    android:textColor="@android:color/black"
+                    android:textSize="14sp"
+                    android:layout_marginEnd="10dp"/>
+
+                <Button
+                    android:id="@+id/btn_resend_code"
+                    android:layout_width="wrap_content"
+                    android:layout_height="40dp"
+                    android:text="Gửi lại"
+                    android:backgroundTint="@color/green_light"
+                    android:textColor="@android:color/white"
+                    android:paddingHorizontal="15dp"/>
+            </LinearLayout>
+
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tv_made_by"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tạo bởi Nguyễn Ngọc Minh Đẹp Trai Số 1"
+            style="@style/MadeBy"/>
+    </LinearLayout>
+</ScrollView>
