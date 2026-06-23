@@ -7,7 +7,6 @@
     android:background="@color/white"
     tools:context=".feature.item_detail.activity.PostDetailActivity">
 
-    <!-- INCLUDE HEADER -->
     <include
         android:id="@+id/layoutHeader"
         layout="@layout/layout_header_back"
@@ -19,7 +18,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:fillViewport="true"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/layoutBottomAction"
         app:layout_constraintTop_toBottomOf="@id/layoutHeader">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -87,7 +86,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/tvProductTitle" />
 
-            <!-- RECYCLERVIEW TAGS -->
             <androidx.recyclerview.widget.RecyclerView
                 android:id="@+id/rvTags"
                 android:layout_width="match_parent"
@@ -98,10 +96,8 @@
                 app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
                 app:layout_constraintTop_toBottomOf="@id/tvProductPrice"
                 tools:listitem="@layout/item_tag"
-                tools:itemCount="3"
-                />
+                tools:itemCount="3" />
 
-            <!-- KHỐI NÀY ĐÃ ĐƯỢC FIX LỖI ĐÓNG THẺ -->
             <LinearLayout
                 android:id="@+id/layoutShortLocation"
                 android:layout_width="match_parent"
@@ -127,7 +123,6 @@
                     android:textColor="#4B5563"
                     android:textSize="14sp" />
             </LinearLayout>
-            <!-- KẾT THÚC KHỐI LOCATION -->
 
             <View
                 android:id="@+id/divider1"
@@ -149,7 +144,6 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/divider1" />
 
-            <!-- INCLUDE SELLER INFO -->
             <include
                 android:id="@+id/layoutSellerInfo"
                 layout="@layout/layout_item_seller_info"
@@ -216,7 +210,7 @@
                 android:layout_height="200dp"
                 android:layout_marginHorizontal="16dp"
                 android:layout_marginTop="12dp"
-                android:layout_marginBottom="32dp"
+                android:layout_marginBottom="16dp"
                 android:background="#E5E7EB"
                 android:scaleType="centerCrop"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -224,4 +218,28 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
+
+    <LinearLayout
+        android:id="@+id/layoutBottomAction"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/white"
+        android:elevation="8dp"
+        android:padding="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnRequestTransaction"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="#059669"
+            android:text="Yêu cầu giao dịch"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

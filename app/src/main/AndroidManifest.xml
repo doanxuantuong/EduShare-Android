@@ -30,7 +30,7 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".feature.auth.activity.RegisterActivity"
+            android:name=".feature.auth.activity.LoginActivity"
             android:exported="true"
             android:theme="@style/Theme.EduShare.Home">
             <intent-filter>
@@ -39,7 +39,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".feature.auth.activity.LoginActivity"/>
+<!--        <activity android:name=".feature.auth.activity.LoginActivity"/>-->
         <activity android:name=".feature.auth.activity.CheckMailActivity" />
         <activity
             android:name=".feature.chat.message.activity.ChatDetailActivity"
@@ -54,6 +54,9 @@
         <activity android:name=".feature.chat.conversation.activity.ConversationActivity" />
         <activity android:name=".feature.locations.activity.MapActivity" />
         <activity android:name=".feature.item_detail.activity.PostDetailActivity" />
+        <activity
+            android:name=".feature.transaction.activity.TransactionConfirmActivity"
+            android:exported="false" />
         <service
             android:name=".feature.notification.firebase.service.MyFirebaseMessagingService"
             android:exported="false">
