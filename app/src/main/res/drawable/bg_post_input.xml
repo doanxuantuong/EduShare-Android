@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Nền bo góc màu nhạt dùng chung cho ô nhập và ô chọn. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/post_surface_muted" />
+    <corners android:radius="10dp" />
+</shape>

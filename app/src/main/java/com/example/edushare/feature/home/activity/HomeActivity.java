@@ -7,17 +7,22 @@ import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.edushare.R;
+import com.example.edushare.common.base.OnActionCallback;
 import com.example.edushare.common.helper.BottomNavigationHelper;
+import com.example.edushare.feature.home.HomeRepository;
 import com.example.edushare.feature.home.adapter.MarketplaceItemAdapter;
 import com.example.edushare.feature.home.model.MarketplaceItem;
+import com.example.edushare.feature.home.model.PostListItemResponse;
 import com.example.edushare.feature.locations.activity.MapActivity;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -25,6 +30,7 @@ import java.util.Locale;
 public class HomeActivity extends AppCompatActivity {
     private final List<MarketplaceItem> allItems = new ArrayList<>();
     private MarketplaceItemAdapter itemAdapter;
+    private HomeRepository homeRepository;
     private EditText edtHomeSearch;
 //    private TextView tvItemCount;
     private TextView tvCategoryAll;
@@ -38,11 +44,13 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
+        homeRepository = new HomeRepository(this);
         initViews();
         setupMarketplaceItems();
         setupCategoryFilters();
         setupSearch();
         setupBottomNavigation();
+        fetchMarketplaceItems();
     }
 
     private void initViews() {
@@ -55,25 +63,82 @@ public class HomeActivity extends AppCompatActivity {
 
         footerLayout = findViewById(R.id.footer_layout);
 
+        findViewById(R.id.btnNotification).setOnClickListener(view ->
+                Toast.makeText(this, R.string.home_notifications, Toast.LENGTH_SHORT).show());
         findViewById(R.id.btnLocation).setOnClickListener(view ->
                 startActivity(new Intent(this, MapActivity.class)));
     }
     private void setupMarketplaceItems() {
-        allItems.add(new MarketplaceItem(
-                R.drawable.img_organic_chemistry_textbook,
-                getString(R.string.home_condition_good),
-                getString(R.string.home_sample_item_title),
-                getString(R.string.home_sample_item_location),
-                getString(R.string.home_sample_item_price),
-                getString(R.string.home_category_textbooks),
-                true
-        ));
-
         RecyclerView rvMarketplaceItems = findViewById(R.id.rvMarketplaceItems);
         itemAdapter = new MarketplaceItemAdapter(allItems);
         rvMarketplaceItems.setLayoutManager(
                 new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
         rvMarketplaceItems.setAdapter(itemAdapter);
+    }
+
+    private void fetchMarketplaceItems() {
+        homeRepository.getPosts(new OnActionCallback<List<PostListItemResponse>>() {
+            @Override
+            public void onSuccess(List<PostListItemResponse> data) {
+                allItems.clear();
+                for (PostListItemResponse post : data) {
+                    allItems.add(toMarketplaceItem(post));
+                }
+                filterItems();
+            }
+
+            @Override
+            public void onFailure(String error) {
+                Toast.makeText(HomeActivity.this, error, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private MarketplaceItem toMarketplaceItem(PostListItemResponse post) {
+        String category = safeText(post.getCategoryName(), "All");
+        String location = safeText(post.getLocationName(), "Unknown location");
+        String status = formatStatus(post.getStatus());
+        String title = safeText(post.getTitle(), "Untitled item");
+
+        return new MarketplaceItem(
+                R.drawable.img_organic_chemistry_textbook,
+                post.getImageUrl(),
+                status,
+                title,
+                location,
+                formatPrice(post.getPrice()),
+                category,
+                !safeText(post.getAuthorName(), "").isEmpty()
+        );
+    }
+
+    private String safeText(String value, String fallback) {
+        if (value == null || value.trim().isEmpty()) {
+            return fallback;
+        }
+        return value.trim();
+    }
+
+    private String formatStatus(String status) {
+        if (status == null || status.trim().isEmpty()) {
+            return "Available";
+        }
+        String normalized = status.trim().toUpperCase(Locale.ROOT);
+        if ("SOLD".equals(normalized)) {
+            return "Sold";
+        }
+        if ("HIDDEN".equals(normalized)) {
+            return "Hidden";
+        }
+        return "Available";
+    }
+
+    private String formatPrice(Double price) {
+        if (price == null || price <= 0) {
+            return "Contact";
+        }
+        NumberFormat formatter = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
+        return formatter.format(price) + "d";
     }
 
     private void setupCategoryFilters() {
