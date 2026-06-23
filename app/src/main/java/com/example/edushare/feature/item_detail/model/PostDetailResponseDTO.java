@@ -17,6 +17,8 @@ public class PostDetailResponseDTO implements Serializable {
     private String locationName;
     private String authorId;
     private String authorName;
+    private String avatarUrl;
+    private boolean isVerified;
 
     // Không dùng được Lombok bên Android (nếu chưa cấu hình), bạn hãy tạo Constructor và Getter/Setter bằng tay nhé:
     public PostDetailResponseDTO() {}
@@ -66,4 +68,20 @@ public class PostDetailResponseDTO implements Serializable {
 
     public String getAuthorName() { return authorName; }
     public void setAuthorName(String authorName) { this.authorName = authorName; }
+
+    public boolean isVerified() {
+        return isVerified;
+    }
+
+    public void setVerified(boolean verified) {
+        isVerified = verified;
+    }
+
+    public String getAvatarUrl() {
+        return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+        this.avatarUrl = avatarUrl;
+    }
 }

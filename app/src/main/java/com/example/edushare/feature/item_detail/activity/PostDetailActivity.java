@@ -1,4 +1,5 @@
 package com.example.edushare.feature.item_detail.activity;
+
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -11,28 +12,29 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.edushare.R;
-import com.example.edushare.common.base.OnActionCallback; // Thêm import này
+import com.example.edushare.common.base.OnActionCallback;
 import com.example.edushare.feature.item_detail.adapter.TagAdapter;
 import com.example.edushare.feature.item_detail.repository.PostDetailRepository;
+import com.example.edushare.feature.item_detail.model.PostDetailResponseDTO;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import com.example.edushare.feature.item_detail.model.PostDetailResponseDTO;
 public class PostDetailActivity extends AppCompatActivity {
     private PostDetailRepository postDetailRepository;
     private ImageView ivProductImage;
-    private TextView tvProductTitle, tvProductPrice, tvShortLocation,tvFreeBadge;
+    private TextView tvProductTitle, tvProductPrice, tvShortLocation, tvFreeBadge;
+    private ImageView ivSellerAvatar, ivVerifyTick;
+    private TextView tvSellerName, tvSellerStatus;
+    private View btnMessage;
 
-
-    @Override // Bổ sung @Override cho đúng vòng đời Activity
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_item_detail);
 
         postDetailRepository = new PostDetailRepository(this);
 
-        // ĐÃ SỬA: Bỏ kiểu dữ liệu ở đầu để gán trực tiếp vào các biến Global đã khai báo trên kia
         ivProductImage = findViewById(R.id.ivProductImage);
         tvProductTitle = findViewById(R.id.tvProductTitle);
         tvProductPrice = findViewById(R.id.tvProductPrice);
@@ -40,9 +42,18 @@ public class PostDetailActivity extends AppCompatActivity {
         tvFreeBadge = findViewById(R.id.tvFreeBadge);
 
         RecyclerView rvTags = findViewById(R.id.rvTags);
+        View sellerInfoLayout = findViewById(R.id.layoutSellerInfo);
+
+        // FIX LỖI 1: Ánh xạ view an toàn và đóng ngoặc hợp lệ
+        if (sellerInfoLayout != null) {
+            ivSellerAvatar = sellerInfoLayout.findViewById(R.id.ivSellerAvatar);
+            ivVerifyTick = sellerInfoLayout.findViewById(R.id.ivVerifyTick);
+            tvSellerName = sellerInfoLayout.findViewById(R.id.tvSellerName);
+            tvSellerStatus = sellerInfoLayout.findViewById(R.id.tvSellerStatus);
+            btnMessage = sellerInfoLayout.findViewById(R.id.btnMessage);
+        }
 
         int postId = getIntent().getIntExtra("POST_ID", -1);
-
         if (postId != -1) {
             loadPostDetailFromServer(postId);
         } else {
@@ -53,61 +64,99 @@ public class PostDetailActivity extends AppCompatActivity {
         mockTags.add("Lab Equipment");
         mockTags.add("Excellent");
         TagAdapter tagAdapter = new TagAdapter(mockTags);
-        rvTags.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
-        rvTags.setAdapter(tagAdapter);
+        if (rvTags != null) {
+            rvTags.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+            rvTags.setAdapter(tagAdapter);
+        }
 
         setupClickListeners();
-    } // ĐÃ SỬA: Xóa bỏ bớt một dấu đóng ngoặc dư thừa gây lỗi bẻ đôi Class ở đây
+    }
 
     private void loadPostDetailFromServer(int postId) {
         postDetailRepository.getPostDetail(postId, new OnActionCallback<PostDetailResponseDTO>() {
-            @Override // Bổ sung @Override cho chuẩn Interface Anonymous Class
+            @Override
             public void onSuccess(PostDetailResponseDTO data) {
-                // Đổ dữ liệu thật từ API Server trả về lên giao diện
-                tvProductTitle.setText(data.getTitle());
-                tvProductPrice.setText(data.getPrice() + "đ");
-                tvShortLocation.setText(data.getLocationName());
+                if (data == null) return;
+
+                // Đổ dữ liệu Post
+                if (tvProductTitle != null) tvProductTitle.setText(data.getTitle());
+                if (tvProductPrice != null) tvProductPrice.setText(data.getPrice() + "đ");
+                if (tvShortLocation != null) tvShortLocation.setText(data.getLocationName());
+
+                // Xử lý Badge loại giao dịch
                 String type = data.getTransactionType();
-                if (type != null && !type.isEmpty()) {
-                    // 1. Gán chữ trực tiếp từ DB lên badge (Viết hoa toàn bộ cho đẹp)
+                if (type != null && !type.isEmpty() && tvFreeBadge != null) {
                     tvFreeBadge.setText(type.toUpperCase());
                     tvFreeBadge.setVisibility(View.VISIBLE);
 
-                    // 2. Tùy biến màu sắc một chút cho phân biệt giữa các loại (Optional - Nhìn cho chuyên nghiệp)
                     switch (type.toUpperCase()) {
                         case "FREE":
-                            tvFreeBadge.setBackgroundColor(android.graphics.Color.parseColor("#059669")); // Màu xanh lá
-                            tvProductPrice.setText("Miễn phí"); // Nếu FREE thì ghi đè chữ giá tiền thành Miễn phí luôn
+                            tvFreeBadge.setBackgroundColor(android.graphics.Color.parseColor("#059669"));
+                            if (tvProductPrice != null) tvProductPrice.setText("Miễn phí");
                             break;
                         case "EXCHANGE":
-                            tvFreeBadge.setBackgroundColor(android.graphics.Color.parseColor("#3B82F6")); // Màu xanh dương
-                            tvProductPrice.setText("Trao đổi đồ");
+                            tvFreeBadge.setBackgroundColor(android.graphics.Color.parseColor("#3B82F6"));
+                            if (tvProductPrice != null) tvProductPrice.setText("Trao đổi đồ");
                             break;
+                        case "SELL":
                         case "SALE":
-                            tvFreeBadge.setBackgroundColor(android.graphics.Color.parseColor("#EF4444")); // Màu đỏ
+                            tvFreeBadge.setBackgroundColor(android.graphics.Color.parseColor("#EF4444"));
                             break;
                         default:
-                            tvFreeBadge.setBackgroundColor(android.graphics.Color.parseColor("#6B7280")); // Màu xám mặc định nếu có loại khác
+                            tvFreeBadge.setBackgroundColor(android.graphics.Color.parseColor("#6B7280"));
                             break;
                     }
-                } else {
-                    // Nếu không có transaction type thì ẩn badge đi
+                } else if (tvFreeBadge != null) {
                     tvFreeBadge.setVisibility(View.GONE);
                 }
-                // Load hình ảnh từ URL server bằng Glide
-                if (data.getImageUrl() != null && !data.getImageUrl().isEmpty()) {
+
+                // Load hình ảnh sản phẩm
+                if (data.getImageUrl() != null && !data.getImageUrl().isEmpty() && ivProductImage != null) {
                     Glide.with(PostDetailActivity.this)
                             .load(data.getImageUrl())
                             .placeholder(R.drawable.img_organic_chemistry_textbook)
                             .into(ivProductImage);
                 }
 
-                // Tọa độ vĩ độ/kinh độ sẵn sàng cho bạn xử lý tiếp (ví dụ truyền sang MapActivity)
-                Double lat = data.getLatitude();
-                Double lng = data.getLongitude();
-            }
+                // Đổ dữ liệu Người bán (Seller)
+                if (tvSellerName != null) {
+                    tvSellerName.setText(data.getAuthorName() != null ? data.getAuthorName() : "Unknown");
+                }
 
-            @Override // Bổ sung @Override
+                if (ivVerifyTick != null && tvSellerStatus != null) {
+                    if (data.isVerified()) {
+                        ivVerifyTick.setVisibility(View.VISIBLE);
+                        tvSellerStatus.setText("Verified Student");
+                        tvSellerStatus.setTextColor(android.graphics.Color.parseColor("#059669"));
+                    } else {
+                        ivVerifyTick.setVisibility(View.GONE);
+                        tvSellerStatus.setText("Unverified Account");
+                        tvSellerStatus.setTextColor(android.graphics.Color.parseColor("#6B7280"));
+                    }
+                }
+
+                if (ivSellerAvatar != null) {
+                    if (data.getAvatarUrl() != null && !data.getAvatarUrl().isEmpty()) {
+                        Glide.with(PostDetailActivity.this)
+                                .load(data.getAvatarUrl())
+                                .circleCrop()
+                                .placeholder(R.drawable.ic_avatar)
+                                .error(R.drawable.ic_avatar)
+                                .into(ivSellerAvatar);
+                    } else {
+                        ivSellerAvatar.setImageResource(R.drawable.ic_avatar);
+                    }
+                }
+
+                if (btnMessage != null) {
+                    btnMessage.setOnClickListener(v -> {
+                        String sellerId = data.getAuthorId();
+                        Toast.makeText(PostDetailActivity.this, "Chatting with user ID: " + sellerId, Toast.LENGTH_SHORT).show();
+                    });
+                }
+            } // FIX LỖI 2: Dọn dẹp đóng ngoặc thừa tại đây
+
+            @Override
             public void onFailure(String message) {
                 Toast.makeText(PostDetailActivity.this, message, Toast.LENGTH_SHORT).show();
             }
@@ -115,36 +164,21 @@ public class PostDetailActivity extends AppCompatActivity {
     }
 
     private void setupClickListeners() {
-        // Cách 1: Nếu layoutHeader của bạn chứa một nút quay lại tùy biến (Ví dụ đặt tên ID nút là btnBack)
         View headerLayout = findViewById(R.id.layoutHeader);
         if (headerLayout != null) {
-            // Hãy kiểm tra lại ID chính xác của nút bấm quay lại trong XML của bạn (thay R.id.btnBack nếu khác)
             View btnBack = headerLayout.findViewById(R.id.btnBack);
             if (btnBack != null) {
                 btnBack.setOnClickListener(v -> finish());
             } else {
-                // Nếu không tìm thấy nút cụ thể, cho phép click vào nguyên vùng header để quay lại tạm thời
                 headerLayout.setOnClickListener(v -> finish());
             }
         }
 
-        // Nút Favorite (Yêu thích) - Kiểm tra null trước khi gán sự kiện
         View btnFavorite = findViewById(R.id.btnFavorite);
         if (btnFavorite != null) {
             btnFavorite.setOnClickListener(v ->
                     Toast.makeText(this, "Added to Favorites!", Toast.LENGTH_SHORT).show()
             );
-        }
-
-        // Nút Nhắn tin
-        View sellerLayout = findViewById(R.id.layoutSellerInfo);
-        if (sellerLayout != null) {
-            View btnMessage = sellerLayout.findViewById(R.id.btnMessage);
-            if (btnMessage != null) {
-                btnMessage.setOnClickListener(v -> {
-                    Toast.makeText(this, "Opening chat with seller...", Toast.LENGTH_SHORT).show();
-                });
-            }
         }
     }
 }
