@@ -39,7 +39,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-<!--        <activity android:name=".feature.auth.activity.LoginActivity"/>-->
+        <activity android:name=".feature.auth.activity.RegisterActivity"/>
         <activity android:name=".feature.auth.activity.CheckMailActivity" />
         <activity android:name=".feature.notification.activity.NotificationActivity"/>
         <activity
