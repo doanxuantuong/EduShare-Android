@@ -1,5 +1,6 @@
 package com.example.edushare.feature.item_detail.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
@@ -7,6 +8,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,6 +19,7 @@ import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.feature.item_detail.adapter.TagAdapter;
 import com.example.edushare.feature.item_detail.repository.PostDetailRepository;
 import com.example.edushare.feature.item_detail.model.PostDetailResponseDTO;
+import com.example.edushare.feature.transaction.activity.TransactionConfirmActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +30,8 @@ public class PostDetailActivity extends AppCompatActivity {
     private TextView tvProductTitle, tvProductPrice, tvShortLocation, tvFreeBadge;
     private ImageView ivSellerAvatar, ivVerifyTick;
     private TextView tvSellerName, tvSellerStatus;
-    private View btnMessage;
-
+    private View btnMessage,btnRequestTransaction;
+    private PostDetailResponseDTO postDetail;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +56,29 @@ public class PostDetailActivity extends AppCompatActivity {
             tvSellerStatus = sellerInfoLayout.findViewById(R.id.tvSellerStatus);
             btnMessage = sellerInfoLayout.findViewById(R.id.btnMessage);
         }
+        btnRequestTransaction = findViewById(R.id.btnRequestTransaction);
+        btnRequestTransaction.setOnClickListener(v -> {
 
+            // Giả sử 'postDetail' là Object chứa dữ liệu bạn đã load lên giao diện chi tiết này
+            if (postDetail != null) {
+
+                // Khởi tạo Intent để chuyển sang màn hình Xác nhận
+                Intent intent = new Intent(PostDetailActivity.this, TransactionConfirmActivity.class);
+
+                // Đẩy toàn bộ thông tin cần thiết qua màn hình confirm (để bên kia đỡ phải gọi lại API)
+                intent.putExtra("POST_ID", postDetail.getId()); // Gửi ID bài đăng lên Backend sau này
+                intent.putExtra("POST_TITLE", postDetail.getTitle());
+                intent.putExtra("POST_IMAGE", postDetail.getImageUrl());
+                intent.putExtra("POST_TYPE", postDetail.getTransactionType()); // Chứa FREE, EXCHANGE, hoặc SELL
+                intent.putExtra("SELLER_NAME", postDetail.getAuthorName());
+                intent.putExtra("SELLER_AVATAR", postDetail.getAvatarUrl());
+
+                // Thực hiện chuyển màn hình
+                startActivity(intent);
+            } else {
+                Toast.makeText(PostDetailActivity.this, "Dữ liệu bài đăng chưa tải xong, vui lòng thử lại!", Toast.LENGTH_SHORT).show();
+            }
+        });
         int postId = getIntent().getIntExtra("POST_ID", -1);
         if (postId != -1) {
             loadPostDetailFromServer(postId);
@@ -78,7 +103,7 @@ public class PostDetailActivity extends AppCompatActivity {
             @Override
             public void onSuccess(PostDetailResponseDTO data) {
                 if (data == null) return;
-
+                postDetail = data;
                 // Đổ dữ liệu Post
                 if (tvProductTitle != null) tvProductTitle.setText(data.getTitle());
                 if (tvProductPrice != null) tvProductPrice.setText(data.getPrice() + "đ");
@@ -156,6 +181,7 @@ public class PostDetailActivity extends AppCompatActivity {
                 if (btnMessage != null) {
                     if (currentUserId.equals(sellerId)) {
                         btnMessage.setVisibility(View.GONE);
+                        btnRequestTransaction.setVisibility(View.GONE);
                         // Hoặc nếu bạn muốn đổi nút Message thành nút "Sửa bài" thì làm thế này:
                         // if (btnMessage instanceof androidx.appcompat.widget.AppCompatButton) {
                         //     ((androidx.appcompat.widget.AppCompatButton) btnMessage).setText("Edit Post");
@@ -165,6 +191,7 @@ public class PostDetailActivity extends AppCompatActivity {
                     } else {
                         // Nếu là người khác xem -> Hiện nút nhắn tin bình thường
                         btnMessage.setVisibility(View.VISIBLE);
+                        btnRequestTransaction.setVisibility(View.VISIBLE);
                         btnMessage.setOnClickListener(v -> {
                             Toast.makeText(PostDetailActivity.this, "Chatting with user ID: " + sellerId, Toast.LENGTH_SHORT).show();
                             // Xử lý Intent chuyển qua ChatActivity của bạn ở đây...

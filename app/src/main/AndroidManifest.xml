@@ -55,6 +55,9 @@
         <activity android:name=".feature.chat.conversation.activity.ConversationActivity" />
         <activity android:name=".feature.locations.activity.MapActivity" />
         <activity android:name=".feature.item_detail.activity.PostDetailActivity" />
+        <activity
+            android:name=".feature.transaction.activity.TransactionConfirmActivity"
+            android:exported="false" />
         <service
             android:name=".common.firebase.messaging.MyFirebaseMessagingService"
             android:exported="false">
