@@ -30,7 +30,7 @@
         android:usesCleartextTraffic="true">
 
         <activity
-            android:name=".feature.auth.activity.LoginActivity"
+            android:name=".feature.auth.activity.RegisterActivity"
             android:exported="true"
             android:theme="@style/Theme.EduShare.Home">
             <intent-filter>
@@ -39,7 +39,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <!--        <activity android:name=".feature.auth.activity.RegisterActivity" />-->
+        <activity android:name=".feature.auth.activity.LoginActivity"/>
+        <activity android:name=".feature.auth.activity.CheckMailActivity" />
         <activity
             android:name=".feature.chat.message.activity.ChatDetailActivity"
             android:exported="false" />

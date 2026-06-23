@@ -63,6 +63,8 @@ public class HomeActivity extends AppCompatActivity {
 
         footerLayout = findViewById(R.id.footer_layout);
 
+        findViewById(R.id.btnNotification).setOnClickListener(view ->
+                Toast.makeText(this, R.string.home_notifications, Toast.LENGTH_SHORT).show());
         findViewById(R.id.btnLocation).setOnClickListener(view ->
                 startActivity(new Intent(this, MapActivity.class)));
     }

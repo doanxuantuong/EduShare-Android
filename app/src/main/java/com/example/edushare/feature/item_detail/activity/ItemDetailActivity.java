@@ -1,4 +1,4 @@
-package com.example.edushare.feature.item_detail.activity;
+package com.example.edushare.feature.item_detail.avtivity;
 
 import android.os.Bundle;
 import android.view.View;
