@@ -26,7 +26,8 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-import com.example.edushare.common.base.RetrofitClient;
+import com.example.edushare.common.base.retrofit.RetrofitClient;
+
 import com.example.edushare.feature.locations.network.LocationApiService;
 
 public class PickLocationActivity extends AppCompatActivity {
@@ -129,8 +130,7 @@ public class PickLocationActivity extends AppCompatActivity {
                 pickedPoint.getLongitude()
         );
 
-        RetrofitClient.createService(LocationApiService.class, this)
-                .createLocation(req)
+        RetrofitClient.createService(LocationApiService.class, this).createLocation(req)
                 .enqueue(new Callback<LocationDto>() {
                     @Override
                     public void onResponse(Call<LocationDto> call,
