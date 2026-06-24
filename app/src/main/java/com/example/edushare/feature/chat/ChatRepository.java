@@ -156,4 +156,22 @@ public class ChatRepository {
             }
         });
     }
+
+    public void checkExistingConversation(String senderId, String recipientId,int postId, OnActionCallback<Integer> callback) {
+        chatApi.checkExistingConversation(senderId, recipientId, postId).enqueue(new Callback<Integer>() {
+            @Override
+            public void onResponse(Call<Integer> call, Response<Integer> response) {
+                if (response.isSuccessful()) {
+                    callback.onSuccess(response.body());
+                } else {
+                    callback.onFailure("Lỗi Server: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Integer> call, Throwable t) {
+                callback.onFailure("Lỗi kết nối: " + t.getMessage());
+            }
+        });
+    }
 }
