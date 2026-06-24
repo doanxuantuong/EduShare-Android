@@ -1,6 +1,4 @@
-package com.example.edushare.feature.users;
-
-import com.google.gson.annotations.SerializedName;
+package com.example.edushare.feature.users.model;
 
 public class User {
     private String id;
