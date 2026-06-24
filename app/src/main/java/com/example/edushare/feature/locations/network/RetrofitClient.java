@@ -10,13 +10,13 @@ public class RetrofitClient {
 
     private static Retrofit instance;
 
-    public static ApiService getApiService() {
+    public static LocationApiService getApiService() {
         if (instance == null) {
             instance = new Retrofit.Builder()
                     .baseUrl(BASE_URL)
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
         }
-        return instance.create(ApiService.class);
+        return instance.create(LocationApiService.class);
     }
 }
