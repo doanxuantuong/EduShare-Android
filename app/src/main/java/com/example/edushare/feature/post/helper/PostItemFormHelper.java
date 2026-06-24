@@ -1,6 +1,7 @@
  package com.example.edushare.feature.post.helper;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.Menu;
 import android.widget.EditText;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.edushare.R;
+import com.example.edushare.feature.post.activity.PickLocationActivity;
 import com.example.edushare.feature.post.model.PostItemForm;
 
 /**
@@ -38,6 +40,8 @@ public class PostItemFormHelper {
     private String selectedCategory = "";
     private String selectedCondition = "";
     private String selectedLocation = "";
+
+    private int selectedLocationId = -1;
 
     public PostItemFormHelper(Activity activity) {
         this.activity = activity;
@@ -137,10 +141,13 @@ public class PostItemFormHelper {
     }
 
     private void showLocationMenu() {
-        showMenu(tvLocation, optionProvider.getLocationOptions(), value -> {
-            selectedLocation = value;
-            tvLocation.setText(value);
-        });
+        Intent intent = new Intent(activity, PickLocationActivity.class);
+        activity.startActivityForResult(intent, 200);
+    }
+    public void onLocationPicked(int locationId, String locationName) {
+        selectedLocationId = locationId;
+        selectedLocation   = locationName;
+        tvLocation.setText(locationName);
     }
 
     private void showMenu(TextView anchor, String[] values, OnMenuValueSelected listener) {
