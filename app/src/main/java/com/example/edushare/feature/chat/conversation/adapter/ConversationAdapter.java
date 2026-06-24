@@ -1,5 +1,6 @@
 package com.example.edushare.feature.chat.conversation.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
@@ -17,6 +19,7 @@ import com.example.edushare.feature.chat.conversation.model.Conversation;
 import com.example.edushare.feature.chat.message.activity.ChatDetailActivity;
 
 import java.util.List;
+import java.util.Objects;
 
 /*
  * Adapter:
@@ -28,6 +31,21 @@ public class ConversationAdapter extends RecyclerView.Adapter<ConversationAdapte
 
     public ConversationAdapter(List<Conversation> conversationList) {
         this.conversationList = conversationList;
+    }
+
+    // Để cập nhật data mới từ bên ViewModel gửi qua
+    @SuppressLint("NotifyDataSetChanged")
+    public void updateData(List<Conversation> newConversations) {
+        if (newConversations == null) return;
+
+        // 1. Xóa sạch dữ liệu cũ
+        this.conversationList.clear();
+
+        // 2. Đổ dữ liệu mới vào
+        this.conversationList.addAll(newConversations);
+
+        // 3. Ra lệnh cho RecyclerView vẽ lại toàn bộ giao diện
+        notifyDataSetChanged();
     }
 
     /*
