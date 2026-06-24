@@ -12,7 +12,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
+// Dùng GridLayoutManager thay cho LinearLayoutManager để RecyclerView hiển thị 2 cột
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.edushare.R;
@@ -37,7 +38,7 @@ public class HomeActivity extends AppCompatActivity {
     private MarketplaceItemAdapter itemAdapter;
     private HomeRepository homeRepository;
     private EditText edtHomeSearch;
-    //    private TextView tvItemCount;
+    // private TextView tvItemCount;
     private TextView tvCategoryAll;
     private TextView tvCategoryTextbooks;
     private TextView tvCategoryLabEquipment;
@@ -79,7 +80,9 @@ public class HomeActivity extends AppCompatActivity {
 
     private void initViews() {
         edtHomeSearch = findViewById(R.id.edtHomeSearch);
-//        tvItemCount = findViewById(R.id.tvItemCount);
+
+        // tvItemCount = findViewById(R.id.tvItemCount);
+
         tvCategoryAll = findViewById(R.id.tvCategoryAll);
         tvCategoryTextbooks = findViewById(R.id.tvCategoryTextbooks);
         tvCategoryLabEquipment = findViewById(R.id.tvCategoryLabEquipment);
@@ -99,8 +102,12 @@ public class HomeActivity extends AppCompatActivity {
     private void setupMarketplaceItems() {
         RecyclerView rvMarketplaceItems = findViewById(R.id.rvMarketplaceItems);
         itemAdapter = new MarketplaceItemAdapter(allItems);
-        rvMarketplaceItems.setLayoutManager(
-                new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+        // Trước đó dùng LinearLayoutManager nên chỉ ra 1 card mỗi hàng.
+        // Đổi sang GridLayoutManager với spanCount = 2 để hiển thị 2 card post mỗi hàng.
+        rvMarketplaceItems.setLayoutManager(new GridLayoutManager(this, 2));
+
+        // Vì RecyclerView nằm trong ScrollView, tắt nested scroll để scroll dọc mượt hơn.
+        rvMarketplaceItems.setNestedScrollingEnabled(false);
         rvMarketplaceItems.setAdapter(itemAdapter);
     }
 
@@ -171,7 +178,8 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void setupCategoryFilters() {
-        tvCategoryAll.setOnClickListener(view -> selectCategory("All", tvCategoryAll));
+        tvCategoryAll.setOnClickListener(view ->
+                selectCategory("All", tvCategoryAll));
         tvCategoryTextbooks.setOnClickListener(view ->
                 selectCategory(getString(R.string.home_category_textbooks), tvCategoryTextbooks));
         tvCategoryLabEquipment.setOnClickListener(view ->
@@ -237,7 +245,7 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void setupBottomNavigation() {
-        // Truyền cả cụm footerLayout và làm sáng đèn nút Home (R.id.nav_home)
+        // Truyền cả cụm footerLayout và làm sáng đèn nút Home.
         BottomNavigationHelper.setup(this, footerLayout, R.id.nav_home);
     }
 

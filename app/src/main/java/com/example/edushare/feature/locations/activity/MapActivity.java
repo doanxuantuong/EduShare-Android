@@ -22,10 +22,11 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.edushare.R;
+import com.example.edushare.common.base.retrofit.RetrofitClient;
 import com.example.edushare.feature.locations.adapter.SearchSuggestionAdapter;
 import com.example.edushare.feature.locations.helper.*;
 import com.example.edushare.feature.locations.model.PostMapDto;
-import com.example.edushare.feature.locations.network.RetrofitClient;
+import com.example.edushare.feature.locations.network.LocationApiService;
 import com.google.android.gms.location.CurrentLocationRequest;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
@@ -165,8 +166,7 @@ public class MapActivity extends AppCompatActivity {
 
     // Thêm method này vào MapActivity
     private void loadPostsFromApi() {
-        RetrofitClient.getApiService()
-                .getPostsForMap(null, null)
+        RetrofitClient.createService(LocationApiService.class, this).getPostsForMap(null, null)
                 .enqueue(new retrofit2.Callback<List<PostMapDto>>() {
 
                     @Override
