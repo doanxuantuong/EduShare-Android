@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Nền pill bao quanh hai tab Active/Sold. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#F0F0F0" />
+    <corners android:radius="28dp" />
+</shape>
