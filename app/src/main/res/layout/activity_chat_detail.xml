@@ -169,4 +169,6 @@
             app:tint="@color/white" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <include layout="@layout/layout_loading_overlay" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

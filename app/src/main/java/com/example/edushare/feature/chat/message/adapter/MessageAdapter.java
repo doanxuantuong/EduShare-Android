@@ -1,5 +1,6 @@
 package com.example.edushare.feature.chat.message.adapter;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -38,6 +39,17 @@ public class MessageAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
         } else {
             return TYPE_RECEIVED;
         }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    public void updateData(List<MessageResponse> newMessages) {
+        if (newMessages == null) return;
+
+        this.messageList.clear();
+
+        this.messageList.addAll(newMessages);
+
+        notifyDataSetChanged();
     }
 
     @NonNull

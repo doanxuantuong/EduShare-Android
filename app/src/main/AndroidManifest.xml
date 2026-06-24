@@ -39,6 +39,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".feature.post.activity.PickLocationActivity"/>
         <activity android:name=".feature.auth.activity.RegisterActivity"/>
         <activity android:name=".feature.auth.activity.CheckMailActivity" />
         <activity android:name=".feature.notification.activity.NotificationActivity"/>
@@ -53,6 +54,10 @@
         <!--        <activity android:name=".feature.chat.activity.ConversationActivity" />-->
         <activity android:name=".feature.users.activity.ProfileActivity" />
         <activity android:name=".feature.users.activity.ProfileDetailActivity" />
+        <activity
+            android:name=".feature.my_items.activity.MyItemsActivity"
+            android:exported="false"
+            android:theme="@style/Theme.EduShare.MyItems" />
         <activity android:name=".feature.chat.conversation.activity.ConversationActivity" />
         <activity android:name=".feature.locations.activity.MapActivity" />
         <activity

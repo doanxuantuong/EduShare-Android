@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -49,6 +50,7 @@ public class HomeActivity extends AppCompatActivity {
     private String userId;
     private View viewUnreadDot;
     private NotificationRepository notificationRepository;
+    private ProgressBar progressBar;
 
     @Override
     protected void onResume() {
@@ -91,6 +93,8 @@ public class HomeActivity extends AppCompatActivity {
         userId = UserSessionHelper.getUserId(this);
         viewUnreadDot = findViewById(R.id.viewUnreadDot);
 
+        progressBar = findViewById(R.id.progressBar);
+
         footerLayout = findViewById(R.id.footer_layout);
 
         findViewById(R.id.btnNotification).setOnClickListener(view ->
@@ -112,9 +116,16 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void fetchMarketplaceItems() {
+        if (progressBar != null) {
+            progressBar.setVisibility(View.VISIBLE);
+        }
         homeRepository.getPosts(new OnActionCallback<List<PostListItemResponse>>() {
             @Override
             public void onSuccess(List<PostListItemResponse> data) {
+                if (progressBar != null) {
+                    progressBar.setVisibility(View.GONE);
+                }
+
                 allItems.clear();
                 for (PostListItemResponse post : data) {
                     allItems.add(toMarketplaceItem(post));

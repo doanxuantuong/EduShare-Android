@@ -13,8 +13,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.edushare.R;
 import com.example.edushare.common.helper.BottomNavigationHelper;
 import com.example.edushare.common.helper.UserSessionHelper;
+import com.example.edushare.common.helper.WebSocketManager;
 import com.example.edushare.feature.auth.activity.LoginActivity;
 import com.example.edushare.feature.transaction.activity.TransactionHistoryActivity;
+import com.example.edushare.feature.my_items.activity.MyItemsActivity;
 
 public class ProfileActivity extends AppCompatActivity {
     private View footerLayout;
@@ -22,6 +24,7 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView tvName;
     private TextView tvEmail;
     private ImageView ivAvatar;
+    private View menuMyItems;
     private View menuLogout;
     private View mainInfo; // Khai báo biến cho vùng thông tin chính
     private View menuTransactionHistory;
@@ -32,6 +35,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         initViews();
         loadSession();
+        setupMyItemsListener();
         setupLogoutListener();
 
         // Cài đặt sự kiện click cho vùng thông tin chính
@@ -47,6 +51,7 @@ public class ProfileActivity extends AppCompatActivity {
         menuTransactionHistory = findViewById(R.id.menuTransactionHistory);
         // Ánh xạ id vùng thông tin chính từ XML của Profile
         mainInfo = findViewById(R.id.main_info);
+        menuMyItems = findViewById(R.id.menuMyItems);
 
         BottomNavigationHelper.setup(this, footerLayout, R.id.nav_profile);
     }
@@ -69,6 +74,14 @@ public class ProfileActivity extends AppCompatActivity {
 
     }
 
+    private void setupMyItemsListener() {
+        // Mở danh sách item của chính người dùng từ menu Profile.
+        menuMyItems.setOnClickListener(view -> {
+            Intent intent = new Intent(ProfileActivity.this, MyItemsActivity.class);
+            startActivity(intent);
+        });
+    }
+
     private void setupLogoutListener() {
         menuLogout.setOnClickListener(v -> {
             new AlertDialog.Builder(this)
@@ -77,6 +90,7 @@ public class ProfileActivity extends AppCompatActivity {
                     .setPositiveButton("Đăng xuất", (dialog, which) -> {
                         UserSessionHelper.clearSession(ProfileActivity.this);
                         Toast.makeText(ProfileActivity.this, "Đăng xuất thành công!", Toast.LENGTH_SHORT).show();
+                        WebSocketManager.getInstance().disconnect();
 
                         Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
