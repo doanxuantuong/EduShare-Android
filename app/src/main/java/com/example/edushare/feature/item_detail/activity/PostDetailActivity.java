@@ -72,7 +72,7 @@ public class PostDetailActivity extends AppCompatActivity {
                 intent.putExtra("POST_TYPE", postDetail.getTransactionType()); // Chứa FREE, EXCHANGE, hoặc SELL
                 intent.putExtra("SELLER_NAME", postDetail.getAuthorName());
                 intent.putExtra("SELLER_AVATAR", postDetail.getAvatarUrl());
-
+                intent.putExtra("SELLER_ID", postDetail.getAuthorId());
                 // Thực hiện chuyển màn hình
                 startActivity(intent);
             } else {

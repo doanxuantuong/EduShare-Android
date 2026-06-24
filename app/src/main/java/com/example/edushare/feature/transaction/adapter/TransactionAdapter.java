@@ -1,0 +1,165 @@
+package com.example.edushare.feature.transaction.adapter;
+
+import android.graphics.Color;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
+import com.example.edushare.R;
+import com.example.edushare.feature.transaction.dto.response.TransactionResponseDTO;
+
+import java.util.List;
+
+public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder> {
+
+    private List<TransactionResponseDTO> transactionList;
+    private String currentRole; // Biến này để biết đang ở tab "Đơn mua" hay "Đơn bán"
+
+    public TransactionAdapter(List<TransactionResponseDTO> transactionList, String currentRole) {
+        this.transactionList = transactionList;
+        this.currentRole = currentRole;
+    }
+
+    // Hàm này dùng để Fragment đẩy data mới vào khi gọi API xong
+    public void updateData(List<TransactionResponseDTO> newList,String newRole) {
+        this.currentRole = newRole;
+        this.transactionList.clear();
+        this.transactionList.addAll(newList);
+        notifyDataSetChanged();
+    }
+
+    @NonNull
+    @Override
+    public TransactionViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_transaction, parent, false);
+        return new TransactionViewHolder(view);
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull TransactionViewHolder holder, int position) {
+        TransactionResponseDTO trans = transactionList.get(position);
+
+        // 1. Gán Mã giao dịch (Tận dụng ID như đã thống nhất)
+        holder.tvOrderCode.setText(String.format("Mã giao dịch: #%05d", trans.getId()));
+
+        // 2. Gán thông tin Bài đăng (Ảnh + Tiêu đề)
+        holder.tvProductTitle.setText(trans.getPostTitle() != null ? trans.getPostTitle() : "Sản phẩm không xác định");
+        if (trans.getPostImage() != null && !trans.getPostImage().isEmpty()) {
+            Glide.with(holder.itemView.getContext())
+                    .load(trans.getPostImage())
+                    .centerCrop()
+                    .placeholder(android.R.color.darker_gray) // Ảnh mặc định nếu đang load
+                    .into(holder.ivProductImage);
+        }
+
+        String type = trans.getTransactionType() != null ? trans.getTransactionType().toUpperCase() : "";
+        switch (type) {
+            case "FREE":
+                holder.tvTransactionType.setText("Loại: Tặng miễn phí");
+                holder.tvTransactionType.setTextColor(Color.parseColor("#10B981")); // Xanh lá
+                break;
+            case "SALE":
+                // CHÚ Ý: Cần có trường price từ DTO
+                // Giả sử DTO của ông có getPrice()
+                // holder.tvTransactionType.setText("Bán: " + trans.getPrice() + " đ");
+                holder.tvTransactionType.setText("Loại: Mua Bán");
+                holder.tvTransactionType.setTextColor(Color.parseColor("#F5A623")); // Cam
+                break;
+            case "EXCHANGE":
+                // CHÚ Ý: Cần có trường exchangeItem từ DTO
+                // holder.tvTransactionType.setText("Trao đổi: " + trans.getExchangeItemName());
+                holder.tvTransactionType.setText("Loại: Trao đổi vật phẩm");
+                holder.tvTransactionType.setTextColor(Color.parseColor("#8B5CF6")); // Tím
+                break;
+            default:
+                holder.tvTransactionType.setText("Loại: Không xác định");
+                holder.tvTransactionType.setTextColor(Color.parseColor("#888888")); // Xám
+                break;
+        }
+        // 4. Xử lý hiển thị Trạng thái (Text + Màu sắc)
+        setupStatusDisplay(holder.tvStatus, trans.getStatus());
+
+        Log.d("DEBUG_BUTTON", "Role hien tai: " + currentRole + " | Status tu Backend: " + trans.getStatus());
+        if (currentRole.equals("SELLER") && "PENDING".equalsIgnoreCase(trans.getStatus())) {
+            holder.layoutActionButtons.setVisibility(View.VISIBLE);
+        } else {
+            holder.layoutActionButtons.setVisibility(View.GONE);
+        }
+
+        // 6. Bắt sự kiện Click nút (Chỗ này ông sẽ gọi API update status lên backend sau)
+        holder.btnAccept.setOnClickListener(v -> {
+            // TODO: Gọi API duyệt đơn
+        });
+
+        holder.btnReject.setOnClickListener(v -> {
+            // TODO: Gọi API từ chối đơn
+        });
+    }
+
+    @Override
+    public int getItemCount() {
+        return transactionList != null ? transactionList.size() : 0;
+    }
+
+    // Hàm phụ trợ giúp set text và màu cho trạng thái mượt mà hơn
+    private void setupStatusDisplay(TextView tvStatus, String status) {
+        if (status == null) status = "";
+
+        switch (status.toUpperCase()) {
+            case "PENDING":
+                tvStatus.setText("CHỜ XÁC NHẬN");
+                tvStatus.setTextColor(Color.parseColor("#F5A623")); // Màu cam
+                break;
+            case "IN-PROGRESS":
+                tvStatus.setText("ĐANG XỬ LÝ");
+                tvStatus.setTextColor(Color.parseColor("#3B82F6")); // Màu xanh dương
+                break;
+            case "SUCCESS":
+                tvStatus.setText("THÀNH CÔNG");
+                tvStatus.setTextColor(Color.parseColor("#10B981")); // Màu xanh lá
+                break;
+            case "REJECTED":
+                tvStatus.setText("TỪ CHỐI");
+                tvStatus.setTextColor(Color.parseColor("#EF4444")); // Màu đỏ
+                break;
+            case "CANCEL":
+                tvStatus.setText("ĐÃ HỦY");
+                tvStatus.setTextColor(Color.parseColor("#9CA3AF")); // Màu xám
+                break;
+            default:
+                tvStatus.setText("KHÔNG XÁC ĐỊNH");
+                tvStatus.setTextColor(Color.parseColor("#000000"));
+                break;
+        }
+    }
+
+    // Class quản lý View
+    public static class TransactionViewHolder extends RecyclerView.ViewHolder {
+        TextView tvOrderCode, tvStatus, tvProductTitle, tvTransactionType;
+        ImageView ivProductImage;
+        LinearLayout layoutActionButtons;
+        Button btnReject, btnAccept;
+
+        public TransactionViewHolder(@NonNull View itemView) {
+            super(itemView);
+            tvOrderCode = itemView.findViewById(R.id.tvOrderCode);
+            tvStatus = itemView.findViewById(R.id.tvStatus);
+            tvProductTitle = itemView.findViewById(R.id.tvProductTitle);
+            tvTransactionType = itemView.findViewById(R.id.tvTransactionType);
+            ivProductImage = itemView.findViewById(R.id.ivProductImage);
+
+            layoutActionButtons = itemView.findViewById(R.id.layoutActionButtons);
+            btnReject = itemView.findViewById(R.id.btnReject);
+            btnAccept = itemView.findViewById(R.id.btnAccept);
+        }
+    }
+}

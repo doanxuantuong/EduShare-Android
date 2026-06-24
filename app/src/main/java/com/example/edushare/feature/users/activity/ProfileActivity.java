@@ -15,6 +15,7 @@ import com.example.edushare.common.helper.BottomNavigationHelper;
 import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.common.helper.WebSocketManager;
 import com.example.edushare.feature.auth.activity.LoginActivity;
+import com.example.edushare.feature.transaction.activity.TransactionHistoryActivity;
 import com.example.edushare.feature.my_items.activity.MyItemsActivity;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -26,7 +27,7 @@ public class ProfileActivity extends AppCompatActivity {
     private View menuMyItems;
     private View menuLogout;
     private View mainInfo; // Khai báo biến cho vùng thông tin chính
-
+    private View menuTransactionHistory;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,7 +48,7 @@ public class ProfileActivity extends AppCompatActivity {
         tvEmail = findViewById(R.id.tvEmail);
         ivAvatar = findViewById(R.id.ivAvatar);
         menuLogout = findViewById(R.id.menuLogout);
-
+        menuTransactionHistory = findViewById(R.id.menuTransactionHistory);
         // Ánh xạ id vùng thông tin chính từ XML của Profile
         mainInfo = findViewById(R.id.main_info);
         menuMyItems = findViewById(R.id.menuMyItems);
@@ -66,6 +67,11 @@ public class ProfileActivity extends AppCompatActivity {
             Intent intent = new Intent(ProfileActivity.this, ProfileDetailActivity.class);
             startActivity(intent);
         });
+        menuTransactionHistory.setOnClickListener(v -> {
+            Intent intent = new Intent(ProfileActivity.this, TransactionHistoryActivity.class);
+            startActivity(intent);
+        });
+
     }
 
     private void setupMyItemsListener() {
