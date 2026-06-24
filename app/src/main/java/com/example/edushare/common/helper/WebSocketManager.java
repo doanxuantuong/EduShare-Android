@@ -24,27 +24,29 @@ public class WebSocketManager {
 
     @SuppressLint("CheckResult")
     public void connectWebSocket() {
-        if (stompClient != null || stompClient.isConnected()) {
+        if (stompClient != null && stompClient.isConnected()) {
             return;
         }
 
-        String wsUrl = "ws://10.0.2.2:8080/ws-edushare/websocket";
-        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, wsUrl);
+        if (stompClient == null) {
+            String wsUrl = "ws://10.0.2.2:8080/ws-edushare/websocket";
+            stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, wsUrl);
 
-        // Lắng nghe trạng thái (Chỉ cần 1 thằng Manager nghe là đủ)
-        stompClient.lifecycle().subscribe(lifecycleEvent -> {
-            switch (lifecycleEvent.getType()) {
-                case OPENED:
-                    Log.d("WebSocket", "Connection opened globally");
-                    break;
-                case ERROR:
-                    Log.d("WebSocket", "Lỗi kết nối globally", lifecycleEvent.getException());
-                    break;
-                case CLOSED:
-                    Log.d("SOCKET", "Đã ngắt kết nối globally");
-                    break;
-            }
-        }, throwable -> Log.e("WebSocket", "Lỗi lifecycle", throwable));
+            // Lắng nghe trạng thái (Chỉ cần 1 thằng Manager nghe là đủ)
+            stompClient.lifecycle().subscribe(lifecycleEvent -> {
+                switch (lifecycleEvent.getType()) {
+                    case OPENED:
+                        Log.d("WebSocket", "Connection opened globally");
+                        break;
+                    case ERROR:
+                        Log.d("WebSocket", "Lỗi kết nối globally", lifecycleEvent.getException());
+                        break;
+                    case CLOSED:
+                        Log.d("SOCKET", "Đã ngắt kết nối globally");
+                        break;
+                }
+            }, throwable -> Log.e("WebSocket", "Lỗi lifecycle", throwable));
+        }
 
         stompClient.connect();
     }
