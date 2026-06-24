@@ -4,6 +4,8 @@ import androidx.room.Entity;
 import androidx.room.PrimaryKey;
 import androidx.annotation.NonNull;
 
+
+// này là để làm cho Room Database á
 @Entity(tableName = "users")
 public class UserEntity {
     @PrimaryKey

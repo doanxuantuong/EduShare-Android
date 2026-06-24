@@ -12,6 +12,8 @@ import com.example.edushare.feature.auth.request.RegisterRequest;
 import com.example.edushare.feature.auth.request.SendOtpRequest;
 import com.example.edushare.feature.auth.response.LoginResponse;
 import com.example.edushare.feature.auth.response.RegisterResponse;
+import com.example.edushare.feature.users.dto.request.UserProfileDetailRequest;
+import com.example.edushare.feature.users.model.User;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -113,6 +115,24 @@ public class UserRepository {
             @Override
             public void onFailure(@NonNull Call<LoginResponse> call, @NonNull Throwable t) {
                 callback.onFailure("Không thể kết nối đến máy chủ");
+            }
+        });
+    }
+
+    public void updateProfile(String id, UserProfileDetailRequest request, OnActionCallback<User> callback) {
+        userApi.updateProfile(id, request).enqueue(new Callback<User>() {
+            @Override
+            public void onResponse(@NonNull Call<User> call, @NonNull Response<User> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    callback.onSuccess(response.body());
+                } else {
+                    callback.onFailure("Lỗi cập nhật: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<User> call, @NonNull Throwable t) {
+                callback.onFailure("Lỗi kết nối: " + t.getMessage());
             }
         });
     }
