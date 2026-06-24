@@ -1,7 +1,5 @@
 package com.example.edushare.feature.chat.message.activity;
 
-import static ua.naiksoftware.stomp.dto.LifecycleEvent.Type.OPENED;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,7 +9,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.edushare.R;
-import com.example.edushare.common.base.OnActionCallback;
+import com.example.edushare.common.base.retrofit.OnActionCallback;
 import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.feature.chat.ChatRepository;
 import com.example.edushare.feature.chat.PostSummaryResponse;
@@ -33,18 +30,15 @@ import com.example.edushare.feature.chat.message.dto.MessageRequest;
 import com.example.edushare.feature.chat.message.dto.MessageResponse;
 import com.example.edushare.feature.chat.message.dto.MessageStatusResponse;
 import com.example.edushare.feature.chat.message.dto.PageResponse;
-import com.example.edushare.feature.chat.message.model.Message;
 import com.example.edushare.feature.item_detail.activity.PostDetailActivity;
 import com.google.gson.Gson;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import retrofit2.Call;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
 

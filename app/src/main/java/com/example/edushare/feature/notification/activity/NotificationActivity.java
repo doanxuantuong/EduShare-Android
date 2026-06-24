@@ -1,7 +1,6 @@
 package com.example.edushare.feature.notification.activity;
 
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
@@ -15,11 +14,11 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.edushare.R;
+import com.example.edushare.common.base.view_model.BaseViewModelFactory;
 import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.feature.notification.NotificationRepository;
 import com.example.edushare.feature.notification.adapter.NotificationAdapter;
 import com.example.edushare.feature.notification.view_model.NotificationViewModel;
-import com.example.edushare.feature.notification.view_model.NotificationViewModelFactory;
 
 public class NotificationActivity extends AppCompatActivity {
     private RecyclerView rvNotifications;
@@ -105,14 +104,11 @@ public class NotificationActivity extends AppCompatActivity {
     }
 
     private void initViewModel() {
-        // 1. Tạo Repository và nhét Context (chính là chữ 'this' của Activity) vào
         NotificationRepository repository = new NotificationRepository(this);
 
-        // 2. Nhét Repository vào Factory
-        NotificationViewModelFactory factory = new NotificationViewModelFactory(repository);
-
-        // 3. Khởi tạo ViewModel thông qua Factory
-        notificationViewModel = new ViewModelProvider(this, factory).get(NotificationViewModel.class);
+        notificationViewModel = new ViewModelProvider(this, new BaseViewModelFactory<>(
+                () -> new NotificationViewModel(repository))
+        ).get(NotificationViewModel.class);
     }
 
     private void observeViewModel() {

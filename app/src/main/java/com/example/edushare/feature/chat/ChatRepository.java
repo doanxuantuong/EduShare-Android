@@ -4,16 +4,13 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
-import com.example.edushare.common.base.OnActionCallback;
-import com.example.edushare.common.base.RetrofitClient;
+import com.example.edushare.common.base.retrofit.OnActionCallback;
+import com.example.edushare.common.base.retrofit.RetrofitClient;
 import com.example.edushare.feature.chat.conversation.dto.request.ConversationCreateRequest;
 import com.example.edushare.feature.chat.conversation.model.Conversation;
 import com.example.edushare.feature.chat.message.dto.MessageRequest;
 import com.example.edushare.feature.chat.message.dto.MessageResponse;
 import com.example.edushare.feature.chat.message.dto.PageResponse;
-import com.example.edushare.feature.chat.message.model.Message;
-
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;

@@ -1,22 +1,17 @@
 package com.example.edushare.feature.users;
 
-import android.util.Log;
-
 import android.content.Context;
 
 import androidx.annotation.NonNull;
 
-import com.example.edushare.common.base.OnActionCallback;
-import com.example.edushare.common.base.RetrofitClient;
+import com.example.edushare.common.base.retrofit.OnActionCallback;
+import com.example.edushare.common.base.retrofit.RetrofitClient;
 import com.example.edushare.feature.auth.request.LoginRequest;
 import com.example.edushare.feature.auth.request.OcrLoginRequest;
 import com.example.edushare.feature.auth.request.RegisterRequest;
 import com.example.edushare.feature.auth.request.SendOtpRequest;
-import com.example.edushare.feature.auth.request.VerifyOtpRequest;
 import com.example.edushare.feature.auth.response.LoginResponse;
 import com.example.edushare.feature.auth.response.RegisterResponse;
-import com.example.edushare.feature.auth.response.SendOtpResponse;
-import com.example.edushare.feature.auth.response.VerifyOtpResponse;
 
 import retrofit2.Call;
 import retrofit2.Callback;

@@ -2,8 +2,8 @@ package com.example.edushare.common.firebase.user_fcm_token.repository;
 
 import android.content.Context;
 
-import com.example.edushare.common.base.OnActionCallback;
-import com.example.edushare.common.base.RetrofitClient;
+import com.example.edushare.common.base.retrofit.OnActionCallback;
+import com.example.edushare.common.base.retrofit.RetrofitClient;
 import com.example.edushare.common.firebase.user_fcm_token.api.UserFcmTokenApi;
 import com.example.edushare.common.firebase.user_fcm_token.dto.SaveFcmTokenRequest;
 

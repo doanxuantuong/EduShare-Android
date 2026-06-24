@@ -9,11 +9,9 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.edushare.R;
-import com.example.edushare.common.base.OnActionCallback;
+import com.example.edushare.common.base.retrofit.OnActionCallback;
 import com.example.edushare.common.widget.SimpleTextWatcher;
 import com.example.edushare.feature.auth.request.RegisterRequest;
-import com.example.edushare.feature.auth.request.SendOtpRequest;
-import com.example.edushare.feature.auth.request.VerifyOtpRequest;
 import com.example.edushare.feature.users.UserRepository;
 
 public class CheckMailActivity extends AppCompatActivity {
