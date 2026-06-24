@@ -6,6 +6,9 @@ import com.example.edushare.common.base.retrofit.RetrofitClient;
 import com.example.edushare.feature.item_detail.api.PostDetailApi;
 import com.example.edushare.feature.transaction.api.TransactionApi;
 import com.example.edushare.feature.transaction.dto.request.TransactionRequestDTO;
+import com.example.edushare.feature.transaction.dto.response.TransactionResponseDTO;
+
+import java.util.List;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -20,5 +23,9 @@ public class TransactionRepository {
     public void createTransaction(TransactionRequestDTO requestDTO, Callback<ResponseBody> callback) {
         Call<ResponseBody> call = transactionApi.createTransaction(requestDTO);
         call.enqueue(callback); // Chạy bất đồng bộ ngầm
+    }
+    public void getTransactionHistory(String token, String role, String status, Callback<List<TransactionResponseDTO>> callback) {
+        Call<List<TransactionResponseDTO>> call = transactionApi.getTransactionHistory("Bearer " + token, role, status);
+        call.enqueue(callback);
     }
 }

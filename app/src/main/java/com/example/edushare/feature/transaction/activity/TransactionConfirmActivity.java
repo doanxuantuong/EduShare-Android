@@ -162,13 +162,15 @@ public class TransactionConfirmActivity extends AppCompatActivity {
             if (isSuccess) {
                 Toast.makeText(this, "Gửi yêu cầu giao dịch thành công!", Toast.LENGTH_LONG).show();
 
-                // 🚀 NƠI REDIRECT SANG CHAT DETAIL (Tùy chọn mở rộng của bạn về sau):
-                // Intent intentChat = new Intent(this, com.example.edushare.feature.chat.message.activity.ChatDetailActivity.class);
-                // intentChat.putExtra("RECIPIENT_ID", sellerId);
-                // intentChat.putExtra("RECIPIENT_NAME", sellerName);
-                // startActivity(intentChat);
+                // 🚀 CHUYỂN HƯỚNG SANG MÀN HÌNH LỊCH SỬ GIAO DỊCH
+                Intent intentHistory = new Intent(TransactionConfirmActivity.this, TransactionHistoryActivity.class);
 
-                finish(); // Đóng màn hình Xác nhận giao dịch để về trang chủ/màn hình chat công việc
+                // Mẹo nhỏ: Clear hết các màn hình xác nhận trước đó để khi ở màn History bấm Back sẽ về thẳng trang chủ, không bị quay lại màn xác nhận này nữa.
+                intentHistory.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+                startActivity(intentHistory);
+
+                finish(); // Đóng màn hình Xác nhận giao dịch hiện tại
             }
         });
     }
