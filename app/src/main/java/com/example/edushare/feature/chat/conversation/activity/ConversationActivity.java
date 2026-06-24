@@ -23,7 +23,7 @@ import com.example.edushare.feature.chat.conversation.adapter.ConversationAdapte
 import com.example.edushare.feature.chat.conversation.model.Conversation;
 import com.example.edushare.feature.chat.message.dto.MessageResponse;
 import com.example.edushare.feature.chat.message.dto.PageResponse;
-import com.example.edushare.feature.notification.firebase.manager.FcmTokenManager;
+import com.example.edushare.common.firebase.user_fcm_token.FcmTokenManager;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;

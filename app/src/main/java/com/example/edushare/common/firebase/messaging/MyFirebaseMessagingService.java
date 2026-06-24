@@ -1,10 +1,10 @@
-package com.example.edushare.feature.notification.firebase.service;
+package com.example.edushare.common.firebase.messaging;
 
 import android.util.Log;
 
 import androidx.annotation.NonNull;
 
-import com.example.edushare.feature.notification.firebase.manager.FcmTokenManager;
+import com.example.edushare.common.firebase.user_fcm_token.FcmTokenManager;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 

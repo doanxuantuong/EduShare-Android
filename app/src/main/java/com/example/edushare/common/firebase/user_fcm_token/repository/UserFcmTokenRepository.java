@@ -1,11 +1,11 @@
-package com.example.edushare.feature.notification.user_fcm_token.repository;
+package com.example.edushare.common.firebase.user_fcm_token.repository;
 
 import android.content.Context;
 
 import com.example.edushare.common.base.OnActionCallback;
 import com.example.edushare.common.base.RetrofitClient;
-import com.example.edushare.feature.notification.user_fcm_token.api.UserFcmTokenApi;
-import com.example.edushare.feature.notification.user_fcm_token.dto.SaveFcmTokenRequest;
+import com.example.edushare.common.firebase.user_fcm_token.api.UserFcmTokenApi;
+import com.example.edushare.common.firebase.user_fcm_token.dto.SaveFcmTokenRequest;
 
 import retrofit2.Call;
 import retrofit2.Callback;
