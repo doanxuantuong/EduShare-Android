@@ -6,6 +6,8 @@ import androidx.lifecycle.ViewModel;
 import com.example.edushare.feature.transaction.dto.response.TransactionResponseDTO;
 import com.example.edushare.feature.transaction.repository.TransactionRepository;
 import java.util.List;
+
+import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -18,7 +20,11 @@ public class TransactionHistoryViewModel extends ViewModel {
     private final MutableLiveData<List<TransactionResponseDTO>> transactionsLiveData = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
+    private final MutableLiveData<Boolean> actionSuccessLiveData = new MutableLiveData<>();
 
+    public LiveData<Boolean> getActionSuccessLiveData() {
+        return actionSuccessLiveData;
+    }
     public TransactionHistoryViewModel(TransactionRepository repository) {
         this.repository = repository;
     }
@@ -46,6 +52,52 @@ public class TransactionHistoryViewModel extends ViewModel {
             public void onFailure(Call<List<TransactionResponseDTO>> call, Throwable t) {
                 isLoading.setValue(false);
                 errorMessage.setValue("Lỗi kết nối: " + t.getMessage());
+            }
+        });
+    }
+    public void acceptTransaction(String token, int transactionId) {
+        isLoading.setValue(true);
+        repository.acceptTransaction(token, transactionId, new retrofit2.Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                isLoading.setValue(false);
+                if (response.isSuccessful()) {
+                    actionSuccessLiveData.setValue(true); // Báo thành công
+                } else {
+                    try {
+                        String errorMsg = response.errorBody() != null ? response.errorBody().string() : "Lỗi không xác định";
+                        errorMessage.setValue("Lỗi: " + errorMsg);
+                    } catch (Exception e) {
+                        errorMessage.setValue("Duyệt đơn thất bại!");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                isLoading.setValue(false);
+                errorMessage.setValue("Lỗi kết nối mạng: " + t.getMessage());
+            }
+        });
+    }
+
+    public void rejectTransaction(String token, int transactionId) {
+        isLoading.setValue(true);
+        repository.rejectTransaction(token, transactionId, new retrofit2.Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                isLoading.setValue(false);
+                if (response.isSuccessful()) {
+                    actionSuccessLiveData.setValue(true); // Báo thành công
+                } else {
+                    errorMessage.setValue("Từ chối đơn thất bại!");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                isLoading.setValue(false);
+                errorMessage.setValue("Lỗi kết nối mạng: " + t.getMessage());
             }
         });
     }

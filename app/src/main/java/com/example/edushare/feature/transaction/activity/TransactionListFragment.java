@@ -67,7 +67,19 @@ public class TransactionListFragment extends Fragment {
 
     private void setupRecyclerView() {
         rvTransactions.setLayoutManager(new LinearLayoutManager(requireContext()));
-        adapter = new TransactionAdapter(new ArrayList<>(), role);
+        String token = UserSessionHelper.getToken(requireContext());
+        adapter = new TransactionAdapter(new ArrayList<>(), role, new TransactionAdapter.OnTransactionActionListener() {
+            @Override
+            public void onAcceptClick(int transactionId) {
+                viewModel.acceptTransaction(token, transactionId);
+            }
+
+            @Override
+            public void onRejectClick(int transactionId) {
+                viewModel.rejectTransaction(token, transactionId);
+            }
+        });
+
         rvTransactions.setAdapter(adapter);
     }
 
@@ -89,7 +101,15 @@ public class TransactionListFragment extends Fragment {
                 }
             }
         });
+        viewModel.getActionSuccessLiveData().observe(getViewLifecycleOwner(), isSuccess -> {
+            if (isSuccess != null && isSuccess) {
+                Toast.makeText(getContext(), "Thao tác thành công!", Toast.LENGTH_SHORT).show();
 
+                String currentUserId = UserSessionHelper.getUserId(requireContext());
+                String token = UserSessionHelper.getToken(requireContext());
+                viewModel.fetchHistory(token, currentUserId, role, status);
+            }
+        });
         // Lắng nghe loading
         viewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
             // Tạm thời để trống
@@ -98,7 +118,6 @@ public class TransactionListFragment extends Fragment {
         // Lắng nghe lỗi
         viewModel.getErrorMessage().observe(getViewLifecycleOwner(), error -> {
             Toast.makeText(getContext(), error, Toast.LENGTH_SHORT).show();
-            // Khi bị lỗi API (ví dụ 403), cũng cho hiện chữ thông báo để UI không bị trống trơn vô lý
             rvTransactions.setVisibility(View.GONE);
             if (tvEmptyState != null) {
                 tvEmptyState.setVisibility(View.VISIBLE);
