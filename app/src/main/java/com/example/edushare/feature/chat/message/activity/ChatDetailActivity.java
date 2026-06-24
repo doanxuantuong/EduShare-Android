@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -89,6 +90,8 @@ public class ChatDetailActivity extends AppCompatActivity {
     private Button btnViewProduct;
     private ChatDetailViewModel chatDetailViewModel;
 
+    private ProgressBar progressBar;
+
 
     // Hủy kết nối WebSocket khi Activity bị hủy
     // Tránh tốn RAM nếu WebSocket vẫn còn mở
@@ -148,6 +151,9 @@ public class ChatDetailActivity extends AppCompatActivity {
         // PHẦN 3: Thanh soạn tin nhắn và gửi tin nhắn
         etMessage = findViewById(R.id.etMessage);
         btnSend = findViewById(R.id.btnSend);
+
+        // PHẦN 4: ProgressBar
+        progressBar = findViewById(R.id.progressBar);
     }
 
     private void initViewModel() {
@@ -174,6 +180,12 @@ public class ChatDetailActivity extends AppCompatActivity {
         chatDetailViewModel.getScrollToPosition().observe(this, position -> {
             if (position != null && position >= 0) {
                 rvMessages.scrollToPosition(position);
+            }
+        });
+
+        chatDetailViewModel.getLoading().observe(this, isLoading -> {
+            if (isLoading != null) {
+                progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
             }
         });
 

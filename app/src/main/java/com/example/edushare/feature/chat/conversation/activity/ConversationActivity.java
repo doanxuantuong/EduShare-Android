@@ -60,6 +60,8 @@ public class ConversationActivity extends AppCompatActivity {
     private ConversationViewModel viewModel;
     private Disposable topicDisposable;
 
+    private ProgressBar progressBar;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -108,6 +110,7 @@ public class ConversationActivity extends AppCompatActivity {
         edtSearchChat = findViewById(R.id.etSearch);
         footerLayout = findViewById(R.id.footer_layout);
         BottomNavigationHelper.setup(this, footerLayout, R.id.nav_chat);
+        progressBar = findViewById(R.id.progressBar);
     }
 
     private void initViewModel() {
@@ -127,6 +130,12 @@ public class ConversationActivity extends AppCompatActivity {
         // 2. Lắng nghe Lỗi
         viewModel.getErrorMessage().observe(this, error -> {
             Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+        });
+
+        viewModel.getLoading().observe(this, isLoading -> {
+            if (isLoading != null) {
+                progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+            }
         });
     }
 
