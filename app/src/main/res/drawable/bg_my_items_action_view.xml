@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Nền nút View: trung tính để không cạnh tranh với hành động Edit. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/my_items_action_gray" />
+    <corners android:radius="10dp" />
+</shape>

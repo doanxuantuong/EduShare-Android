@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Bảng màu riêng của màn My Items, lấy theo nền và màu chính đang dùng ở Home/Profile/Post. -->
+    <color name="my_items_background">#F5F6FA</color>
+    <color name="my_items_surface">#FFFFFF</color>
+    <color name="my_items_text_primary">#1F2937</color>
+    <color name="my_items_text_secondary">#6B7280</color>
+    <color name="my_items_text_muted">#94A3B8</color>
+    <color name="my_items_primary">#0D9488</color>
+    <color name="my_items_primary_light">#CCFBF1</color>
+    <color name="my_items_action_gray">#E5E7EB</color>
+    <color name="my_items_danger">#EF4444</color>
+    <color name="my_items_danger_light">#FFE1E1</color>
+    <color name="my_items_card_stroke">#F1F5F9</color>
+
+    <!-- Text chỉ dùng cho màn quản lý item của người dùng. -->
+    <string name="my_items_title">My Items</string>
+    <string name="my_items_active_tab_format">Active (%1$d)</string>
+    <string name="my_items_sold_tab_format">Sold (%1$d)</string>
+    <string name="my_items_views_format">%1$d views</string>
+    <string name="my_items_likes_format">%1$d likes</string>
+    <string name="my_items_view">View</string>
+    <string name="my_items_edit">Edit</string>
+    <string name="my_items_empty_state">No items in this tab</string>
+    <string name="my_items_deleted_message">Removed "%1$s" from My Items</string>
+    <string name="desc_add_my_item">Post a new item</string>
+    <string name="desc_my_item_image">My item photo</string>
+    <string name="desc_delete_my_item">Delete my item</string>
+
+    <!-- Theme riêng giúp màn My Items có nền đồng bộ nhưng vẫn kế thừa theme chung của app. -->
+    <style name="Theme.EduShare.MyItems" parent="Theme.EduShare">
+        <item name="android:windowBackground">@color/my_items_background</item>
+    </style>
+
+    <!-- Style cho các nút hành động trong card item để layout không bị lặp thuộc tính. -->
+    <style name="MyItemsActionButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">48dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:foreground">?attr/selectableItemBackground</item>
+    </style>
+</resources>

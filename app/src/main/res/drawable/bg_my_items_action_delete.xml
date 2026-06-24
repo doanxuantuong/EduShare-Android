@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Nền nút xoá tách màu đỏ nhạt để cảnh báo hành động nguy hiểm. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="@color/my_items_danger_light" />
+    <corners android:radius="10dp" />
+</shape>

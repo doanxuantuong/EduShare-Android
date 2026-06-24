@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="16dp"
+    app:cardBackgroundColor="@color/my_items_surface"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="2dp"
+    app:strokeColor="@color/my_items_card_stroke"
+    app:strokeWidth="1dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <!-- Phần trên của card: ảnh bên trái, thông tin chính bên phải giống thiết kế mẫu. -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/ivMyItemImage"
+                android:layout_width="132dp"
+                android:layout_height="144dp"
+                android:background="@drawable/bg_my_items_image"
+                android:contentDescription="@string/desc_my_item_image"
+                android:padding="6dp"
+                android:scaleType="centerInside"
+                tools:src="@drawable/img_organic_chemistry_textbook" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="144dp"
+                android:layout_weight="1"
+                android:orientation="vertical"
+                android:paddingStart="16dp"
+                android:paddingTop="18dp"
+                android:paddingEnd="12dp">
+
+                <TextView
+                    android:id="@+id/tvMyItemTitle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:maxLines="2"
+                    android:minLines="2"
+                    android:textColor="@color/my_items_text_primary"
+                    android:textSize="17sp"
+                    android:textStyle="bold"
+                    tools:text="Organic Chemistry Textbook - 5th Edition" />
+
+                <TextView
+                    android:id="@+id/tvMyItemPrice"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:ellipsize="end"
+                    android:maxLines="1"
+                    android:textColor="@color/my_items_primary"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    tools:text="150,000đ" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="17dp"
+                        android:layout_height="17dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_my_items_eye" />
+
+                    <TextView
+                        android:id="@+id/tvMyItemViewCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:textColor="@color/my_items_text_secondary"
+                        android:textSize="14sp"
+                        tools:text="24 views" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="&#8226;"
+                        android:textColor="@color/my_items_text_secondary"
+                        android:textSize="14sp" />
+
+                    <ImageView
+                        android:layout_width="17dp"
+                        android:layout_height="17dp"
+                        android:layout_marginStart="8dp"
+                        android:contentDescription="@null"
+                        android:src="@drawable/ic_my_items_heart" />
+
+                    <TextView
+                        android:id="@+id/tvMyItemLikeCount"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:textColor="@color/my_items_text_secondary"
+                        android:textSize="14sp"
+                        tools:text="5 likes" />
+                </LinearLayout>
+            </LinearLayout>
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/my_items_card_stroke" />
+
+        <!-- Hàng hành động để người dùng xem, sửa hoặc xoá bài đăng của chính mình. -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="72dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp">
+
+            <TextView
+                android:id="@+id/btnViewMyItem"
+                style="@style/MyItemsActionButton"
+                android:layout_weight="1"
+                android:background="@drawable/bg_my_items_action_view"
+                android:text="@string/my_items_view"
+                android:textColor="@color/my_items_text_primary" />
+
+            <TextView
+                android:id="@+id/btnEditMyItem"
+                style="@style/MyItemsActionButton"
+                android:layout_marginStart="12dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_my_items_action_edit"
+                android:text="@string/my_items_edit"
+                android:textColor="@color/my_items_primary" />
+
+            <FrameLayout
+                android:id="@+id/btnDeleteMyItem"
+                android:layout_width="56dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="12dp"
+                android:background="@drawable/bg_my_items_action_delete"
+                android:clickable="true"
+                android:contentDescription="@string/desc_delete_my_item"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground">
+
+                <ImageView
+                    android:layout_width="22dp"
+                    android:layout_height="22dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_my_items_delete" />
+            </FrameLayout>
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

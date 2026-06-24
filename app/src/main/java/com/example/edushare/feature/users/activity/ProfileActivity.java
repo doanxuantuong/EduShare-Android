@@ -14,6 +14,7 @@ import com.example.edushare.R;
 import com.example.edushare.common.helper.BottomNavigationHelper;
 import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.feature.auth.activity.LoginActivity;
+import com.example.edushare.feature.my_items.activity.MyItemsActivity;
 
 public class ProfileActivity extends AppCompatActivity {
     private View footerLayout;
@@ -21,6 +22,7 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView tvName;
     private TextView tvEmail;
     private ImageView ivAvatar;
+    private View menuMyItems;
     private View menuLogout;
     private View mainInfo; // Khai báo biến cho vùng thông tin chính
 
@@ -31,6 +33,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         initViews();
         loadSession();
+        setupMyItemsListener();
         setupLogoutListener();
 
         // Cài đặt sự kiện click cho vùng thông tin chính
@@ -46,6 +49,7 @@ public class ProfileActivity extends AppCompatActivity {
 
         // Ánh xạ id vùng thông tin chính từ XML của Profile
         mainInfo = findViewById(R.id.main_info);
+        menuMyItems = findViewById(R.id.menuMyItems);
 
         BottomNavigationHelper.setup(this, footerLayout, R.id.nav_profile);
     }
@@ -59,6 +63,14 @@ public class ProfileActivity extends AppCompatActivity {
         // Khi click vào vùng thông tin cá nhân thì chuyển sang trang ProfileDetailActivity
         mainInfo.setOnClickListener(v -> {
             Intent intent = new Intent(ProfileActivity.this, ProfileDetailActivity.class);
+            startActivity(intent);
+        });
+    }
+
+    private void setupMyItemsListener() {
+        // Mở danh sách item của chính người dùng từ menu Profile.
+        menuMyItems.setOnClickListener(view -> {
+            Intent intent = new Intent(ProfileActivity.this, MyItemsActivity.class);
             startActivity(intent);
         });
     }
