@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F6FA">
+
+    <RelativeLayout
+        android:id="@+id/rlHeader"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:background="#1BAA8B"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <ImageView
+            android:id="@+id/ivBack"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="16dp"
+            android:padding="8dp"
+            android:src="@drawable/ic_chevron_right"
+            android:rotation="180"
+            app:tint="#FFFFFF"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="?attr/selectableItemBackgroundBorderless" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"
+            android:text="Thông tin cá nhân"
+            android:textColor="#FFFFFF"
+            android:textSize="18sp"
+            android:textStyle="bold" />
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:fillViewport="true"
+        android:overScrollMode="never"
+        android:scrollbars="none"
+        app:layout_constraintTop_toBottomOf="@id/rlHeader"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="24dp">
+
+                <FrameLayout
+                    android:layout_width="100dp"
+                    android:layout_height="100dp">
+
+                    <ImageView
+                        android:id="@+id/ivDetailAvatar"
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:background="@drawable/bg_circle"
+                        android:scaleType="centerCrop"
+                        android:src="@drawable/ic_avatar" />
+
+                    <ImageView
+                        android:id="@+id/ivChangeAvatar"
+                        android:layout_width="28dp"
+                        android:layout_height="28dp"
+                        android:layout_gravity="bottom|end"
+                        android:background="@drawable/bg_circle"
+                        android:backgroundTint="#1BAA8B"
+                        android:padding="6dp"
+                        android:src="@drawable/ic_edit"
+                        app:tint="#FFFFFF" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <TextView style="@style/ProfileFormLabel" android:text="Họ và tên" />
+            <EditText
+                android:id="@+id/etDetailName"
+                style="@style/ProfileFormEditText"
+                android:inputType="textPersonName"
+                android:text="Nguyễn Văn A" />
+
+            <TextView style="@style/ProfileFormLabel" android:text="Mã số sinh viên" />
+            <EditText
+                android:id="@+id/etDetailStudentCode"
+                style="@style/ProfileFormEditText"
+                android:inputType="number"
+                android:text="23130375" />
+
+            <TextView style="@style/ProfileFormLabel" android:text="Số điện thoại" />
+            <EditText
+                android:id="@+id/etDetailPhone"
+                style="@style/ProfileFormEditText"
+                android:inputType="phone"
+                android:text="0123456789" />
+
+            <Button
+                android:id="@+id/btnUpdateProfile"
+                android:layout_width="match_parent"
+                android:layout_height="50dp"
+                android:layout_marginTop="24dp"
+                android:backgroundTint="#1BAA8B"
+                android:text="Chỉnh sửa thông tin"
+                android:textColor="#FFFFFF"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:cornerRadius="10dp" />
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,13 +7,13 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog; // Import để làm hộp thoại xác nhận
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.edushare.R;
 import com.example.edushare.common.helper.BottomNavigationHelper;
 import com.example.edushare.common.helper.UserSessionHelper;
-import com.example.edushare.feature.auth.activity.LoginActivity; // Import trang Login để chuyển màn hình
+import com.example.edushare.feature.auth.activity.LoginActivity;
 
 public class ProfileActivity extends AppCompatActivity {
     private View footerLayout;
@@ -21,32 +21,31 @@ public class ProfileActivity extends AppCompatActivity {
     private TextView tvName;
     private TextView tvEmail;
     private ImageView ivAvatar;
-    private View menuLogout; // 1. Khai báo thêm biến cho nút Đăng xuất
+    private View menuLogout;
+    private View mainInfo; // Khai báo biến cho vùng thông tin chính
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_profile);
 
-        // Ánh xạ toàn bộ các View lên trước
         initViews();
-
-        // Đổ dữ liệu tài khoản từ Session lên giao diện
         loadSession();
-
-        // Cài đặt sự kiện Click cho nút Đăng xuất
         setupLogoutListener();
+
+        // Cài đặt sự kiện click cho vùng thông tin chính
+        setupNavigationListeners();
     }
 
     private void initViews() {
-        // Ánh xạ thẻ include từ file activity_profile.xml
         footerLayout = findViewById(R.id.footer_layout);
         tvName = findViewById(R.id.tvName);
         tvEmail = findViewById(R.id.tvEmail);
         ivAvatar = findViewById(R.id.ivAvatar);
-
-        // Ánh xạ id của nút Đăng xuất
         menuLogout = findViewById(R.id.menuLogout);
+
+        // Ánh xạ id vùng thông tin chính từ XML của Profile
+        mainInfo = findViewById(R.id.main_info);
 
         BottomNavigationHelper.setup(this, footerLayout, R.id.nav_profile);
     }
@@ -56,29 +55,29 @@ public class ProfileActivity extends AppCompatActivity {
         tvEmail.setText(UserSessionHelper.getEmail(this));
     }
 
+    private void setupNavigationListeners() {
+        // Khi click vào vùng thông tin cá nhân thì chuyển sang trang ProfileDetailActivity
+        mainInfo.setOnClickListener(v -> {
+            Intent intent = new Intent(ProfileActivity.this, ProfileDetailActivity.class);
+            startActivity(intent);
+        });
+    }
+
     private void setupLogoutListener() {
         menuLogout.setOnClickListener(v -> {
-            // Hiển thị một Dialog hỏi lại cho chắc chắn, tránh người dùng bấm nhầm khi đang lướt
             new AlertDialog.Builder(this)
                     .setTitle("Đăng xuất")
                     .setMessage("Bạn có chắc chắn muốn đăng xuất khỏi EduShare không?")
                     .setPositiveButton("Đăng xuất", (dialog, which) -> {
-
-                        // 1. Xóa sạch dữ liệu Session (Token, Email, Name...) đã lưu trước đó
                         UserSessionHelper.clearSession(ProfileActivity.this);
-
-                        // Thông báo nhanh cho người dùng
                         Toast.makeText(ProfileActivity.this, "Đăng xuất thành công!", Toast.LENGTH_SHORT).show();
 
-                        // 2. Chuyển hướng người dùng quay về màn hình Đăng nhập (LoginActivity)
                         Intent intent = new Intent(ProfileActivity.this, LoginActivity.class);
-
-                        // Xóa sạch toàn bộ "lịch sử" các Activity cũ (Stack) để ngăn người dùng nhấn nút Back quay lại trang Profile
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
                         finish();
                     })
-                    .setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss()) // Bấm Hủy thì đóng tắt dialog đi
+                    .setNegativeButton("Hủy", (dialog, which) -> dialog.dismiss())
                     .show();
         });
     }
