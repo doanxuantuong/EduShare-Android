@@ -37,5 +37,11 @@ public interface TransactionApi {
             @Header("Authorization") String token,
             @Path("id") int transactionId
     );
+
+    @PUT("transactions/{id}/complete")
+    Call<ResponseBody> completeTransaction(
+            @Header("Authorization") String token,
+            @Path("id") int transactionId
+    );
 }
 

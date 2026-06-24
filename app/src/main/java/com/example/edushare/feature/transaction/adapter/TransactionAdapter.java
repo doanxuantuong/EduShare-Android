@@ -22,6 +22,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     public interface OnTransactionActionListener {
         void onAcceptClick(int transactionId);
         void onRejectClick(int transactionId);
+        void onCompleteClick(int transactionId);
     }
     private OnTransactionActionListener actionListener;
     private List<TransactionResponseDTO> transactionList;
@@ -92,23 +93,36 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         // 4. Xử lý hiển thị Trạng thái (Text + Màu sắc)
         setupStatusDisplay(holder.tvStatus, trans.getStatus());
 
-        if (currentRole.equals("SELLER") && "PENDING".equalsIgnoreCase(trans.getStatus())) {
+        holder.layoutActionButtons.setVisibility(View.GONE);
+        holder.btnAccept.setVisibility(View.GONE);
+        holder.btnReject.setVisibility(View.GONE);
+        if ("PENDING".equalsIgnoreCase(trans.getStatus()) && "SELLER".equals(currentRole)) {
             holder.layoutActionButtons.setVisibility(View.VISIBLE);
-        } else {
-            holder.layoutActionButtons.setVisibility(View.GONE);
+            holder.btnAccept.setVisibility(View.VISIBLE);
+            holder.btnAccept.setText("Chấp nhận");
+            holder.btnReject.setVisibility(View.VISIBLE);
+            holder.btnReject.setText("Từ chối");
+        }
+        else if ("IN_PROGRESS".equalsIgnoreCase(trans.getStatus()) && "BUYER".equals(currentRole)) {
+            holder.layoutActionButtons.setVisibility(View.VISIBLE);
+            holder.btnAccept.setVisibility(View.VISIBLE); // Tận dụng nút Accept đổi chữ thành "Đã nhận hàng"
+            holder.btnAccept.setText("Đã nhận được hàng");
+            holder.btnReject.setVisibility(View.GONE);   // Ẩn nút từ chối đi
         }
 
         // 6. Bắt sự kiện Click nút (Chỗ này ông sẽ gọi API update status lên backend sau)
         holder.btnAccept.setOnClickListener(v -> {
             if (actionListener != null) {
-                // Hét lên: "Ê Fragment, nó bấm Duyệt cái đơn ID này nè!"
-                actionListener.onAcceptClick(trans.getId());
+                if ("IN_PROGRESS".equalsIgnoreCase(trans.getStatus())) {
+                    actionListener.onCompleteClick(trans.getId());
+                } else {
+                    actionListener.onAcceptClick(trans.getId());
+                }
             }
         });
 
         holder.btnReject.setOnClickListener(v -> {
             if (actionListener != null) {
-                // Hét lên: "Ê Fragment, nó bấm Từ chối đơn ID này nè!"
                 actionListener.onRejectClick(trans.getId());
             }
         });

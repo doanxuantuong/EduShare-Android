@@ -101,4 +101,29 @@ public class TransactionHistoryViewModel extends ViewModel {
             }
         });
     }
+    public void completeTransaction(String token, int transactionId) {
+        isLoading.setValue(true);
+        repository.completeTransaction(token, transactionId, new retrofit2.Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                isLoading.setValue(false);
+                if (response.isSuccessful()) {
+                    actionSuccessLiveData.setValue(true); // Kích hoạt để Fragment tự reload lại data
+                } else {
+                    try {
+                        String errorMsg = response.errorBody() != null ? response.errorBody().string() : "Thao tác thất bại!";
+                        errorMessage.setValue("Lỗi: " + errorMsg);
+                    } catch (Exception e) {
+                        errorMessage.setValue("Xác nhận thất bại!");
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                isLoading.setValue(false);
+                errorMessage.setValue("Lỗi kết nối mạng: " + t.getMessage());
+            }
+        });
+    }
 }
