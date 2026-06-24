@@ -83,4 +83,19 @@ public class NotificationViewModel extends ViewModel {
         });
     }
 
+    public void markAllAsRead(String userId) {
+        notificationRepository.markNotificationsAsRead(userId, new OnActionCallback<Void>() {
+            @Override
+            public void onSuccess(Void data) {
+                // Thành công! Không cần update giao diện vì user đang thoát ra Home rồi.
+            }
+
+            @Override
+            public void onFailure(String message) {
+                // Log lỗi ra chứ không báo Toast để tránh phiền user lúc họ đang thoát
+                errorMessage.postValue("Lỗi ẩn: " + message);
+            }
+        });
+    }
+
 }

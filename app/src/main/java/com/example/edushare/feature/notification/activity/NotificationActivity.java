@@ -7,6 +7,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.ViewModelProvider;
@@ -45,8 +46,21 @@ public class NotificationActivity extends AppCompatActivity {
             notificationViewModel.loadNextPage(userId);
         }
 
+        getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                // 1. Chạy lén API đánh dấu đã đọc trước khi thoát
+                if (userId != null && !userId.isEmpty()) {
+                    notificationViewModel.markAllAsRead(userId);
+                }
+
+                finish();
+            }
+        });
+
         btnBack.setOnClickListener(view -> {
-            finish();
+            // Lệnh này sẽ tự động kích hoạt cái handleOnBackPressed() ở Bước 2
+            getOnBackPressedDispatcher().onBackPressed();
         });
     }
 

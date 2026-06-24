@@ -7,6 +7,8 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
+import retrofit2.http.PUT;
 import retrofit2.http.Query;
 
 public interface NotificationApi {
@@ -16,4 +18,10 @@ public interface NotificationApi {
             @Query("page") int page,
             @Query("size") int size
     );
+
+    @PUT("api/notifications/mark-all-read")
+    Call<Void> markNotificationsAsRead(@Query("userId") String userId);
+
+    @GET("/api/notifications/check-unread")
+    Call<Boolean> checkUnread(@Query("userId") String userId);
 }

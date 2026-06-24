@@ -26,7 +26,7 @@ public class NotificationRepository {
     public void getUserNotification(String userId, int page, int size, OnActionCallback<PageResponse<NotificationResponseDto>> callback) {
         notificationApi.getUserNotifications(userId, page, size).enqueue(new Callback<PageResponse<NotificationResponseDto>>() {
             @Override
-            public void onResponse(@NonNull Call<PageResponse<NotificationResponseDto>> call,@NonNull Response<PageResponse<NotificationResponseDto>> response) {
+            public void onResponse(@NonNull Call<PageResponse<NotificationResponseDto>> call, @NonNull Response<PageResponse<NotificationResponseDto>> response) {
                 if (response.isSuccessful() && response.body() != null) {
                     callback.onSuccess(response.body());
                 } else {
@@ -36,6 +36,43 @@ public class NotificationRepository {
 
             @Override
             public void onFailure(Call<PageResponse<NotificationResponseDto>> call, Throwable t) {
+                callback.onFailure("Loi ket noi: " + t.getMessage());
+            }
+        });
+    }
+
+    public void markNotificationsAsRead(String userId, OnActionCallback<Void> callback) {
+        notificationApi.markNotificationsAsRead(userId).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                if (response.isSuccessful()) {
+                    callback.onSuccess(null);
+                } else {
+                    callback.onFailure("Loi Server: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Void> call, Throwable t) {
+                callback.onFailure("Loi ket noi: " + t.getMessage());
+            }
+        });
+    }
+
+    public void checkUnread(String userId, OnActionCallback<Boolean> callback) {
+        notificationApi.checkUnread(userId).enqueue(new Callback<Boolean>() {
+            @Override
+            public void onResponse(@NonNull Call<Boolean> call, @NonNull Response<Boolean> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    // Trả kết quả true/false qua callback
+                    callback.onSuccess(response.body());
+                } else {
+                    callback.onFailure("Loi Server: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Boolean> call, @NonNull Throwable t) {
                 callback.onFailure("Loi ket noi: " + t.getMessage());
             }
         });

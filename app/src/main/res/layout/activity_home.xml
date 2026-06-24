@@ -87,10 +87,13 @@
 
                     <View
                         android:id="@+id/viewUnreadDot"
-                        android:layout_width="9dp"
-                        android:layout_height="9dp"
+                        android:layout_width="10dp"
+                        android:layout_height="10dp"
+                        android:layout_gravity="top|end"
+                        android:layout_marginTop="8dp"
+                        android:layout_marginEnd="8dp"
                         android:background="@drawable/bg_unread_dot"
-                        app:layout_constraintEnd_toEndOf="parent" />
+                        />
 
                 </FrameLayout>
                 <FrameLayout

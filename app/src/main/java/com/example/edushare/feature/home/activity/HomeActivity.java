@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -17,12 +18,16 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.edushare.R;
 import com.example.edushare.common.base.OnActionCallback;
+import com.example.edushare.common.base.RetrofitClient;
 import com.example.edushare.common.helper.BottomNavigationHelper;
+import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.feature.home.HomeRepository;
 import com.example.edushare.feature.home.adapter.MarketplaceItemAdapter;
 import com.example.edushare.feature.home.model.MarketplaceItem;
 import com.example.edushare.feature.home.model.PostListItemResponse;
 import com.example.edushare.feature.locations.activity.MapActivity;
+import com.example.edushare.feature.notification.NotificationApi;
+import com.example.edushare.feature.notification.NotificationRepository;
 import com.example.edushare.feature.notification.activity.NotificationActivity;
 
 import java.text.NumberFormat;
@@ -30,12 +35,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+
 public class HomeActivity extends AppCompatActivity {
     private final List<MarketplaceItem> allItems = new ArrayList<>();
     private MarketplaceItemAdapter itemAdapter;
     private HomeRepository homeRepository;
     private EditText edtHomeSearch;
-//    private TextView tvItemCount;
+    //    private TextView tvItemCount;
     private TextView tvCategoryAll;
     private TextView tvCategoryTextbooks;
     private TextView tvCategoryLabEquipment;
@@ -43,6 +52,17 @@ public class HomeActivity extends AppCompatActivity {
     private String selectedCategory = "All";
     private View footerLayout;
     private FrameLayout btnNotification;
+    private String userId;
+    private View viewUnreadDot;
+    private NotificationRepository notificationRepository;
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (userId != null && !userId.isEmpty()) {
+            checkUnreadNotification();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +70,7 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         homeRepository = new HomeRepository(this);
+        notificationRepository = new NotificationRepository(this);
         initViews();
         setupMarketplaceItems();
         setupCategoryFilters();
@@ -71,6 +92,8 @@ public class HomeActivity extends AppCompatActivity {
         tvCategoryLabEquipment = findViewById(R.id.tvCategoryLabEquipment);
         tvCategoryElectronics = findViewById(R.id.tvCategoryElectronics);
         btnNotification = findViewById(R.id.btnNotification);
+        userId = UserSessionHelper.getUserId(this);
+        viewUnreadDot = findViewById(R.id.viewUnreadDot);
 
         footerLayout = findViewById(R.id.footer_layout);
 
@@ -79,6 +102,7 @@ public class HomeActivity extends AppCompatActivity {
         findViewById(R.id.btnLocation).setOnClickListener(view ->
                 startActivity(new Intent(this, MapActivity.class)));
     }
+
     private void setupMarketplaceItems() {
         RecyclerView rvMarketplaceItems = findViewById(R.id.rvMarketplaceItems);
         itemAdapter = new MarketplaceItemAdapter(allItems);
@@ -222,5 +246,21 @@ public class HomeActivity extends AppCompatActivity {
     private void setupBottomNavigation() {
         // Truyền cả cụm footerLayout và làm sáng đèn nút Home (R.id.nav_home)
         BottomNavigationHelper.setup(this, footerLayout, R.id.nav_home);
+    }
+
+    private void checkUnreadNotification() {
+        notificationRepository.checkUnread(userId, new OnActionCallback<Boolean>() {
+            @Override
+            public void onSuccess(Boolean hasUnread) {
+                // Hiện chấm đỏ nếu API trả về true, ngược lại thì ẩn
+                viewUnreadDot.setVisibility(hasUnread ? View.VISIBLE : View.GONE);
+            }
+
+            @Override
+            public void onFailure(String message) {
+                viewUnreadDot.setVisibility(View.GONE);
+                Log.e("CheckUnread", message);
+            }
+        });
     }
 }
