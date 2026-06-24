@@ -1,7 +1,5 @@
 package com.example.edushare.feature.chat.message.activity;
 
-import static ua.naiksoftware.stomp.dto.LifecycleEvent.Type.OPENED;
-
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,7 +9,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,7 +20,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.edushare.R;
-import com.example.edushare.common.base.OnActionCallback;
+import com.example.edushare.common.base.retrofit.OnActionCallback;
 import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.feature.chat.ChatRepository;
 import com.example.edushare.feature.chat.PostSummaryResponse;
@@ -33,17 +30,15 @@ import com.example.edushare.feature.chat.message.dto.MessageRequest;
 import com.example.edushare.feature.chat.message.dto.MessageResponse;
 import com.example.edushare.feature.chat.message.dto.MessageStatusResponse;
 import com.example.edushare.feature.chat.message.dto.PageResponse;
-import com.example.edushare.feature.chat.message.model.Message;
+import com.example.edushare.feature.item_detail.activity.PostDetailActivity;
 import com.google.gson.Gson;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
-import retrofit2.Call;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
 
@@ -113,6 +108,9 @@ public class ChatDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_detail);
 
+        // Call API lấy danh sách đoạn tin nhắn của conversation
+        chatRepository = new ChatRepository(this);
+
         // Khởi tạo các View: Lấy các thành phần trong layout
         initViews();
 
@@ -152,43 +150,10 @@ public class ChatDetailActivity extends AppCompatActivity {
             }
         });
 
-        // Call API lấy danh sách đoạn tin nhắn của conversation
-        chatRepository = new ChatRepository(this);
-
         if (postId != -1) {
             fetchPostSummaryFromApi(postId);
         }
 
-        // ==========================================
-        // LOGIC XỬ LÝ PHÒNG CHAT ẢO
-        // ==========================================
-        if (conversationId != -1) {
-            // NẾU LÀ PHÒNG THẬT: Lấy tin nhắn cũ
-            fetchMessagesByConversationIdFromApi(currentPage);
-        } else {
-            // NẾU LÀ PHÒNG ẢO (Từ chi tiết sản phẩm qua):
-            // KHÔNG LÀM GÌ CẢ, để danh sách rỗng chờ người dùng nhắn tin đầu tiên.
-        }
-
-        btnViewProduct.setOnClickListener(v -> {
-            Intent intent = new Intent(this, ChatDetailActivity.class);
-
-            // 1. Dữ liệu đánh dấu phòng chat ảo
-            intent.putExtra("CONVERSATION_ID", -1);
-
-            // 2. Dữ liệu giả của người bán (Lấy 1 mail có sẵn trong DB để lát nữa gửi tin nhắn thật được)
-            intent.putExtra("RECIPIENT_ID", "sjdhhdsf-dai@gmail.com");
-            intent.putExtra("SENDER_ID", senderId);
-            intent.putExtra("RECIPIENT_NAME", "Trần Thành Đại");
-
-            // 3. Dữ liệu giả của Sản phẩm (Đồ án)
-            intent.putExtra("POST_ID", 2); // ID ảo
-            intent.putExtra("POST_TITLE", "Source code quản lý KTX (Spring Boot + Android)");
-            intent.putExtra("POST_PRICE", "150,000 VNĐ");
-            intent.putExtra("POST_IMAGE_URL", "https://via.placeholder.com/150");
-
-            startActivity(intent);
-        });
         // Kết nối WebSocket
         connectWebSocket();
     }
@@ -207,6 +172,12 @@ public class ChatDetailActivity extends AppCompatActivity {
         tvPostPrice = findViewById(R.id.tvProductPrice);
         btnCloseProduct = findViewById(R.id.btnCloseProduct); // Ánh xạ nút X
         btnViewProduct = findViewById(R.id.btnViewProduct);
+
+        btnViewProduct.setOnClickListener(view -> {
+            Intent intent = new Intent(this, PostDetailActivity.class);
+            intent.putExtra("POST_ID", postId);
+            startActivity(intent);
+        });
 
         // Xử lý nút "Dấu X"
         btnCloseProduct.setOnClickListener(v -> {
@@ -232,6 +203,7 @@ public class ChatDetailActivity extends AppCompatActivity {
             recipientName = intent.getStringExtra("RECIPIENT_NAME");
             recipientAvatarUrl = intent.getStringExtra("RECIPIENT_AVATAR");
             postId = intent.getIntExtra("POST_ID", -1);
+            checkExistingConversation(senderId, recipientId, postId);
 
             if (postId != -1) {
                 // TRƯỜNG HỢP: ĐI TỪ SẢN PHẨM VÀO -> Hiện Header và set dữ liệu
@@ -468,6 +440,28 @@ public class ChatDetailActivity extends AppCompatActivity {
         if (isUpdated) {
             messageAdapter.notifyDataSetChanged();
         }
+    }
+
+    public void checkExistingConversation(String senderId, String recipientId, int postId) {
+        chatRepository.checkExistingConversation(senderId, recipientId, postId, new OnActionCallback<Integer>() {
+            @Override
+            public void onSuccess(Integer data) {
+                if (data != null && data > 0) {
+                    conversationId = data; // Phòng thật
+                    currentPage = 0;
+                    fetchMessagesByConversationIdFromApi(currentPage);
+                    Log.d("ChatDetail", "Conversation ID: " + conversationId);
+                } else {
+                    conversationId = -1; // Phòng ảo
+                    Log.d("ChatDetail", "Conversation ID: " + conversationId);
+                }
+            }
+
+            @Override
+            public void onFailure(String error) {
+                conversationId = -1; // Lỗi mạng thì cũng coi như phòng ảo luôn
+            }
+        });
     }
 
     @SuppressLint("CheckResult")

@@ -8,7 +8,6 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,8 +16,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.edushare.R;
-import com.example.edushare.common.base.OnActionCallback;
-import com.example.edushare.common.base.RetrofitClient;
+import com.example.edushare.common.base.retrofit.OnActionCallback;
 import com.example.edushare.common.helper.BottomNavigationHelper;
 import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.feature.home.HomeRepository;
@@ -26,7 +24,6 @@ import com.example.edushare.feature.home.adapter.MarketplaceItemAdapter;
 import com.example.edushare.feature.home.model.MarketplaceItem;
 import com.example.edushare.feature.home.model.PostListItemResponse;
 import com.example.edushare.feature.locations.activity.MapActivity;
-import com.example.edushare.feature.notification.NotificationApi;
 import com.example.edushare.feature.notification.NotificationRepository;
 import com.example.edushare.feature.notification.activity.NotificationActivity;
 
@@ -34,10 +31,6 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 
 public class HomeActivity extends AppCompatActivity {
     private final List<MarketplaceItem> allItems = new ArrayList<>();

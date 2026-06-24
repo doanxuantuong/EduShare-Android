@@ -1,4 +1,4 @@
-package com.example.edushare.common.base;
+package com.example.edushare.common.base.retrofit;
 
 import android.content.Context;
 

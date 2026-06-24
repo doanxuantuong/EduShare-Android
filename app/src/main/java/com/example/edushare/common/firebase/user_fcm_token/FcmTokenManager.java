@@ -4,7 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
 
-import com.example.edushare.common.base.OnActionCallback;
+import com.example.edushare.common.base.retrofit.OnActionCallback;
 import com.example.edushare.common.firebase.user_fcm_token.repository.UserFcmTokenRepository;
 import com.google.firebase.messaging.FirebaseMessaging;
 

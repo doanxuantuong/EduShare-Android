@@ -4,16 +4,13 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
-import com.example.edushare.common.base.OnActionCallback;
-import com.example.edushare.common.base.RetrofitClient;
+import com.example.edushare.common.base.retrofit.OnActionCallback;
+import com.example.edushare.common.base.retrofit.RetrofitClient;
 import com.example.edushare.feature.chat.conversation.dto.request.ConversationCreateRequest;
 import com.example.edushare.feature.chat.conversation.model.Conversation;
 import com.example.edushare.feature.chat.message.dto.MessageRequest;
 import com.example.edushare.feature.chat.message.dto.MessageResponse;
 import com.example.edushare.feature.chat.message.dto.PageResponse;
-import com.example.edushare.feature.chat.message.model.Message;
-
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -153,6 +150,24 @@ public class ChatRepository {
             @Override
             public void onFailure(Call<MessageResponse> call, Throwable t) {
                 callback.onFailure("Lỗi kết nối mạng: " + t.getMessage());
+            }
+        });
+    }
+
+    public void checkExistingConversation(String senderId, String recipientId,int postId, OnActionCallback<Integer> callback) {
+        chatApi.checkExistingConversation(senderId, recipientId, postId).enqueue(new Callback<Integer>() {
+            @Override
+            public void onResponse(Call<Integer> call, Response<Integer> response) {
+                if (response.isSuccessful()) {
+                    callback.onSuccess(response.body());
+                } else {
+                    callback.onFailure("Lỗi Server: " + response.code());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Integer> call, Throwable t) {
+                callback.onFailure("Lỗi kết nối: " + t.getMessage());
             }
         });
     }

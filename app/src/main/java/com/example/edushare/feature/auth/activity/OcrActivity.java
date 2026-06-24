@@ -22,8 +22,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.edushare.R;
-import com.example.edushare.common.base.OnActionCallback;
-import com.example.edushare.common.helper.AuthManager;
+import com.example.edushare.common.base.retrofit.OnActionCallback;
 import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.feature.auth.request.OcrLoginRequest;
 import com.example.edushare.feature.auth.response.LoginResponse;

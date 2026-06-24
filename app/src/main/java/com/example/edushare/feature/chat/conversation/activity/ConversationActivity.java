@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.edushare.R;
-import com.example.edushare.common.base.OnActionCallback;
+import com.example.edushare.common.base.retrofit.OnActionCallback;
 import com.example.edushare.common.helper.BottomNavigationHelper;
 import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.feature.chat.ChatRepository;

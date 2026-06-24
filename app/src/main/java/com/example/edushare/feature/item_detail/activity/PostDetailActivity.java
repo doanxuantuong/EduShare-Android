@@ -8,14 +8,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatButton;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.edushare.R;
-import com.example.edushare.common.base.OnActionCallback;
+import com.example.edushare.common.base.retrofit.OnActionCallback;
 import com.example.edushare.common.helper.UserSessionHelper;
+import com.example.edushare.feature.chat.message.activity.ChatDetailActivity;
 import com.example.edushare.feature.item_detail.adapter.TagAdapter;
 import com.example.edushare.feature.item_detail.repository.PostDetailRepository;
 import com.example.edushare.feature.item_detail.model.PostDetailResponseDTO;
@@ -193,8 +193,21 @@ public class PostDetailActivity extends AppCompatActivity {
                         btnMessage.setVisibility(View.VISIBLE);
                         btnRequestTransaction.setVisibility(View.VISIBLE);
                         btnMessage.setOnClickListener(v -> {
-                            Toast.makeText(PostDetailActivity.this, "Chatting with user ID: " + sellerId, Toast.LENGTH_SHORT).show();
-                            // Xử lý Intent chuyển qua ChatActivity của bạn ở đây...
+                            Intent intent = new Intent(PostDetailActivity.this, ChatDetailActivity.class);
+
+                            // 2. Dữ liệu giả của người bán (Lấy 1 mail có sẵn trong DB để lát nữa gửi tin nhắn thật được)
+                            intent.putExtra("RECIPIENT_ID", postDetail.getAuthorId());
+                            intent.putExtra("RECIPIENT_NAME", postDetail.getAuthorName());
+                            intent.putExtra("SENDER_ID", UserSessionHelper.getUserId(PostDetailActivity.this));
+
+                            // 3. Dữ liệu giả của Sản phẩm (Đồ án)
+                            intent.putExtra("POST_ID", postDetail.getId());
+                            intent.putExtra("POST_TITLE", postDetail.getTitle());
+                            intent.putExtra("POST_IMAGE_URL", postDetail.getImageUrl());
+                            String priceString = (postDetail.getPrice() != null) ? postDetail.getPrice() + "đ" : "Liên hệ";
+                            intent.putExtra("POST_PRICE", priceString);
+
+                            startActivity(intent);
                         });
                     }
                 }

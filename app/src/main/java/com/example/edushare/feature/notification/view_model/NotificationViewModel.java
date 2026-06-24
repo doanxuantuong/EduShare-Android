@@ -1,11 +1,9 @@
 package com.example.edushare.feature.notification.view_model;
 
-import android.content.Context;
-
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.edushare.common.base.OnActionCallback;
+import com.example.edushare.common.base.retrofit.OnActionCallback;
 import com.example.edushare.feature.chat.message.dto.PageResponse;
 import com.example.edushare.feature.notification.NotificationRepository;
 import com.example.edushare.feature.notification.dto.NotificationResponseDto;

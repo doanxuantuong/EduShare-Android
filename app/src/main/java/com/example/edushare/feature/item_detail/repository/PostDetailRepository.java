@@ -4,9 +4,8 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
-import com.example.edushare.common.base.OnActionCallback;
-import com.example.edushare.common.base.RetrofitClient;
-import com.example.edushare.feature.chat.ChatApi;
+import com.example.edushare.common.base.retrofit.OnActionCallback;
+import com.example.edushare.common.base.retrofit.RetrofitClient;
 import com.example.edushare.feature.item_detail.api.PostDetailApi;
 import com.example.edushare.feature.item_detail.model.PostDetailResponseDTO;
 

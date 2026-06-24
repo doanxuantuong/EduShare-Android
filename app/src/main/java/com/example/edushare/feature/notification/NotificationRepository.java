@@ -4,12 +4,10 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 
-import com.example.edushare.common.base.OnActionCallback;
-import com.example.edushare.common.base.RetrofitClient;
+import com.example.edushare.common.base.retrofit.OnActionCallback;
+import com.example.edushare.common.base.retrofit.RetrofitClient;
 import com.example.edushare.feature.chat.message.dto.PageResponse;
 import com.example.edushare.feature.notification.dto.NotificationResponseDto;
-
-import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;

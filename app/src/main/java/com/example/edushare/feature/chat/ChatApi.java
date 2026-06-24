@@ -53,4 +53,8 @@ public interface ChatApi {
 
     @POST("/conversations")
     Call<MessageResponse> sendFirstMessage(@Body ConversationCreateRequest conversationCreateRequest);
+
+    @GET("/conversations/check-existing")
+    Call<Integer> checkExistingConversation(@Query("senderId") String senderId, @Query("recipientId") String recipientId, @Query("postId") int postId);
+
 }
