@@ -7,20 +7,24 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.edushare.R;
 import com.example.edushare.common.base.retrofit.OnActionCallback;
+import com.example.edushare.common.base.view_model.BaseViewModelFactory;
 import com.example.edushare.common.helper.BottomNavigationHelper;
 import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.feature.chat.ChatRepository;
 import com.example.edushare.feature.chat.conversation.adapter.ConversationAdapter;
 import com.example.edushare.feature.chat.conversation.model.Conversation;
+import com.example.edushare.feature.chat.conversation.view_model.ConversationViewModel;
 import com.example.edushare.feature.chat.message.dto.MessageResponse;
 import com.example.edushare.feature.chat.message.dto.PageResponse;
 import com.example.edushare.common.firebase.user_fcm_token.FcmTokenManager;
@@ -46,21 +50,48 @@ import ua.naiksoftware.stomp.StompClient;
 public class ConversationActivity extends AppCompatActivity {
     private RecyclerView rvChatList;
     private ConversationAdapter adapter;
-    private List<Conversation> conversationList;
-    private List<Conversation> originalConversationList;
-    private ChatRepository chatRepository;
     private View footerLayout;
-    private String currentUserId;
-    private int currentPage = 0;
-    private final int PAGE_SIZE = 8;
-    private boolean isLoading = false; // Đang call API thì không cho call đè
-    private boolean isLastPage = false; // Hết tin cũ rồi thì không gọi API nữa
-    private boolean isFirstOpen = true;
-    private StompClient stompClient;
     private EditText edtSearchChat;
+    private String currentUserId;
+    private StompClient stompClient;
+    private boolean isFirstOpen = true;
 
-    // Hủy kết nối WebSocket khi Activity bị hủy
-    // Tránh tốn RAM nếu WebSocket vẫn còn mở
+    private ConversationViewModel viewModel;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_chat_list);
+
+        currentUserId = UserSessionHelper.getUserId(this);
+
+        initViews();
+        initViewModel();
+        initRecyclerView();
+        setupSearch();
+
+        // Lần đầu mở app -> Gọi load data
+        viewModel.loadConversations(currentUserId, true);
+
+        connectWebSocket();
+
+        FcmTokenManager fcmTokenManager = new FcmTokenManager(this);
+        fcmTokenManager.getAndSaveFcmToken(currentUserId);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (currentUserId != null) {
+            if (isFirstOpen) {
+                isFirstOpen = false;
+            } else {
+                // Đi đâu đó quay lại thì Refresh danh sách
+                viewModel.loadConversations(currentUserId, true);
+            }
+        }
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
@@ -69,74 +100,37 @@ public class ConversationActivity extends AppCompatActivity {
         }
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        //Chỉ định giao diện hiển thị cho Activity
-        setContentView(R.layout.activity_chat_list);
-
-        //Khởi tạo sự kiện cho các View
-        initViews();
-        setupRecyclerView();
-
-        loadSession();
-
-        // Khởi tạo Repository
-        chatRepository = new ChatRepository(this);
-
-        // Gọi API lấy dữ liệu thực
-        fetchConversationsFromApi(currentPage);
-
-        connectWebSocket();
-
-        setupSearch();
-
-        FcmTokenManager fcmTokenManager = new FcmTokenManager(this);
-        fcmTokenManager.getAndSaveFcmToken(currentUserId);
-    }
-
-    private void loadSession() {
-        // Khởi tạo và thiết lập cụm điều hướng dùng chung
-        currentUserId = UserSessionHelper.getUserId(this);
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        // Mỗi khi màn hình này hiện lên (kể cả lúc từ phòng chat quay ra),
-        // gọi lại API để lấy danh sách lastMessage mới nhất.
-        if (currentUserId != null) {
-            // Nếu là lần đầu tiên mở Activity (onCreate đã gọi API rồi)
-            if (isFirstOpen) {
-                isFirstOpen = false; // Đánh dấu lần sau quay lại không phải lần đầu nữa
-            } else {
-                currentPage = 0;
-                isLastPage = false;
-                fetchConversationsFromApi(currentPage);
-            }
-        }
-    }
-
     private void initViews() {
         rvChatList = findViewById(R.id.rvChatList);
         edtSearchChat = findViewById(R.id.etSearch);
-
-        // 2. Ánh xạ thẻ <include> trong file xml (ID là footer_layout)
         footerLayout = findViewById(R.id.footer_layout);
-
-        // 3. Kích hoạt bộ Helper: Truyền id của tab Chat (R.id.nav_chat) để nó biết đường làm sáng đèn icon Chat
         BottomNavigationHelper.setup(this, footerLayout, R.id.nav_chat);
     }
 
-    private void setupRecyclerView() {
-        // Tạo danh sách các đoạn hội thoại (conversationList)
-        conversationList = new ArrayList<>();
-        originalConversationList = new ArrayList<>();
+    private void initViewModel() {
+        ChatRepository repository = new ChatRepository(this);
 
-        // Thêm dữ liệu qua bên Adapter cho Adapter load lên
-        adapter = new ConversationAdapter(conversationList);
-        rvChatList.setLayoutManager(new LinearLayoutManager(this));
-        //Gắn Adapter vào RecyclerView để hiển thị danh sách
+        // Khởi tạo ViewModel
+        viewModel = new ViewModelProvider(this, new BaseViewModelFactory<>(
+                () -> new ConversationViewModel(repository))
+        ).get(ConversationViewModel.class);
+
+        // 1. Lắng nghe Danh sách thay đổi
+        viewModel.getConversationList().observe(this, conversations -> {
+            // Adapter bây giờ updateData(List)
+            adapter.updateData(conversations);
+        });
+
+        // 2. Lắng nghe Lỗi
+        viewModel.getErrorMessage().observe(this, error -> {
+            Toast.makeText(this, error, Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    private void initRecyclerView() {
+        adapter = new ConversationAdapter(new ArrayList<>());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        rvChatList.setLayoutManager(layoutManager);
         rvChatList.setAdapter(adapter);
 
         rvChatList.addOnScrollListener(new RecyclerView.OnScrollListener() {
@@ -144,106 +138,41 @@ public class ConversationActivity extends AppCompatActivity {
             public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
                 super.onScrolled(recyclerView, dx, dy);
 
+                // Kiểm tra xem người dùng có đang vuốt màn hình từ dưới lên
                 if (dy > 0) {
-                    LinearLayoutManager layoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
-                    if (layoutManager != null) {
-                        int lastVisibleItem = layoutManager.findLastVisibleItemPosition();
-                        int totalItemCount = conversationList.size();
+                    // Số lượng đoạn conversation đang hiển thị
+                    int visibleItemCount = layoutManager.getChildCount();
+                    // Số lượng conversation đã bị cuộn qua và khuất lên phía trên
+                    int totalItemCount = layoutManager.getItemCount();
+                    // Tổng số lượng conversation mà Adapter đang cầm trong tay
+                    int pastVisibleItems = layoutManager.findFirstVisibleItemPosition();
 
-                        // nếu item cuối đã chạm đáy
-                        if (lastVisibleItem == conversationList.size() - 1) {
-                            if (!isLoading && !isLastPage) {
-                                currentPage++;
-                                fetchConversationsFromApi(currentPage);
-                            }
-                        }
+                    // Lấy số cái đang nhìn thấy (6) + số cái đã khuất ở trên (14).
+                    // Nếu tổng này lớn hơn hoặc bằng tổng số (20),
+                    // nghĩa là chạm tới đáy của danh sách hiện tại.
+                    if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
+                        viewModel.loadConversations(currentUserId, false);
                     }
                 }
-
-            }
-
-        });
-    }
-
-    private void fetchConversationsFromApi(int page) {
-        isLoading = true;
-        chatRepository.getConversations(currentUserId, page, PAGE_SIZE, new OnActionCallback<PageResponse<Conversation>>() {
-            @SuppressLint("NotifyDataSetChanged")
-            @Override
-            public void onSuccess(PageResponse<Conversation> data) {
-
-                // Kiểm tra xem có đang load dở không, và đã hết trang chưa
-                isLoading = false;
-                isLastPage = data.isLast();
-                List<Conversation> newConversations = data.getContent();
-                int sizeReceived = (newConversations != null) ? newConversations.size() : 0;
-
-                if (newConversations != null && !newConversations.isEmpty()) {
-                    if (page == 0) {
-                        // Xóa danh sách cũ và thêm dữ liệu mới từ API
-                        conversationList.clear();
-                        conversationList.addAll(newConversations);
-                        originalConversationList.addAll(newConversations);
-
-                        // Thông báo cho adapter cập nhật giao diện
-                        adapter.notifyDataSetChanged();
-                    } else {
-                        // TÌM VỊ TRÍ CUỐI CÙNG ĐỂ CHÈN
-                        int insertIndex = conversationList.size();
-
-                        // THÊM VÀO CUỐI DANH SÁCH
-                        conversationList.addAll(newConversations);
-
-                        // VẼ TỪ VỊ TRÍ CUỐI ĐÓ
-                        adapter.notifyItemRangeInserted(insertIndex, newConversations.size());
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(String error) {
-                isLoading = false;
-                Toast.makeText(ConversationActivity.this, error, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    @SuppressLint("NotifyDataSetChanged")
-    private void updateConversationList(MessageResponse newMessage) {
-        int existingIndex = -1;
-
-        // 1. Quét xem đoạn chat này đã có sẵn trong danh sách hiển thị chưa
-        for (int i = 0; i < conversationList.size(); i++) {
-            if (conversationList.get(i).getId() == newMessage.getConversationId()) {
-                existingIndex = i;
-                break;
-            }
-        }
-
-        if (existingIndex != -1) {
-            Conversation conversation = conversationList.get(existingIndex);
-            conversation.setLastMessage(newMessage.getContent());
-            conversation.setUpdatedAt(newMessage.getCreatedAt());
-            conversation.setUnreadCount(conversation.getUnreadCount() + 1);
-
-            if (existingIndex != 0) {
-                conversationList.remove(existingIndex);
-                conversationList.add(0, conversation);
-                adapter.notifyItemMoved(existingIndex, 0);
-                adapter.notifyItemChanged(0);
-            } else {
-                // Đã ở sẵn trên đầu rồi thì chỉ cần vẽ lại vị trí 0
-                adapter.notifyItemChanged(0);
+    private void setupSearch() {
+        edtSearchChat.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
 
-            // Đẩy RecyclerView cuộn mượt mà lên vị trí trên cùng
-            rvChatList.smoothScrollToPosition(0);
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                viewModel.search(s.toString()); // Chuyền keyword qua cho ViewModel xử
+            }
 
-        } else {
-            currentPage = 0;
-            isLastPage = false;
-            fetchConversationsFromApi(currentPage);
-        }
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
     }
 
     @SuppressLint("CheckResult")
@@ -251,8 +180,24 @@ public class ConversationActivity extends AppCompatActivity {
         String wsUrl = "ws://10.0.2.2:8080/ws-edushare/websocket";
         stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, wsUrl);
 
-        subscribeChatTopic();
+        // 1. SOCKET LẮNG NGHE TIN NHẮN MỚI
+        stompClient.topic("/topic/messages/" + currentUserId).subscribe(stompMessage -> {
+            try {
+                String jsonPayload = stompMessage.getPayload();
+                Log.d("SOCKET_DATA", "ChatList nhận JSON: " + jsonPayload);
 
+                MessageResponse newMessage = new Gson().fromJson(jsonPayload, MessageResponse.class);
+
+                // Đẩy qua cho Thư ký (ViewModel) xử lý ngầm
+                runOnUiThread(() -> viewModel.handleNewMessage(newMessage, currentUserId));
+            } catch (Exception e) {
+                Log.e("SOCKET_DATA", "Lỗi Parse JSON ở ChatList", e);
+            }
+        }, throwable -> {
+            Log.e("WebSocket", "Subscribe chat topic error", throwable);
+        });
+
+        // 2. SOCKET LẮNG NGHE TRẠNG THÁI KẾT NỐI
         stompClient.lifecycle().subscribe(lifecycleEvent -> {
             switch (lifecycleEvent.getType()) {
                 case OPENED:
@@ -269,68 +214,8 @@ public class ConversationActivity extends AppCompatActivity {
             Log.e("WebSocket", "Lỗi lifecycle Conversation", throwable);
         });
 
+        // 3. Kích hoạt kết nối
         stompClient.connect();
-    }
-
-    @SuppressLint("CheckResult")
-    private void subscribeChatTopic() {
-        String myTopic = "/topic/messages/" + currentUserId;
-        stompClient.topic(myTopic).subscribe(stompMessage -> {
-            try {
-                String jsonPayload = stompMessage.getPayload();
-                Log.d("SOCKET_DATA", "ChatList nhận JSON: " + jsonPayload);
-
-                Gson gson = new Gson();
-                MessageResponse newMessage = gson.fromJson(jsonPayload, MessageResponse.class);
-
-                runOnUiThread(() -> {
-                    updateConversationList(newMessage);
-                });
-            } catch (Exception e) {
-                Log.e("SOCKET_DATA", "Lỗi Parse JSON ở ChatList", e);
-            }
-        }, throwable -> {
-            Log.e("WebSocket", "Subscribe chat topic error", throwable);
-        });
-    }
-
-    // Tìm kiếm đoạn chat dựa vào tên của người nhận
-    private void findConversationsByReceiverName(String receiverName) {
-        conversationList.clear();
-
-        if (receiverName == null || receiverName.trim().isEmpty()) {
-            conversationList.addAll(originalConversationList);
-        } else {
-            String keyword = receiverName.trim().toLowerCase();
-
-            for (Conversation conversation : originalConversationList) {
-                String name = conversation.getRecipientName();
-
-                if (name != null && name.toLowerCase().contains(keyword)) {
-                    conversationList.add(conversation);
-                }
-            }
-        }
-
-        adapter.notifyDataSetChanged();
-    }
-
-    //Code setup cho việc tìm kiếm
-    private void setupSearch() {
-        edtSearchChat.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                findConversationsByReceiverName(s.toString());
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
     }
 
 }
