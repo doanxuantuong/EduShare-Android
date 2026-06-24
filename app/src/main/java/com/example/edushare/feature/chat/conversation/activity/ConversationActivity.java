@@ -21,6 +21,7 @@ import com.example.edushare.common.base.retrofit.OnActionCallback;
 import com.example.edushare.common.base.view_model.BaseViewModelFactory;
 import com.example.edushare.common.helper.BottomNavigationHelper;
 import com.example.edushare.common.helper.UserSessionHelper;
+import com.example.edushare.common.helper.WebSocketManager;
 import com.example.edushare.feature.chat.ChatRepository;
 import com.example.edushare.feature.chat.conversation.adapter.ConversationAdapter;
 import com.example.edushare.feature.chat.conversation.model.Conversation;
@@ -33,6 +34,7 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.disposables.Disposable;
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
 
@@ -53,10 +55,10 @@ public class ConversationActivity extends AppCompatActivity {
     private View footerLayout;
     private EditText edtSearchChat;
     private String currentUserId;
-    private StompClient stompClient;
     private boolean isFirstOpen = true;
 
     private ConversationViewModel viewModel;
+    private Disposable topicDisposable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -95,8 +97,9 @@ public class ConversationActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (stompClient != null && stompClient.isConnected()) {
-            stompClient.disconnect();
+        // Hủy lắng nghe tin nhắn để giải phóng hoàn toàn RAM cho màn hình
+        if (topicDisposable != null && !topicDisposable.isDisposed()) {
+            topicDisposable.dispose();
         }
     }
 
@@ -177,11 +180,12 @@ public class ConversationActivity extends AppCompatActivity {
 
     @SuppressLint("CheckResult")
     private void connectWebSocket() {
-        String wsUrl = "ws://10.0.2.2:8080/ws-edushare/websocket";
-        stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, wsUrl);
 
-        // 1. SOCKET LẮNG NGHE TIN NHẮN MỚI
-        stompClient.topic("/topic/messages/" + currentUserId).subscribe(stompMessage -> {
+        WebSocketManager.getInstance().connectWebSocket();
+
+        StompClient sharedClient = WebSocketManager.getInstance().getStompClient();
+
+        topicDisposable = sharedClient.topic("/topic/messages/" + currentUserId).subscribe(stompMessage -> {
             try {
                 String jsonPayload = stompMessage.getPayload();
                 Log.d("SOCKET_DATA", "ChatList nhận JSON: " + jsonPayload);
@@ -193,29 +197,7 @@ public class ConversationActivity extends AppCompatActivity {
             } catch (Exception e) {
                 Log.e("SOCKET_DATA", "Lỗi Parse JSON ở ChatList", e);
             }
-        }, throwable -> {
-            Log.e("WebSocket", "Subscribe chat topic error", throwable);
         });
-
-        // 2. SOCKET LẮNG NGHE TRẠNG THÁI KẾT NỐI
-        stompClient.lifecycle().subscribe(lifecycleEvent -> {
-            switch (lifecycleEvent.getType()) {
-                case OPENED:
-                    Log.d("WebSocket", "Connection opened");
-                    break;
-                case ERROR:
-                    Log.d("WebSocket", "Lỗi kết nối", lifecycleEvent.getException());
-                    break;
-                case CLOSED:
-                    Log.d("SOCKET", "Đã ngắt kết nối");
-                    break;
-            }
-        }, throwable -> {
-            Log.e("WebSocket", "Lỗi lifecycle Conversation", throwable);
-        });
-
-        // 3. Kích hoạt kết nối
-        stompClient.connect();
     }
 
 }
