@@ -28,4 +28,11 @@ public class TransactionRepository {
         Call<List<TransactionResponseDTO>> call = transactionApi.getTransactionHistory("Bearer " + token, role, status);
         call.enqueue(callback);
     }
+    public void acceptTransaction(String token, int transactionId, retrofit2.Callback<ResponseBody> callback) {
+        transactionApi.acceptTransaction(token, transactionId).enqueue(callback);
+    }
+
+    public void rejectTransaction(String token, int transactionId, retrofit2.Callback<ResponseBody> callback) {
+        transactionApi.rejectTransaction(token, transactionId).enqueue(callback);
+    }
 }

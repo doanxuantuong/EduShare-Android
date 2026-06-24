@@ -12,6 +12,8 @@ import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
+import retrofit2.http.Path;
 import retrofit2.http.Query;
 
 public interface TransactionApi {
@@ -23,6 +25,17 @@ public interface TransactionApi {
             @Header("Authorization") String token,
             @Query("role") String role,
             @Query("status") String status
+    );
+    @PUT("transactions/{id}/accept")
+    Call<ResponseBody> acceptTransaction(
+            @Header("Authorization") String token,
+            @Path("id") int transactionId
+    );
+
+    @PUT("transactions/{id}/reject")
+    Call<ResponseBody> rejectTransaction(
+            @Header("Authorization") String token,
+            @Path("id") int transactionId
     );
 }
 

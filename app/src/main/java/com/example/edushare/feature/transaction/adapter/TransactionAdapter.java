@@ -1,7 +1,6 @@
 package com.example.edushare.feature.transaction.adapter;
 
 import android.graphics.Color;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,13 +19,18 @@ import com.example.edushare.feature.transaction.dto.response.TransactionResponse
 import java.util.List;
 
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.TransactionViewHolder> {
-
+    public interface OnTransactionActionListener {
+        void onAcceptClick(int transactionId);
+        void onRejectClick(int transactionId);
+    }
+    private OnTransactionActionListener actionListener;
     private List<TransactionResponseDTO> transactionList;
     private String currentRole; // Biến này để biết đang ở tab "Đơn mua" hay "Đơn bán"
 
-    public TransactionAdapter(List<TransactionResponseDTO> transactionList, String currentRole) {
+    public TransactionAdapter(List<TransactionResponseDTO> transactionList, String currentRole, OnTransactionActionListener onTransactionActionListener) {
         this.transactionList = transactionList;
         this.currentRole = currentRole;
+        this.actionListener = onTransactionActionListener;
     }
 
     // Hàm này dùng để Fragment đẩy data mới vào khi gọi API xong
@@ -88,7 +92,6 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         // 4. Xử lý hiển thị Trạng thái (Text + Màu sắc)
         setupStatusDisplay(holder.tvStatus, trans.getStatus());
 
-        Log.d("DEBUG_BUTTON", "Role hien tai: " + currentRole + " | Status tu Backend: " + trans.getStatus());
         if (currentRole.equals("SELLER") && "PENDING".equalsIgnoreCase(trans.getStatus())) {
             holder.layoutActionButtons.setVisibility(View.VISIBLE);
         } else {
@@ -97,11 +100,17 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
         // 6. Bắt sự kiện Click nút (Chỗ này ông sẽ gọi API update status lên backend sau)
         holder.btnAccept.setOnClickListener(v -> {
-            // TODO: Gọi API duyệt đơn
+            if (actionListener != null) {
+                // Hét lên: "Ê Fragment, nó bấm Duyệt cái đơn ID này nè!"
+                actionListener.onAcceptClick(trans.getId());
+            }
         });
 
         holder.btnReject.setOnClickListener(v -> {
-            // TODO: Gọi API từ chối đơn
+            if (actionListener != null) {
+                // Hét lên: "Ê Fragment, nó bấm Từ chối đơn ID này nè!"
+                actionListener.onRejectClick(trans.getId());
+            }
         });
     }
 
@@ -110,30 +119,29 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         return transactionList != null ? transactionList.size() : 0;
     }
 
-    // Hàm phụ trợ giúp set text và màu cho trạng thái mượt mà hơn
     private void setupStatusDisplay(TextView tvStatus, String status) {
         if (status == null) status = "";
 
         switch (status.toUpperCase()) {
             case "PENDING":
                 tvStatus.setText("CHỜ XÁC NHẬN");
-                tvStatus.setTextColor(Color.parseColor("#F5A623")); // Màu cam
+                tvStatus.setTextColor(Color.parseColor("#F5A623")); // Cam
                 break;
-            case "IN-PROGRESS":
+            case "IN_PROGRESS": // Đã sửa dấu gạch dưới
                 tvStatus.setText("ĐANG XỬ LÝ");
-                tvStatus.setTextColor(Color.parseColor("#3B82F6")); // Màu xanh dương
+                tvStatus.setTextColor(Color.parseColor("#3B82F6")); // Xanh dương
                 break;
-            case "SUCCESS":
+            case "SUCCESS": // Thêm hiển thị cho tab Thành công
                 tvStatus.setText("THÀNH CÔNG");
-                tvStatus.setTextColor(Color.parseColor("#10B981")); // Màu xanh lá
+                tvStatus.setTextColor(Color.parseColor("#10B981")); // Xanh lá
                 break;
             case "REJECTED":
                 tvStatus.setText("TỪ CHỐI");
-                tvStatus.setTextColor(Color.parseColor("#EF4444")); // Màu đỏ
+                tvStatus.setTextColor(Color.parseColor("#EF4444")); // Đỏ
                 break;
-            case "CANCEL":
-                tvStatus.setText("ĐÃ HỦY");
-                tvStatus.setTextColor(Color.parseColor("#9CA3AF")); // Màu xám
+            case "CANCELED": // Đổi từ CANCEL thành CANCELED cho khớp Enum Backend
+                tvStatus.setText("ĐÃ HỦY đơn");
+                tvStatus.setTextColor(Color.parseColor("#9CA3AF")); // Xám
                 break;
             default:
                 tvStatus.setText("KHÔNG XÁC ĐỊNH");

@@ -18,9 +18,9 @@ public class TransactionHistoryActivity extends AppCompatActivity {
     private RadioGroup rgRoleSelector;
     private String currentRole = "BUYER"; // Mặc định hiển thị đơn tôi đi mua trước
 
-    private final String[] tabTitles = {"Chờ xác nhận", "Đã duyệt", "Từ chối/Hủy"};
-    private final String[] statuses = {"PENDING", "IN-PROGRESS", "SUCCESS", "REJECTED", "CANCEL"};
+    private final String[] tabTitles = {"Chờ xác nhận", "Đang xử lý", "Thành công", "Đã hủy"};
 
+    private final String[] statuses = {"PENDING", "IN_PROGRESS", "SUCCESS", "REJECTED,CANCELED"};
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
