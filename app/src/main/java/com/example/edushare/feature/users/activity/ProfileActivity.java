@@ -20,14 +20,17 @@ import com.example.edushare.feature.my_items.activity.MyItemsActivity;
 
 public class ProfileActivity extends AppCompatActivity {
     private View footerLayout;
-
     private TextView tvName;
     private TextView tvEmail;
     private ImageView ivAvatar;
     private View menuMyItems;
     private View menuLogout;
-    private View mainInfo; // Khai báo biến cho vùng thông tin chính
+    private View mainInfo;
     private View menuTransactionHistory;
+
+    // 1. Khai báo thêm biến menu thông báo
+    private View menuNotifications;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,8 +40,6 @@ public class ProfileActivity extends AppCompatActivity {
         loadSession();
         setupMyItemsListener();
         setupLogoutListener();
-
-        // Cài đặt sự kiện click cho vùng thông tin chính
         setupNavigationListeners();
     }
 
@@ -49,29 +50,36 @@ public class ProfileActivity extends AppCompatActivity {
         ivAvatar = findViewById(R.id.ivAvatar);
         menuLogout = findViewById(R.id.menuLogout);
         menuTransactionHistory = findViewById(R.id.menuTransactionHistory);
-        // Ánh xạ id vùng thông tin chính từ XML của Profile
         mainInfo = findViewById(R.id.main_info);
         menuMyItems = findViewById(R.id.menuMyItems);
+
+        // 2. Ánh xạ id chính xác từ file XML profile
+        menuNotifications = findViewById(R.id.menuNotifications);
 
         BottomNavigationHelper.setup(this, footerLayout, R.id.nav_profile);
     }
 
-    private void loadSession() {
-        tvName.setText(UserSessionHelper.getFullName(this));
-        tvEmail.setText(UserSessionHelper.getEmail(this));
-    }
-
     private void setupNavigationListeners() {
-        // Khi click vào vùng thông tin cá nhân thì chuyển sang trang ProfileDetailActivity
         mainInfo.setOnClickListener(v -> {
             Intent intent = new Intent(ProfileActivity.this, ProfileDetailActivity.class);
             startActivity(intent);
         });
+
         menuTransactionHistory.setOnClickListener(v -> {
             Intent intent = new Intent(ProfileActivity.this, TransactionHistoryActivity.class);
             startActivity(intent);
         });
 
+        // 3. Thêm sự kiện click chuyển sang màn hình danh sách thông báo
+        menuNotifications.setOnClickListener(v -> {
+            Intent intent = new Intent(ProfileActivity.this, com.example.edushare.feature.notification.activity.NotificationActivity.class);
+            startActivity(intent);
+        });
+    }
+
+    private void loadSession() {
+        tvName.setText(UserSessionHelper.getFullName(this));
+        tvEmail.setText(UserSessionHelper.getEmail(this));
     }
 
     private void setupMyItemsListener() {
