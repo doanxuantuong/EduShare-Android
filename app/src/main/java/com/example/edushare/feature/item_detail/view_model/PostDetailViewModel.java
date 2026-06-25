@@ -2,25 +2,27 @@ package com.example.edushare.feature.item_detail.view_model;
 
 import android.app.Application;
 import androidx.annotation.NonNull;
-import androidx.lifecycle.AndroidViewModel;
+import androidx.lifecycle.AndroidViewModel; // 🔥 Chuyển sang import cái này
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
 
 import com.example.edushare.common.base.retrofit.OnActionCallback;
 import com.example.edushare.feature.item_detail.model.PostDetailResponseDTO;
 import com.example.edushare.feature.item_detail.repository.PostDetailRepository;
 
-public class PostDetailViewModel extends ViewModel {
+// Đổi từ 'extends ViewModel' sang 'extends AndroidViewModel'
+public class PostDetailViewModel extends AndroidViewModel {
 
     private final PostDetailRepository repository;
     private final MutableLiveData<PostDetailResponseDTO> postDetailLiveData = new MutableLiveData<>();
     private final MutableLiveData<Boolean> isLoading = new MutableLiveData<>(false);
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
 
-    public PostDetailViewModel(PostDetailRepository postDetailRepository) {
-
-        this.repository = postDetailRepository;
+    // 🔥 Sửa hàm khởi tạo nhận tham số Application như thế này:
+    public PostDetailViewModel(@NonNull Application application) {
+        super(application);
+        // Tự tạo repository trực tiếp bằng application context
+        this.repository = new PostDetailRepository(application);
     }
 
     public LiveData<PostDetailResponseDTO> getPostDetailLiveData() { return postDetailLiveData; }
