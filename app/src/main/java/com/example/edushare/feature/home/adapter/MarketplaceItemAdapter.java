@@ -1,5 +1,6 @@
 package com.example.edushare.feature.home.adapter;
 
+import android.content.Intent;
 import android.graphics.Color;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -7,7 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.content.Intent;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -17,25 +18,22 @@ import com.example.edushare.feature.home.model.MarketplaceItem;
 import com.example.edushare.feature.item_detail.activity.PostDetailActivity;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MarketplaceItemAdapter extends RecyclerView.Adapter<MarketplaceItemAdapter.ItemViewHolder> {
     private final List<MarketplaceItem> items = new ArrayList<>();
 
     public MarketplaceItemAdapter(List<MarketplaceItem> items) {
-        this.items.addAll(items);
+        if (items != null) {
+            this.items.addAll(items);
+        }
     }
 
     public void replaceItems(List<MarketplaceItem> newItems) {
-        int previousSize = items.size();
         items.clear();
-        if (previousSize > 0) {
-            notifyItemRangeRemoved(0, previousSize);
-        }
-        items.addAll(newItems);
-        if (!newItems.isEmpty()) {
-            notifyItemRangeInserted(0, newItems.size());
-        }
+        items.addAll(newItems == null ? Collections.emptyList() : newItems);
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -49,6 +47,13 @@ public class MarketplaceItemAdapter extends RecyclerView.Adapter<MarketplaceItem
     @Override
     public void onBindViewHolder(@NonNull ItemViewHolder holder, int position) {
         MarketplaceItem item = items.get(position);
+        resetItemView(holder);
+
+        String status = item.getCondition();
+        if ("Hidden".equalsIgnoreCase(status)) {
+            hideItemView(holder);
+            return;
+        }
 
         if (!TextUtils.isEmpty(item.getImageUrl())) {
             Glide.with(holder.ivItemPhoto.getContext())
@@ -60,30 +65,8 @@ public class MarketplaceItemAdapter extends RecyclerView.Adapter<MarketplaceItem
             holder.ivItemPhoto.setImageResource(item.getImageResource());
         }
 
-
-        String status = item.getCondition();
-
         if ("Sold".equalsIgnoreCase(status)) {
-            holder.tvCondition.setVisibility(View.VISIBLE);
-            holder.tvCondition.setText("ĐÃ BÁN");
-
-            holder.tvCondition.setTextColor(Color.WHITE);
-            holder.tvCondition.setBackgroundColor(Color.parseColor("#EF4444")); // Màu đỏ chủ đạo thương mại điện tử
-
-            int paddingPx = (int) (6 * holder.itemView.getContext().getResources().getDisplayMetrics().density);
-            holder.tvCondition.setPadding(paddingPx, 2, paddingPx, 2);
-
-            holder.ivItemPhoto.setAlpha(0.4f);
-
-        } else if ("Hidden".equalsIgnoreCase(status)) {
-            holder.itemView.setVisibility(View.GONE);
-            holder.itemView.setLayoutParams(new RecyclerView.LayoutParams(0, 0));
-            return;
-
-        } else {
-            holder.tvCondition.setVisibility(View.GONE);
-
-            holder.ivItemPhoto.setAlpha(1.0f);
+            showSoldBadge(holder);
         }
 
         holder.tvItemTitle.setText(item.getTitle());
@@ -101,6 +84,48 @@ public class MarketplaceItemAdapter extends RecyclerView.Adapter<MarketplaceItem
     @Override
     public int getItemCount() {
         return items.size();
+    }
+
+    private void resetItemView(ItemViewHolder holder) {
+        // RecyclerView tái sử dụng view, nên phải trả card về trạng thái mặc định trước khi bind item mới.
+        ViewGroup.LayoutParams layoutParams = holder.itemView.getLayoutParams();
+        if (layoutParams != null) {
+            layoutParams.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            layoutParams.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            holder.itemView.setLayoutParams(layoutParams);
+        }
+
+        holder.itemView.setVisibility(View.VISIBLE);
+        holder.itemView.setOnClickListener(null);
+        holder.ivItemPhoto.setAlpha(1.0f);
+        holder.tvCondition.setVisibility(View.GONE);
+        holder.tvCondition.setText("");
+        holder.tvCondition.setTextColor(holder.itemView.getContext().getColor(R.color.home_text_primary));
+        holder.tvCondition.setBackgroundResource(R.drawable.bg_home_condition_badge);
+    }
+
+    private void hideItemView(ItemViewHolder holder) {
+        // Item bị ẩn vẫn có thể còn trong response, nên thu nhỏ view để không chiếm chỗ trên lưới.
+        ViewGroup.LayoutParams layoutParams = holder.itemView.getLayoutParams();
+        if (layoutParams != null) {
+            layoutParams.width = 0;
+            layoutParams.height = 0;
+            holder.itemView.setLayoutParams(layoutParams);
+        }
+        holder.itemView.setVisibility(View.GONE);
+        holder.itemView.setOnClickListener(null);
+    }
+
+    private void showSoldBadge(ItemViewHolder holder) {
+        int verticalPadding = (int) (2 * holder.itemView.getContext().getResources().getDisplayMetrics().density);
+        int horizontalPadding = (int) (6 * holder.itemView.getContext().getResources().getDisplayMetrics().density);
+
+        holder.tvCondition.setVisibility(View.VISIBLE);
+        holder.tvCondition.setText("ĐÃ BÁN");
+        holder.tvCondition.setTextColor(Color.WHITE);
+        holder.tvCondition.setBackgroundColor(Color.parseColor("#EF4444"));
+        holder.tvCondition.setPadding(horizontalPadding, verticalPadding, horizontalPadding, verticalPadding);
+        holder.ivItemPhoto.setAlpha(0.4f);
     }
 
     static class ItemViewHolder extends RecyclerView.ViewHolder {

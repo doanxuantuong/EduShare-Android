@@ -13,18 +13,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-// Dùng GridLayoutManager thay cho LinearLayoutManager để RecyclerView hiển thị 2 cột
+import androidx.core.widget.NestedScrollView;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.edushare.R;
-import com.example.edushare.common.base.retrofit.OnActionCallback;
+import com.example.edushare.common.base.view_model.BaseViewModelFactory;
 import com.example.edushare.common.helper.BottomNavigationHelper;
 import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.feature.home.HomeRepository;
 import com.example.edushare.feature.home.adapter.MarketplaceItemAdapter;
-import com.example.edushare.feature.home.model.MarketplaceItem;
-import com.example.edushare.feature.home.model.PostListItemResponse;
+import com.example.edushare.feature.home.view_model.HomeViewModel;
 import com.example.edushare.feature.locations.activity.MapActivity;
 import com.example.edushare.feature.notification.NotificationRepository;
 import com.example.edushare.feature.notification.activity.NotificationActivity;
@@ -35,57 +35,52 @@ import java.util.List;
 import java.util.Locale;
 
 public class HomeActivity extends AppCompatActivity {
-    private final List<MarketplaceItem> allItems = new ArrayList<>();
+    private static final int LOAD_MORE_THRESHOLD_PX = 120;
+
     private MarketplaceItemAdapter itemAdapter;
-    private HomeRepository homeRepository;
+    private HomeViewModel homeViewModel;
     private EditText edtHomeSearch;
     // private TextView tvItemCount;
     private TextView tvCategoryAll;
     private TextView tvCategoryTextbooks;
     private TextView tvCategoryLabEquipment;
     private TextView tvCategoryElectronics;
-    private String selectedCategory = "All";
     private View footerLayout;
     private FrameLayout btnNotification;
     private String userId;
     private View viewUnreadDot;
     private NotificationRepository notificationRepository;
     private ProgressBar progressBar;
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        if (homeRepository != null && itemAdapter != null) {
-            fetchMarketplaceItems();
-        }
-        if (userId != null && !userId.isEmpty()) {
-            checkUnreadNotification();
-        }
-    }
+    private NestedScrollView homeScrollView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        homeRepository = new HomeRepository(this);
-        notificationRepository = new NotificationRepository(this);
         initViews();
         setupMarketplaceItems();
+        initViewModel();
+        observeViewModel();
         setupCategoryFilters();
         setupSearch();
+        setupPaginationScroll();
         setupBottomNavigation();
-        btnNotification.setOnClickListener(item -> {
-            Intent intent = new Intent(this, NotificationActivity.class);
-            startActivity(intent);
-        });
+        setupHeaderActions();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (homeViewModel != null) {
+            homeViewModel.reloadPosts();
+            homeViewModel.checkUnreadNotification(userId);
+        }
     }
 
     private void initViews() {
         edtHomeSearch = findViewById(R.id.edtHomeSearch);
-
-        // tvItemCount = findViewById(R.id.tvItemCount);
-
+        homeScrollView = findViewById(R.id.homeScrollView);
         tvCategoryAll = findViewById(R.id.tvCategoryAll);
         tvCategoryTextbooks = findViewById(R.id.tvCategoryTextbooks);
         tvCategoryLabEquipment = findViewById(R.id.tvCategoryLabEquipment);
@@ -98,100 +93,68 @@ public class HomeActivity extends AppCompatActivity {
 
         footerLayout = findViewById(R.id.footer_layout);
 
-        findViewById(R.id.btnNotification).setOnClickListener(view ->
-                Toast.makeText(this, R.string.home_notifications, Toast.LENGTH_SHORT).show());
-        findViewById(R.id.btnLocation).setOnClickListener(view ->
-                startActivity(new Intent(this, MapActivity.class)));
+        viewUnreadDot.setVisibility(View.GONE);
     }
 
     private void setupMarketplaceItems() {
         RecyclerView rvMarketplaceItems = findViewById(R.id.rvMarketplaceItems);
-        itemAdapter = new MarketplaceItemAdapter(allItems);
-        // Trước đó dùng LinearLayoutManager nên chỉ ra 1 card mỗi hàng.
-        // Đổi sang GridLayoutManager với spanCount = 2 để hiển thị 2 card post mỗi hàng.
+        itemAdapter = new MarketplaceItemAdapter(new ArrayList<>());
         rvMarketplaceItems.setLayoutManager(new GridLayoutManager(this, 2));
 
-        // Vì RecyclerView nằm trong ScrollView, tắt nested scroll để scroll dọc mượt hơn.
+        // RecyclerView nằm trong NestedScrollView, nên ScrollView cha chịu trách nhiệm bắt phân trang.
         rvMarketplaceItems.setNestedScrollingEnabled(false);
         rvMarketplaceItems.setAdapter(itemAdapter);
     }
 
-    private void fetchMarketplaceItems() {
-        if (progressBar != null) {
-            progressBar.setVisibility(View.VISIBLE);
-        }
-        homeRepository.getPosts(new OnActionCallback<List<PostListItemResponse>>() {
-            @Override
-            public void onSuccess(List<PostListItemResponse> data) {
-                if (progressBar != null) {
-                    progressBar.setVisibility(View.GONE);
-                }
+    private void initViewModel() {
+        HomeRepository homeRepository = new HomeRepository(this);
+        NotificationRepository notificationRepository = new NotificationRepository(this);
 
-                allItems.clear();
-                for (PostListItemResponse post : data) {
-                    allItems.add(toMarketplaceItem(post));
-                }
-                filterItems();
+        homeViewModel = new ViewModelProvider(this, new BaseViewModelFactory<>(
+                () -> new HomeViewModel(homeRepository, notificationRepository))
+        ).get(HomeViewModel.class);
+    }
+
+    private void observeViewModel() {
+        homeViewModel.getMarketplaceItems().observe(this, items -> itemAdapter.replaceItems(items));
+
+        homeViewModel.getLoading().observe(this, isLoading ->
+                progressBar.setVisibility(Boolean.TRUE.equals(isLoading) ? View.VISIBLE : View.GONE));
+
+        homeViewModel.getErrorMessage().observe(this, message -> {
+            if (message != null && !message.trim().isEmpty()) {
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+            }
+        });
+
+        homeViewModel.getHasUnreadNotification().observe(this, hasUnread ->
+                viewUnreadDot.setVisibility(Boolean.TRUE.equals(hasUnread) ? View.VISIBLE : View.GONE));
+    }
+
+    private void setupHeaderActions() {
+        btnNotification.setOnClickListener(view ->
+                startActivity(new Intent(this, NotificationActivity.class)));
+
+        findViewById(R.id.btnLocation).setOnClickListener(view ->
+                startActivity(new Intent(this, MapActivity.class)));
+    }
+
+    private void setupPaginationScroll() {
+        homeScrollView.setOnScrollChangeListener((NestedScrollView.OnScrollChangeListener) (scrollView, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+            if (scrollY <= oldScrollY || scrollView.getChildCount() == 0) {
+                return;
             }
 
-            @Override
-            public void onFailure(String error) {
-                Toast.makeText(HomeActivity.this, error, Toast.LENGTH_LONG).show();
+            View contentView = scrollView.getChildAt(0);
+            int distanceToBottom = contentView.getMeasuredHeight() - scrollView.getMeasuredHeight() - scrollY;
+            if (distanceToBottom <= LOAD_MORE_THRESHOLD_PX) {
+                homeViewModel.loadNextPage();
             }
         });
     }
 
-    private MarketplaceItem toMarketplaceItem(PostListItemResponse post) {
-        String category = safeText(post.getCategoryName(), "All");
-        String location = safeText(post.getLocationName(), "Unknown location");
-        String status = formatStatus(post.getStatus());
-        String title = safeText(post.getTitle(), "Untitled item");
-
-        return new MarketplaceItem(
-                post.getId(),
-                R.drawable.img_organic_chemistry_textbook,
-                post.getImageUrl(),
-                status,
-                title,
-                location,
-                formatPrice(post.getPrice()),
-                category,
-                !safeText(post.getAuthorName(), "").isEmpty()
-        );
-    }
-
-    private String safeText(String value, String fallback) {
-        if (value == null || value.trim().isEmpty()) {
-            return fallback;
-        }
-        return value.trim();
-    }
-
-    private String formatStatus(String status) {
-        if (status == null || status.trim().isEmpty()) {
-            return "Available";
-        }
-        String normalized = status.trim().toUpperCase(Locale.ROOT);
-        if ("SOLD".equals(normalized)) {
-            return "Sold";
-        }
-        if ("HIDDEN".equals(normalized)) {
-            return "Hidden";
-        }
-        return "Available";
-    }
-
-    private String formatPrice(Double price) {
-        if (price == null || price <= 0) {
-            return "Contact";
-        }
-        NumberFormat formatter = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
-        return formatter.format(price) + "d";
-    }
-
     private void setupCategoryFilters() {
-        tvCategoryAll.setOnClickListener(view ->
-                selectCategory("All", tvCategoryAll));
+        tvCategoryAll.setOnClickListener(view -> selectCategory("All", tvCategoryAll));
         tvCategoryTextbooks.setOnClickListener(view ->
                 selectCategory(getString(R.string.home_category_textbooks), tvCategoryTextbooks));
         tvCategoryLabEquipment.setOnClickListener(view ->
@@ -201,14 +164,13 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     private void selectCategory(String category, TextView selectedView) {
-        selectedCategory = category;
         resetCategoryStyle(tvCategoryAll);
         resetCategoryStyle(tvCategoryTextbooks);
         resetCategoryStyle(tvCategoryLabEquipment);
         resetCategoryStyle(tvCategoryElectronics);
         selectedView.setBackgroundResource(R.drawable.bg_home_category_active);
         selectedView.setTextColor(getColor(R.color.white));
-        filterItems();
+        homeViewModel.selectCategory(category);
     }
 
     private void resetCategoryStyle(TextView categoryView) {
@@ -224,7 +186,7 @@ public class HomeActivity extends AppCompatActivity {
 
             @Override
             public void onTextChanged(CharSequence text, int start, int before, int count) {
-                filterItems();
+                homeViewModel.updateSearchQuery(text.toString());
             }
 
             @Override
@@ -233,47 +195,8 @@ public class HomeActivity extends AppCompatActivity {
         });
     }
 
-    private void filterItems() {
-        String query = edtHomeSearch.getText().toString().trim().toLowerCase(Locale.ROOT);
-        List<MarketplaceItem> filteredItems = new ArrayList<>();
-
-        for (MarketplaceItem item : allItems) {
-            boolean matchesCategory = "All".equals(selectedCategory)
-                    || selectedCategory.equals(item.getCategory());
-            boolean matchesQuery = query.isEmpty()
-                    || item.getTitle().toLowerCase(Locale.ROOT).contains(query);
-
-            if (matchesCategory && matchesQuery) {
-                filteredItems.add(item);
-            }
-        }
-
-        itemAdapter.replaceItems(filteredItems);
-//        tvItemCount.setText(getResources().getQuantityString(
-//                R.plurals.home_item_count_format,
-//                filteredItems.size(),
-//                filteredItems.size()
-//        ));
-    }
-
     private void setupBottomNavigation() {
-        // Truyền cả cụm footerLayout và làm sáng đèn nút Home.
+        // Truyền cả cụm footerLayout và làm sáng nút Home ở thanh điều hướng dưới.
         BottomNavigationHelper.setup(this, footerLayout, R.id.nav_home);
-    }
-
-    private void checkUnreadNotification() {
-        notificationRepository.checkUnread(userId, new OnActionCallback<Boolean>() {
-            @Override
-            public void onSuccess(Boolean hasUnread) {
-                // Hiện chấm đỏ nếu API trả về true, ngược lại thì ẩn
-                viewUnreadDot.setVisibility(hasUnread ? View.VISIBLE : View.GONE);
-            }
-
-            @Override
-            public void onFailure(String message) {
-                viewUnreadDot.setVisibility(View.GONE);
-                Log.e("CheckUnread", message);
-            }
-        });
     }
 }
