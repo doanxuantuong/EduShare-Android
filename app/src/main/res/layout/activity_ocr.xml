@@ -8,7 +8,7 @@
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2">
+        android:layout_weight="4">
 
         <androidx.camera.view.PreviewView
             android:id="@+id/previewView"
@@ -23,8 +23,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="wrap_content"
         android:background="#FFFFFF"
         android:orientation="vertical"
         android:padding="16dp">
@@ -32,9 +31,9 @@
         <TextView
             android:id="@+id/tvResult"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:layout_marginBottom="12dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:gravity="center"
             android:text="Đặt thẻ sinh viên vào khung và nhấn Quét"
             android:textColor="#1A1A1A"
             android:textSize="14sp" />
