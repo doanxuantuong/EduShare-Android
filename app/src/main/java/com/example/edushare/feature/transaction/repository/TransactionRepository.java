@@ -38,4 +38,7 @@ public class TransactionRepository {
     public void completeTransaction(String token, int transactionId, retrofit2.Callback<ResponseBody> callback) {
         transactionApi.completeTransaction(token, transactionId).enqueue(callback);
     }
+    public void cancelTransaction(String token, int transactionId, Callback<ResponseBody> callback) {
+        transactionApi.cancelTransaction(token, transactionId).enqueue(callback);
+    }
 }

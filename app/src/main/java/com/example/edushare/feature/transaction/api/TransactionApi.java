@@ -43,5 +43,10 @@ public interface TransactionApi {
             @Header("Authorization") String token,
             @Path("id") int transactionId
     );
+    @PUT("transactions/{id}/cancel")
+    Call<ResponseBody> cancelTransaction(
+            @Header("Authorization") String token,
+            @Path("id") int transactionId
+    );
 }
 

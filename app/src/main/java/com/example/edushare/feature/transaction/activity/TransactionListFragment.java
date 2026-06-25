@@ -91,6 +91,10 @@ public class TransactionListFragment extends Fragment {
             public void onCompleteClick(int transactionId) {
                 viewModel.completeTransaction(token, transactionId);
             }
+            @Override
+            public void onCancelClick(int transactionId) {
+                viewModel.cancelTransaction(token, transactionId);
+            }
         });
 
         rvTransactions.setAdapter(adapter);
