@@ -15,6 +15,9 @@
     <string name="post_photos">Photos</string>
     <string name="post_add_photo">Add</string>
     <string name="post_photo_limit">Add up to 8 photos</string>
+    <string name="post_image_url">Image URL</string>
+    <string name="post_image_url_hint">Paste image link while upload is unavailable</string>
+    <string name="post_validation_image_url_invalid">Image URL must start with http:// or https://</string>
     <string name="post_item_type">Item Type</string>
     <string name="post_type_sale">For Sale</string>
     <string name="post_type_free">Free/Borrow</string>

@@ -1,32 +1,40 @@
 package com.example.edushare.feature.post.helper;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
+import android.net.Uri;
 import android.view.Menu;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.edushare.R;
 import com.example.edushare.common.base.retrofit.OnActionCallback;
+import com.example.edushare.common.firebase.storage.FirebaseStorageHelper;
 import com.example.edushare.feature.post.activity.PickLocationActivity;
 import com.example.edushare.feature.post.model.CreatePostRequest;
 import com.example.edushare.feature.post.model.PostItemForm;
 import com.example.edushare.feature.post.model.PostResponse;
 import com.example.edushare.feature.post.repository.PostRepository;
 
-/**
- * Gắn các view của màn Post với hành vi chỉ liên quan đến UI.
- * Gọi API, xử lý upload và lưu dữ liệu nên được tách sang class riêng.
- */
 public class PostItemFormHelper {
+    private static final int REQUEST_PICK_LOCATION = 200;
+
     private final Activity activity;
+    private final int requestPickPhoto;
     private final PostItemFormValidator validator;
     private final PostItemOptionProvider optionProvider;
     private final PostRepository postRepository;
+    private final FirebaseStorageHelper storageHelper;
 
+    private View layoutAddPhoto;
+    private View layoutAddPhotoPlaceholder;
+    private ImageView ivPostPhotoPreview;
     private TextView tvTypeSale;
     private TextView tvTypeFree;
     private TextView tvCategory;
@@ -38,6 +46,7 @@ public class PostItemFormHelper {
     private TextView tvConditionPoor;
     private TextView btnSubmitPost;
     private EditText edtTitle;
+    private EditText edtImageUrl;
     private EditText edtPrice;
     private EditText edtDescription;
 
@@ -46,15 +55,22 @@ public class PostItemFormHelper {
     private String selectedCategory = "";
     private String selectedCondition = "";
     private String selectedLocation = "";
+    private Uri selectedPhotoUri;
 
     private int selectedLocationId = -1;
     private boolean isSubmitting = false;
 
     public PostItemFormHelper(Activity activity) {
+        this(activity, 201);
+    }
+
+    public PostItemFormHelper(Activity activity, int requestPickPhoto) {
         this.activity = activity;
+        this.requestPickPhoto = requestPickPhoto;
         this.validator = new PostItemFormValidator(activity);
         this.optionProvider = new PostItemOptionProvider(activity);
         this.postRepository = new PostRepository(activity);
+        this.storageHelper = new FirebaseStorageHelper();
         this.selectedItemType = activity.getString(R.string.post_type_sale);
     }
 
@@ -69,6 +85,9 @@ public class PostItemFormHelper {
     }
 
     private void bindViews() {
+        layoutAddPhoto = activity.findViewById(R.id.layoutAddPhoto);
+        layoutAddPhotoPlaceholder = activity.findViewById(R.id.layoutAddPhotoPlaceholder);
+        ivPostPhotoPreview = activity.findViewById(R.id.ivPostPhotoPreview);
         tvTypeSale = activity.findViewById(R.id.tvTypeSale);
         tvTypeFree = activity.findViewById(R.id.tvTypeFree);
         tvCategory = activity.findViewById(R.id.tvPostCategory);
@@ -80,6 +99,7 @@ public class PostItemFormHelper {
         tvConditionPoor = activity.findViewById(R.id.tvConditionPoor);
         btnSubmitPost = activity.findViewById(R.id.btnSubmitPost);
         edtTitle = activity.findViewById(R.id.edtPostTitle);
+        edtImageUrl = activity.findViewById(R.id.edtPostImageUrl);
         edtPrice = activity.findViewById(R.id.edtPostPrice);
         edtDescription = activity.findViewById(R.id.edtPostDescription);
     }
@@ -89,8 +109,24 @@ public class PostItemFormHelper {
     }
 
     private void setupPhotoAction() {
-        activity.findViewById(R.id.layoutAddPhoto).setOnClickListener(view ->
-                Toast.makeText(activity, R.string.post_photo_picker_message, Toast.LENGTH_SHORT).show());
+        layoutAddPhoto.setOnClickListener(view -> openPhotoPicker());
+    }
+
+    private void openPhotoPicker() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("image/*");
+        activity.startActivityForResult(Intent.createChooser(intent, "Select post image"), requestPickPhoto);
+    }
+
+    public void onPhotoPicked(Uri imageUri) {
+        if (imageUri == null) {
+            return;
+        }
+        selectedPhotoUri = imageUri;
+        ivPostPhotoPreview.setImageURI(imageUri);
+        ivPostPhotoPreview.setVisibility(View.VISIBLE);
+        layoutAddPhotoPlaceholder.setVisibility(View.GONE);
     }
 
     private void setupItemTypeActions() {
@@ -150,8 +186,9 @@ public class PostItemFormHelper {
 
     private void showLocationMenu() {
         Intent intent = new Intent(activity, PickLocationActivity.class);
-        activity.startActivityForResult(intent, 200);
+        activity.startActivityForResult(intent, REQUEST_PICK_LOCATION);
     }
+
     public void onLocationPicked(int locationId, String locationName) {
         selectedLocationId = locationId;
         selectedLocation = locationName;
@@ -188,8 +225,61 @@ public class PostItemFormHelper {
             return;
         }
 
+        String manualImageUrl = getManualImageUrl();
+        if (manualImageUrl == null) {
+            Toast.makeText(activity, R.string.post_validation_image_url_invalid, Toast.LENGTH_SHORT).show();
+            return;
+        }
+
         setSubmitting(true);
-        postRepository.createPost(toCreatePostRequest(form), new OnActionCallback<PostResponse>() {
+        if (!manualImageUrl.isEmpty()) {
+            createPost(form, manualImageUrl);
+            return;
+        }
+
+        if (selectedPhotoUri == null) {
+            createPost(form, null);
+            return;
+        }
+
+        storageHelper.uploadPostImage(selectedPhotoUri, new OnActionCallback<String>() {
+            @Override
+            public void onSuccess(String imageUrl) {
+                createPost(form, imageUrl);
+            }
+
+            @Override
+            public void onFailure(String error) {
+                setSubmitting(false);
+                showUploadFailedDialog(form, error);
+            }
+        });
+    }
+
+    private String getManualImageUrl() {
+        String imageUrl = edtImageUrl.getText().toString().trim();
+        if (imageUrl.isEmpty()) {
+            return "";
+        }
+        if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
+            return imageUrl;
+        }
+        return null;
+    }
+    private void showUploadFailedDialog(PostItemForm form, String error) {
+        new AlertDialog.Builder(activity)
+                .setTitle("Cannot upload image")
+                .setMessage(error + "\n\nCreate this post without an image?")
+                .setNegativeButton("Cancel", null)
+                .setPositiveButton("Post without image", (dialog, which) -> {
+                    setSubmitting(true);
+                    createPost(form, null);
+                })
+                .show();
+    }
+
+    private void createPost(PostItemForm form, String imageUrl) {
+        postRepository.createPost(toCreatePostRequest(form, imageUrl), new OnActionCallback<PostResponse>() {
             @Override
             public void onSuccess(PostResponse data) {
                 setSubmitting(false);
@@ -211,7 +301,7 @@ public class PostItemFormHelper {
         btnSubmitPost.setText(submitting ? R.string.post_submit_loading : R.string.post_submit);
     }
 
-    private CreatePostRequest toCreatePostRequest(PostItemForm form) {
+    private CreatePostRequest toCreatePostRequest(PostItemForm form, String imageUrl) {
         String transactionType = activity.getString(R.string.post_type_sale).equals(form.getItemType())
                 ? "SALE"
                 : "FREE";
@@ -220,7 +310,7 @@ public class PostItemFormHelper {
                 form.getDescription(),
                 form.getCondition(),
                 parsePrice(form, transactionType),
-                null,
+                imageUrl,
                 form.getCategory(),
                 form.getLocationId(),
                 form.getItemType(),
