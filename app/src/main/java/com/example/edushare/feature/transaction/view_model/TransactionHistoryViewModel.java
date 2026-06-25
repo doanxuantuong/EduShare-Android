@@ -22,9 +22,6 @@ public class TransactionHistoryViewModel extends ViewModel {
     private final MutableLiveData<String> errorMessage = new MutableLiveData<>();
     private final MutableLiveData<Boolean> actionSuccessLiveData = new MutableLiveData<>();
 
-    public LiveData<Boolean> getActionSuccessLiveData() {
-        return actionSuccessLiveData;
-    }
     public TransactionHistoryViewModel(TransactionRepository repository) {
         this.repository = repository;
     }
@@ -32,11 +29,11 @@ public class TransactionHistoryViewModel extends ViewModel {
     public LiveData<List<TransactionResponseDTO>> getTransactionsLiveData() { return transactionsLiveData; }
     public LiveData<Boolean> getIsLoading() { return isLoading; }
     public LiveData<String> getErrorMessage() { return errorMessage; }
+    public LiveData<Boolean> getActionSuccessLiveData() { return actionSuccessLiveData; }
 
-    // Hàm gọi API
+
     public void fetchHistory(String token, String userId, String role, String status) {
         isLoading.setValue(true);
-        // Truyền token vào đây
         repository.getTransactionHistory(token, role, status, new Callback<List<TransactionResponseDTO>>() {
             @Override
             public void onResponse(Call<List<TransactionResponseDTO>> call, Response<List<TransactionResponseDTO>> response) {
@@ -55,20 +52,21 @@ public class TransactionHistoryViewModel extends ViewModel {
             }
         });
     }
-    public void acceptTransaction(String token, int transactionId) {
-        isLoading.setValue(true);
-        repository.acceptTransaction(token, transactionId, new retrofit2.Callback<ResponseBody>() {
+
+    private Callback<ResponseBody> createActionCallback(String actionName) {
+        return new Callback<ResponseBody>() {
             @Override
             public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                isLoading.setValue(false);
+                isLoading.setValue(false); // Tắt loading chung
                 if (response.isSuccessful()) {
-                    actionSuccessLiveData.setValue(true); // Báo thành công
+                    actionSuccessLiveData.setValue(true); // Báo Fragment reload lại tab
                 } else {
                     try {
-                        String errorMsg = response.errorBody() != null ? response.errorBody().string() : "Lỗi không xác định";
+                        // Đọc câu chửi lỗi chi tiết từ Backend trả về nếu có
+                        String errorMsg = response.errorBody() != null ? response.errorBody().string() : "Thao tác thất bại!";
                         errorMessage.setValue("Lỗi: " + errorMsg);
                     } catch (Exception e) {
-                        errorMessage.setValue("Duyệt đơn thất bại!");
+                        errorMessage.setValue(actionName + " thất bại!");
                     }
                 }
             }
@@ -78,77 +76,28 @@ public class TransactionHistoryViewModel extends ViewModel {
                 isLoading.setValue(false);
                 errorMessage.setValue("Lỗi kết nối mạng: " + t.getMessage());
             }
-        });
+        };
+    }
+
+
+
+    public void acceptTransaction(String token, int transactionId) {
+        isLoading.setValue(true);
+        repository.acceptTransaction(token, transactionId, createActionCallback("Duyệt đơn"));
     }
 
     public void rejectTransaction(String token, int transactionId) {
         isLoading.setValue(true);
-        repository.rejectTransaction(token, transactionId, new retrofit2.Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                isLoading.setValue(false);
-                if (response.isSuccessful()) {
-                    actionSuccessLiveData.setValue(true); // Báo thành công
-                } else {
-                    errorMessage.setValue("Từ chối đơn thất bại!");
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                isLoading.setValue(false);
-                errorMessage.setValue("Lỗi kết nối mạng: " + t.getMessage());
-            }
-        });
+        repository.rejectTransaction(token, transactionId, createActionCallback("Từ chối đơn"));
     }
+
     public void completeTransaction(String token, int transactionId) {
         isLoading.setValue(true);
-        repository.completeTransaction(token, transactionId, new retrofit2.Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                isLoading.setValue(false);
-                if (response.isSuccessful()) {
-                    actionSuccessLiveData.setValue(true); // Kích hoạt để Fragment tự reload lại data
-                } else {
-                    try {
-                        String errorMsg = response.errorBody() != null ? response.errorBody().string() : "Thao tác thất bại!";
-                        errorMessage.setValue("Lỗi: " + errorMsg);
-                    } catch (Exception e) {
-                        errorMessage.setValue("Xác nhận thất bại!");
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                isLoading.setValue(false);
-                errorMessage.setValue("Lỗi kết nối mạng: " + t.getMessage());
-            }
-        });
+        repository.completeTransaction(token, transactionId, createActionCallback("Xác nhận nhận hàng"));
     }
+
     public void cancelTransaction(String token, int transactionId) {
         isLoading.setValue(true);
-        repository.cancelTransaction(token, transactionId, new retrofit2.Callback<ResponseBody>() {
-            @Override
-            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                isLoading.setValue(false);
-                if (response.isSuccessful()) {
-                    actionSuccessLiveData.setValue(true); // Kích hoạt reload fragment
-                } else {
-                    try {
-                        String errorMsg = response.errorBody() != null ? response.errorBody().string() : "Hủy thất bại!";
-                        errorMessage.setValue("Lỗi: " + errorMsg);
-                    } catch (Exception e) {
-                        errorMessage.setValue("Hủy giao dịch thất bại!");
-                    }
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ResponseBody> call, Throwable t) {
-                isLoading.setValue(false);
-                errorMessage.setValue("Lỗi kết nối mạng: " + t.getMessage());
-            }
-        });
+        repository.cancelTransaction(token, transactionId, createActionCallback("Hủy giao dịch"));
     }
 }
