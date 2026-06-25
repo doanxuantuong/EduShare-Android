@@ -1,8 +1,6 @@
-package com.example.edushare.feature.chat;
+package com.example.edushare.feature.chat.message.dto;
 
 import com.google.gson.annotations.SerializedName;
-
-import java.io.Serializable;
 
 public class PostSummaryResponse {
     @SerializedName("id")

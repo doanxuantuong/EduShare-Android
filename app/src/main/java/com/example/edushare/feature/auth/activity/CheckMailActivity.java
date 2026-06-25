@@ -12,7 +12,7 @@ import com.example.edushare.R;
 import com.example.edushare.common.base.retrofit.OnActionCallback;
 import com.example.edushare.common.widget.SimpleTextWatcher;
 import com.example.edushare.feature.auth.request.RegisterRequest;
-import com.example.edushare.feature.users.UserRepository;
+import com.example.edushare.feature.users.repository.UserRepository;
 
 public class CheckMailActivity extends AppCompatActivity {
 

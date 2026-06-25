@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.edushare.common.base.retrofit.OnActionCallback;
 import com.example.edushare.feature.chat.message.dto.PageResponse;
-import com.example.edushare.feature.notification.NotificationRepository;
+import com.example.edushare.feature.notification.repository.NotificationRepository;
 import com.example.edushare.feature.notification.dto.NotificationResponseDto;
 
 import java.util.ArrayList;

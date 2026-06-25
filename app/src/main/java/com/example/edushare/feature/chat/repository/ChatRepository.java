@@ -1,4 +1,4 @@
-package com.example.edushare.feature.chat;
+package com.example.edushare.feature.chat.repository;
 
 import android.content.Context;
 
@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 
 import com.example.edushare.common.base.retrofit.OnActionCallback;
 import com.example.edushare.common.base.retrofit.RetrofitClient;
+import com.example.edushare.feature.chat.api.ChatApi;
+import com.example.edushare.feature.chat.message.dto.PostSummaryResponse;
 import com.example.edushare.feature.chat.conversation.dto.request.ConversationCreateRequest;
 import com.example.edushare.feature.chat.conversation.model.Conversation;
 import com.example.edushare.feature.chat.message.dto.MessageRequest;

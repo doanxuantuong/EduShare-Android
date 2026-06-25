@@ -17,7 +17,7 @@ import com.example.edushare.R;
 import com.example.edushare.common.base.view_model.BaseViewModelFactory;
 import com.example.edushare.common.helper.BottomNavigationHelper;
 import com.example.edushare.feature.item_detail.activity.PostDetailActivity;
-import com.example.edushare.feature.my_items.MyItemsRepository;
+import com.example.edushare.feature.my_items.repository.MyItemsRepository;
 import com.example.edushare.feature.my_items.adapter.MyItemAdapter;
 import com.example.edushare.feature.my_items.model.MyItem;
 import com.example.edushare.feature.my_items.view_model.MyItemsViewModel;

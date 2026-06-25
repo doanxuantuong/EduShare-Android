@@ -16,7 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.edushare.R;
 import com.example.edushare.common.base.view_model.BaseViewModelFactory;
 import com.example.edushare.common.helper.UserSessionHelper;
-import com.example.edushare.feature.notification.NotificationRepository;
+import com.example.edushare.feature.notification.repository.NotificationRepository;
 import com.example.edushare.feature.notification.adapter.NotificationAdapter;
 import com.example.edushare.feature.notification.view_model.NotificationViewModel;
 

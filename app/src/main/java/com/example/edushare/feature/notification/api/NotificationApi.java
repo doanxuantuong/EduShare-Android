@@ -1,13 +1,10 @@
-package com.example.edushare.feature.notification;
+package com.example.edushare.feature.notification.api;
 
 import com.example.edushare.feature.chat.message.dto.PageResponse;
 import com.example.edushare.feature.notification.dto.NotificationResponseDto;
 
-import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.http.GET;
-import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Query;
 

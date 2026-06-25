@@ -1,4 +1,4 @@
-package com.example.edushare.feature.users;
+package com.example.edushare.feature.users.room;
 
 import android.content.Context;
 

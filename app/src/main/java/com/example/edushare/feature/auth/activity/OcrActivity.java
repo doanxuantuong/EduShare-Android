@@ -28,7 +28,7 @@ import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.feature.auth.request.OcrLoginRequest;
 import com.example.edushare.feature.auth.response.LoginResponse;
 import com.example.edushare.feature.home.activity.HomeActivity;
-import com.example.edushare.feature.users.UserRepository;
+import com.example.edushare.feature.users.repository.UserRepository;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.TextRecognition;

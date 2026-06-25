@@ -22,30 +22,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.edushare.R;
-import com.example.edushare.common.base.retrofit.OnActionCallback;
 import com.example.edushare.common.base.view_model.BaseViewModelFactory;
 import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.common.helper.WebSocketManager;
-import com.example.edushare.feature.chat.ChatRepository;
-import com.example.edushare.feature.chat.PostSummaryResponse;
-import com.example.edushare.feature.chat.conversation.dto.request.ConversationCreateRequest;
+import com.example.edushare.feature.chat.repository.ChatRepository;
 import com.example.edushare.feature.chat.message.adapter.MessageAdapter;
-import com.example.edushare.feature.chat.message.dto.MessageRequest;
 import com.example.edushare.feature.chat.message.dto.MessageResponse;
 import com.example.edushare.feature.chat.message.dto.MessageStatusResponse;
-import com.example.edushare.feature.chat.message.dto.PageResponse;
 import com.example.edushare.feature.chat.message.view_model.ChatDetailViewModel;
 import com.example.edushare.feature.item_detail.activity.PostDetailActivity;
 import com.google.gson.Gson;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 
 import io.reactivex.disposables.Disposable;
-import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
 
 public class ChatDetailActivity extends AppCompatActivity {

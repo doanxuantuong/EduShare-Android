@@ -13,8 +13,8 @@ import com.example.edushare.R;
 import com.example.edushare.common.base.retrofit.OnActionCallback;
 import com.example.edushare.common.helper.RegisterValidator;
 import com.example.edushare.feature.auth.request.SendOtpRequest;
-import com.example.edushare.feature.users.LocalUserRepository;
-import com.example.edushare.feature.users.UserRepository;
+import com.example.edushare.feature.users.room.LocalUserRepository;
+import com.example.edushare.feature.users.repository.UserRepository;
 
 public class RegisterActivity extends AppCompatActivity {
 
