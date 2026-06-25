@@ -201,7 +201,6 @@ public class TransactionConfirmActivity extends AppCompatActivity {
                 finalType = "SALE";
             }
 
-            // ✅ ĐÃ THÊM: Đóng gói dữ liệu sạch sẽ vào DTO
             TransactionRequestDTO requestDTO = new TransactionRequestDTO(
                     postId,
                     sellerId,

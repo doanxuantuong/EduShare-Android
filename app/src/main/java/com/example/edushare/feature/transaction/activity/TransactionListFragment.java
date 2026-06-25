@@ -62,9 +62,18 @@ public class TransactionListFragment extends Fragment {
         String currentUserId = UserSessionHelper.getUserId(requireContext());
         String token = UserSessionHelper.getToken(requireContext());
 
-        viewModel.fetchHistory(token, currentUserId, role, status);
     }
+    @Override
+    public void onResume() {
+        super.onResume();
 
+        String currentUserId = UserSessionHelper.getUserId(requireContext());
+        String token = UserSessionHelper.getToken(requireContext());
+
+        if (viewModel != null && token != null && currentUserId != null) {
+            viewModel.fetchHistory(token, currentUserId, role, status);
+        }
+    }
     private void setupRecyclerView() {
         rvTransactions.setLayoutManager(new LinearLayoutManager(requireContext()));
         String token = UserSessionHelper.getToken(requireContext());
@@ -77,6 +86,14 @@ public class TransactionListFragment extends Fragment {
             @Override
             public void onRejectClick(int transactionId) {
                 viewModel.rejectTransaction(token, transactionId);
+            }
+            @Override
+            public void onCompleteClick(int transactionId) {
+                viewModel.completeTransaction(token, transactionId);
+            }
+            @Override
+            public void onCancelClick(int transactionId) {
+                viewModel.cancelTransaction(token, transactionId);
             }
         });
 

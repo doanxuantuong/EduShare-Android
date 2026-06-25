@@ -22,6 +22,8 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     public interface OnTransactionActionListener {
         void onAcceptClick(int transactionId);
         void onRejectClick(int transactionId);
+        void onCompleteClick(int transactionId);
+        void onCancelClick(int transactionId);
     }
     private OnTransactionActionListener actionListener;
     private List<TransactionResponseDTO> transactionList;
@@ -92,24 +94,58 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         // 4. Xử lý hiển thị Trạng thái (Text + Màu sắc)
         setupStatusDisplay(holder.tvStatus, trans.getStatus());
 
-        if (currentRole.equals("SELLER") && "PENDING".equalsIgnoreCase(trans.getStatus())) {
+        if ("PENDING".equalsIgnoreCase(trans.getStatus())) {
+            if ("SELLER".equals(currentRole)) {
+                // Người bán: Hiện Duyệt và Từ chối
+                holder.layoutActionButtons.setVisibility(View.VISIBLE);
+                holder.btnAccept.setVisibility(View.VISIBLE);
+                holder.btnAccept.setText("Chấp nhận");
+                holder.btnReject.setVisibility(View.VISIBLE);
+                holder.btnReject.setText("Từ chối");
+            } else if ("BUYER".equals(currentRole)) {
+                // Người mua: Chỉ hiện nút Hủy yêu cầu (Tận dụng nút btnReject)
+                holder.layoutActionButtons.setVisibility(View.VISIBLE);
+                holder.btnReject.setVisibility(View.VISIBLE);
+                holder.btnReject.setText("Hủy yêu cầu");
+            }
+        }
+        // Trường hợp đơn ĐANG XỬ LÝ (IN_PROGRESS)
+        else if ("IN_PROGRESS".equalsIgnoreCase(trans.getStatus())) {
             holder.layoutActionButtons.setVisibility(View.VISIBLE);
-        } else {
-            holder.layoutActionButtons.setVisibility(View.GONE);
+            if ("BUYER".equals(currentRole)) {
+                // Người mua: Hiện "Đã nhận hàng" và "Hủy giao dịch"
+                holder.btnAccept.setVisibility(View.VISIBLE);
+                holder.btnAccept.setText("Đã nhận hàng");
+                holder.btnReject.setVisibility(View.VISIBLE);
+                holder.btnReject.setText("Hủy giao dịch");
+            } else if ("SELLER".equals(currentRole)) {
+                // Người bán: Chỉ hiện nút "Hủy giao dịch" (Tận dụng btnReject)
+                holder.btnReject.setVisibility(View.VISIBLE);
+                holder.btnReject.setText("Hủy giao dịch");
+            }
         }
 
-        // 6. Bắt sự kiện Click nút (Chỗ này ông sẽ gọi API update status lên backend sau)
+        // 2. Bắt sự kiện click cho nút Chính (Chấp nhận HOẶC Hoàn thành)
         holder.btnAccept.setOnClickListener(v -> {
             if (actionListener != null) {
-                // Hét lên: "Ê Fragment, nó bấm Duyệt cái đơn ID này nè!"
-                actionListener.onAcceptClick(trans.getId());
+                if ("IN_PROGRESS".equalsIgnoreCase(trans.getStatus())) {
+                    actionListener.onCompleteClick(trans.getId());
+                } else {
+                    actionListener.onAcceptClick(trans.getId());
+                }
             }
         });
 
+        // 3. Bắt sự kiện click cho nút Phụ (Từ chối HOẶC Hủy)
         holder.btnReject.setOnClickListener(v -> {
             if (actionListener != null) {
-                // Hét lên: "Ê Fragment, nó bấm Từ chối đơn ID này nè!"
-                actionListener.onRejectClick(trans.getId());
+                // Nếu chữ trên nút đang là Hủy thì gọi hàm Cancel, ngược lại gọi Reject của người bán
+                String currentText = holder.btnReject.getText().toString();
+                if (currentText.contains("Hủy")) {
+                    actionListener.onCancelClick(trans.getId());
+                } else {
+                    actionListener.onRejectClick(trans.getId());
+                }
             }
         });
     }
