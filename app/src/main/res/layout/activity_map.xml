@@ -30,22 +30,17 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <!-- Back button -->
-        <com.google.android.material.card.MaterialCardView
+        <ImageButton
             android:id="@+id/btnBack"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            app:cardCornerRadius="20dp"
-            app:cardBackgroundColor="#F0F0F0"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:src="@android:drawable/ic_menu_revert"
+            app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent">
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:padding="10dp"
-                android:src="@android:drawable/ic_menu_revert"
-                app:tint="#1A1A1A"/>
-        </com.google.android.material.card.MaterialCardView>
+            app:tint="#1F2937" />
 
         <!-- Title -->
         <TextView
