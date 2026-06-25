@@ -35,6 +35,31 @@
                 android:textColor="#F5A623"/>
         </RelativeLayout>
 
+        <LinearLayout
+            android:id="@+id/layoutPartnerInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="6dp">
+
+            <ImageView
+                android:id="@+id/ivPartnerAvatar"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_avatar"
+                android:background="@android:color/transparent"/>
+
+            <TextView
+                android:id="@+id/tvPartnerName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:text="Người mua: Nguyễn Văn A"
+                android:textSize="13sp"
+                android:textColor="#4B5563"/>
+        </LinearLayout>
+
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
@@ -98,14 +123,14 @@
                 android:background="#EF4444"/>
 
             <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/btnAccept"
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
-            android:text="Chấp nhận"
-            android:textColor="#FFFFFF"
-            android:textSize="12sp"
-            android:layout_marginStart="8dp"
-            android:background="#1BAA8B"/>
+                android:id="@+id/btnAccept"
+                android:layout_width="wrap_content"
+                android:layout_height="36dp"
+                android:text="Chấp nhận"
+                android:textColor="#FFFFFF"
+                android:textSize="12sp"
+                android:layout_marginStart="8dp"
+                android:background="#1BAA8B"/>
         </LinearLayout>
 
     </LinearLayout>

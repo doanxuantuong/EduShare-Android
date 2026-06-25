@@ -9,6 +9,51 @@ public class TransactionResponseDTO {
     private String sellerId;
     private String transactionType;
     private String status;
+    private Double price;
+    private String buyerName;
+    private String buyerAvatar;
+    private String sellerName;
+    private String sellerAvatar;
+
+    public String getBuyerName() {
+        return buyerName;
+    }
+
+    public void setBuyerName(String buyerName) {
+        this.buyerName = buyerName;
+    }
+
+    public String getBuyerAvatar() {
+        return buyerAvatar;
+    }
+
+    public void setBuyerAvatar(String buyerAvatar) {
+        this.buyerAvatar = buyerAvatar;
+    }
+
+    public String getSellerName() {
+        return sellerName;
+    }
+
+    public void setSellerName(String sellerName) {
+        this.sellerName = sellerName;
+    }
+
+    public String getSellerAvatar() {
+        return sellerAvatar;
+    }
+
+    public void setSellerAvatar(String sellerAvatar) {
+        this.sellerAvatar = sellerAvatar;
+    }
+
+    public Double getPrice() {
+        return price;
+    }
+
+    public void setPrice(Double price) {
+        this.price = price;
+    }
 
     public int getId() {
         return id;

@@ -1,5 +1,6 @@
 package com.example.edushare.feature.transaction.adapter;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.edushare.R;
+import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.feature.transaction.dto.response.TransactionResponseDTO;
 
 import java.util.List;
@@ -27,7 +29,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     }
     private OnTransactionActionListener actionListener;
     private List<TransactionResponseDTO> transactionList;
-    private String currentRole; // Biến này để biết đang ở tab "Đơn mua" hay "Đơn bán"
+    private String currentRole;
 
     public TransactionAdapter(List<TransactionResponseDTO> transactionList, String currentRole, OnTransactionActionListener onTransactionActionListener) {
         this.transactionList = transactionList;
@@ -35,8 +37,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         this.actionListener = onTransactionActionListener;
     }
 
-    // Hàm này dùng để Fragment đẩy data mới vào khi gọi API xong
-    public void updateData(List<TransactionResponseDTO> newList,String newRole) {
+    public void updateData(List<TransactionResponseDTO> newList, String newRole) {
         this.currentRole = newRole;
         this.transactionList.clear();
         this.transactionList.addAll(newList);
@@ -54,19 +55,40 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     public void onBindViewHolder(@NonNull TransactionViewHolder holder, int position) {
         TransactionResponseDTO trans = transactionList.get(position);
 
-        // 1. Gán Mã giao dịch (Tận dụng ID như đã thống nhất)
-        holder.tvOrderCode.setText(String.format("Mã giao dịch: #%05d", trans.getId()));
+        Context context = holder.itemView.getContext();
+        String currentUserId = UserSessionHelper.getUserId(context);
 
-        // 2. Gán thông tin Bài đăng (Ảnh + Tiêu đề)
-        holder.tvProductTitle.setText(trans.getPostTitle() != null ? trans.getPostTitle() : "Sản phẩm không xác định");
-        if (trans.getPostImage() != null && !trans.getPostImage().isEmpty()) {
-            Glide.with(holder.itemView.getContext())
-                    .load(trans.getPostImage())
-                    .centerCrop()
-                    .placeholder(android.R.color.darker_gray) // Ảnh mặc định nếu đang load
-                    .into(holder.ivProductImage);
+        if (currentUserId != null && currentUserId.equals(trans.getSellerId())) {
+            holder.tvPartnerName.setText("Người mua: " + (trans.getBuyerName() != null ? trans.getBuyerName() : "Ẩn danh"));
+
+            Glide.with(context)
+                    .load(trans.getBuyerAvatar())
+                    .circleCrop()
+                    .placeholder(R.drawable.ic_avatar)
+                    .into(holder.ivPartnerAvatar);
+        } else {
+            holder.tvPartnerName.setText("Người bán: " + (trans.getSellerName() != null ? trans.getSellerName() : "Unknown"));
+
+            Glide.with(context)
+                    .load(trans.getSellerAvatar())
+                    .circleCrop()
+                    .placeholder(R.drawable.ic_avatar)
+                    .into(holder.ivPartnerAvatar);
         }
 
+        // Gán Mã giao dịch
+        holder.tvOrderCode.setText(String.format("Mã giao dịch: #%05d", trans.getId()));
+
+        // Gán thông tin Bài đăng (Ảnh + Tiêu đề)
+        holder.tvProductTitle.setText(trans.getPostTitle() != null ? trans.getPostTitle() : "Sản phẩm không xác định");
+
+        Glide.with(context)
+                .load(trans.getPostImage())
+                .centerCrop()
+                .placeholder(android.R.color.darker_gray)
+                .into(holder.ivProductImage);
+
+        // --- Xử lý loại giao dịch & giá tiền bài viết ---
         String type = trans.getTransactionType() != null ? trans.getTransactionType().toUpperCase() : "";
         switch (type) {
             case "FREE":
@@ -74,15 +96,12 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
                 holder.tvTransactionType.setTextColor(Color.parseColor("#10B981")); // Xanh lá
                 break;
             case "SALE":
-                // CHÚ Ý: Cần có trường price từ DTO
-                // Giả sử DTO của ông có getPrice()
-                // holder.tvTransactionType.setText("Bán: " + trans.getPrice() + " đ");
-                holder.tvTransactionType.setText("Loại: Mua Bán");
+                // 🔥 Sửa lỗi ghi đè text: Gom chung lại thành một chuỗi duy nhất để hiển thị số tiền!
+                String priceString = (trans.getPrice() != null) ? trans.getPrice().intValue() + " đ" : "Liên hệ";
+                holder.tvTransactionType.setText("Bán: " + priceString);
                 holder.tvTransactionType.setTextColor(Color.parseColor("#F5A623")); // Cam
                 break;
             case "EXCHANGE":
-                // CHÚ Ý: Cần có trường exchangeItem từ DTO
-                // holder.tvTransactionType.setText("Trao đổi: " + trans.getExchangeItemName());
                 holder.tvTransactionType.setText("Loại: Trao đổi vật phẩm");
                 holder.tvTransactionType.setTextColor(Color.parseColor("#8B5CF6")); // Tím
                 break;
@@ -91,43 +110,42 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
                 holder.tvTransactionType.setTextColor(Color.parseColor("#888888")); // Xám
                 break;
         }
-        // 4. Xử lý hiển thị Trạng thái (Text + Màu sắc)
+
+        // Xử lý hiển thị Trạng thái (Text + Màu sắc)
         setupStatusDisplay(holder.tvStatus, trans.getStatus());
+
+        // Reset trạng thái các nút trước khi check điều kiện nhằm tránh bug hiển thị sai khi scroll biệt lập
         holder.layoutActionButtons.setVisibility(View.GONE);
         holder.btnAccept.setVisibility(View.GONE);
         holder.btnReject.setVisibility(View.GONE);
+
         if ("PENDING".equalsIgnoreCase(trans.getStatus())) {
             if ("SELLER".equals(currentRole)) {
-                // Người bán: Hiện Duyệt và Từ chối
                 holder.layoutActionButtons.setVisibility(View.VISIBLE);
                 holder.btnAccept.setVisibility(View.VISIBLE);
                 holder.btnAccept.setText("Chấp nhận");
                 holder.btnReject.setVisibility(View.VISIBLE);
                 holder.btnReject.setText("Từ chối");
             } else if ("BUYER".equals(currentRole)) {
-                // Người mua: Chỉ hiện nút Hủy yêu cầu (Tận dụng nút btnReject)
                 holder.layoutActionButtons.setVisibility(View.VISIBLE);
                 holder.btnReject.setVisibility(View.VISIBLE);
                 holder.btnReject.setText("Hủy yêu cầu");
             }
         }
-        // Trường hợp đơn ĐANG XỬ LÝ (IN_PROGRESS)
         else if ("IN_PROGRESS".equalsIgnoreCase(trans.getStatus())) {
             holder.layoutActionButtons.setVisibility(View.VISIBLE);
             if ("BUYER".equals(currentRole)) {
-                // Người mua: Hiện "Đã nhận hàng" và "Hủy giao dịch"
                 holder.btnAccept.setVisibility(View.VISIBLE);
                 holder.btnAccept.setText("Đã nhận hàng");
                 holder.btnReject.setVisibility(View.VISIBLE);
                 holder.btnReject.setText("Hủy giao dịch");
             } else if ("SELLER".equals(currentRole)) {
-                // Người bán: Chỉ hiện nút "Hủy giao dịch" (Tận dụng btnReject)
                 holder.btnReject.setVisibility(View.VISIBLE);
                 holder.btnReject.setText("Hủy giao dịch");
             }
         }
 
-        // 2. Bắt sự kiện click cho nút Chính (Chấp nhận HOẶC Hoàn thành)
+        // Bắt sự kiện click nút Chấp nhận / Đã nhận hàng
         holder.btnAccept.setOnClickListener(v -> {
             if (actionListener != null) {
                 if ("IN_PROGRESS".equalsIgnoreCase(trans.getStatus())) {
@@ -138,10 +156,9 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             }
         });
 
-        // 3. Bắt sự kiện click cho nút Phụ (Từ chối HOẶC Hủy)
+        // Bắt sự kiện click nút Từ chối / Hủy đơn
         holder.btnReject.setOnClickListener(v -> {
             if (actionListener != null) {
-                // Nếu chữ trên nút đang là Hủy thì gọi hàm Cancel, ngược lại gọi Reject của người bán
                 String currentText = holder.btnReject.getText().toString();
                 if (currentText.contains("Hủy")) {
                     actionListener.onCancelClick(trans.getId());
@@ -163,23 +180,23 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         switch (status.toUpperCase()) {
             case "PENDING":
                 tvStatus.setText("CHỜ XÁC NHẬN");
-                tvStatus.setTextColor(Color.parseColor("#F5A623")); // Cam
+                tvStatus.setTextColor(Color.parseColor("#F5A623"));
                 break;
-            case "IN_PROGRESS": // Đã sửa dấu gạch dưới
+            case "IN_PROGRESS":
                 tvStatus.setText("ĐANG XỬ LÝ");
-                tvStatus.setTextColor(Color.parseColor("#3B82F6")); // Xanh dương
+                tvStatus.setTextColor(Color.parseColor("#3B82F6"));
                 break;
-            case "SUCCESS": // Thêm hiển thị cho tab Thành công
+            case "SUCCESS":
                 tvStatus.setText("THÀNH CÔNG");
-                tvStatus.setTextColor(Color.parseColor("#10B981")); // Xanh lá
+                tvStatus.setTextColor(Color.parseColor("#10B981"));
                 break;
             case "REJECTED":
                 tvStatus.setText("TỪ CHỐI");
-                tvStatus.setTextColor(Color.parseColor("#EF4444")); // Đỏ
+                tvStatus.setTextColor(Color.parseColor("#EF4444"));
                 break;
-            case "CANCELED": // Đổi từ CANCEL thành CANCELED cho khớp Enum Backend
+            case "CANCELED":
                 tvStatus.setText("ĐÃ HỦY đơn");
-                tvStatus.setTextColor(Color.parseColor("#9CA3AF")); // Xám
+                tvStatus.setTextColor(Color.parseColor("#9CA3AF"));
                 break;
             default:
                 tvStatus.setText("KHÔNG XÁC ĐỊNH");
@@ -190,8 +207,8 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
     // Class quản lý View
     public static class TransactionViewHolder extends RecyclerView.ViewHolder {
-        TextView tvOrderCode, tvStatus, tvProductTitle, tvTransactionType;
-        ImageView ivProductImage;
+        TextView tvOrderCode, tvStatus, tvProductTitle, tvTransactionType, tvPartnerName;
+        ImageView ivProductImage, ivPartnerAvatar;
         LinearLayout layoutActionButtons;
         Button btnReject, btnAccept;
 
@@ -202,6 +219,10 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             tvProductTitle = itemView.findViewById(R.id.tvProductTitle);
             tvTransactionType = itemView.findViewById(R.id.tvTransactionType);
             ivProductImage = itemView.findViewById(R.id.ivProductImage);
+
+            // 🔥 Đã bổ sung findViewById cho các View đối tác mới thêm từ file XML
+            tvPartnerName = itemView.findViewById(R.id.tvPartnerName);
+            ivPartnerAvatar = itemView.findViewById(R.id.ivPartnerAvatar);
 
             layoutActionButtons = itemView.findViewById(R.id.layoutActionButtons);
             btnReject = itemView.findViewById(R.id.btnReject);
