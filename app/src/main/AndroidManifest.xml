@@ -51,6 +51,7 @@
             android:exported="false"
             android:theme="@style/Theme.EduShare.Post" />
         <!--        <activity android:name=".feature.chat.activity.ConversationActivity" />-->
+        <activity android:name=".feature.post.activity.PickLocationActivity" />
         <activity android:name=".feature.users.activity.ProfileActivity" />
         <activity android:name=".feature.users.activity.ProfileDetailActivity" />
         <activity android:name=".feature.chat.conversation.activity.ConversationActivity" />

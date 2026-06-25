@@ -16,6 +16,7 @@ import com.example.edushare.feature.post.model.LocationDto;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
@@ -75,9 +76,23 @@ public class PickLocationActivity extends AppCompatActivity {
         map.setMultiTouchControls(true);
         map.setBuiltInZoomControls(false);
 
+        // Tọa độ trung tâm trường Nông Lâm
         GeoPoint nlu = new GeoPoint(10.8710, 106.7932);
-        map.getController().setZoom(17.0);
+        map.getController().setZoom(18.0);
         map.getController().setCenter(nlu);
+
+        // Giới hạn vùng scroll trong khuôn viên trường
+        BoundingBox nluBounds = new BoundingBox(
+                10.8750,  // North - latitude max
+                106.7970, // East  - longitude max
+                10.8670,  // South - latitude min
+                106.7890  // West  - longitude min
+        );
+        map.setScrollableAreaLimitDouble(nluBounds);
+
+        // Giới hạn zoom
+        map.setMinZoomLevel(15.0);
+        map.setMaxZoomLevel(20.0);
 
         map.getOverlays().add(new org.osmdroid.views.overlay.Overlay() {
             @Override
