@@ -61,18 +61,21 @@
             android:textSize="14sp" />
     </LinearLayout>
 
-    <androidx.appcompat.widget.AppCompatButton
+    <com.google.android.material.button.MaterialButton
         android:id="@+id/btnMessage"
+        style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
         android:layout_width="wrap_content"
         android:layout_height="40dp"
         android:layout_marginEnd="16dp"
-        android:background="#ECFDF5"
         android:paddingHorizontal="16dp"
         android:text="Message"
         android:textAllCaps="false"
         android:textColor="#059669"
         android:textStyle="bold"
-        android:visibility="visible"
+        app:backgroundTint="#ECFDF5"
+        app:cornerRadius="10dp"
+        android:insetTop="0dp"
+        android:insetBottom="0dp"
         app:layout_constraintBottom_toBottomOf="@id/ivSellerAvatar"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/ivSellerAvatar" />

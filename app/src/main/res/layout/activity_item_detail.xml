@@ -68,10 +68,9 @@
                 android:layout_height="48dp"
                 android:layout_marginEnd="16dp"
                 android:background="?attr/selectableItemBackgroundBorderless"
-                android:src="@android:drawable/ic_btn_speak_now"
+                android:src="@drawable/ic_favorite_heart"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="@id/tvProductTitle"
-                app:tint="#059669" />
+                app:layout_constraintTop_toTopOf="@id/tvProductTitle" />
 
             <TextView
                 android:id="@+id/tvProductPrice"

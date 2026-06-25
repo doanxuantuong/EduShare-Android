@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -24,7 +25,7 @@ public class TransactionConfirmActivity extends AppCompatActivity {
 
     // Dữ liệu nhận từ màn hình Chi tiết
     private int postId;
-    private String sellerId; // ✅ ĐÃ THÊM: Hứng ID người bán để gửi lên backend
+    private String sellerId; // Hứng ID người bán để gửi lên backend
     private String postTitle, postImage, postType, sellerName, sellerAvatar;
 
     // Các View hiển thị thông tin chung
@@ -42,7 +43,7 @@ public class TransactionConfirmActivity extends AppCompatActivity {
     // ID bài viết cá nhân mang đi đổi (Nếu có chọn đồ đổi)
     private int selectedMyItemId = -1;
 
-    // ✅ ĐÃ THÊM: ViewModel quản lý logic theo chuẩn kiến trúc MVVM
+    // ViewModel quản lý logic theo chuẩn kiến trúc MVVM
     private TransactionViewModel transactionViewModel;
 
     @Override
@@ -50,7 +51,7 @@ public class TransactionConfirmActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_transaction_confirm);
 
-        // ✅ KHỞI TẠO: Khởi tạo tầng dữ liệu MVVM
+        // Khởi tạo tầng dữ liệu MVVM
         TransactionRepository repository = new TransactionRepository(this);
         transactionViewModel = new TransactionViewModel(repository);
 
@@ -58,7 +59,7 @@ public class TransactionConfirmActivity extends AppCompatActivity {
         setupToolbar();
         receiveIntentData();
         setupBusinessLayout();
-        setupViewModelObservers(); // ✅ ĐÃ THÊM: Lắng nghe trạng thái API trả về
+        setupViewModelObservers(); // Lắng nghe trạng thái API trả về
         setupClickListeners();
     }
 
@@ -95,7 +96,7 @@ public class TransactionConfirmActivity extends AppCompatActivity {
         Intent intent = getIntent();
         if (intent != null) {
             postId = intent.getIntExtra("POST_ID", -1);
-            sellerId = intent.getStringExtra("SELLER_ID"); // ✅ ĐÃ FIX: Nhận chuẩn ID người bán từ màn hình Detail truyền sang
+            sellerId = intent.getStringExtra("SELLER_ID"); // Nhận chuẩn ID người bán từ màn hình Detail truyền sang
             postTitle = intent.getStringExtra("POST_TITLE");
             postImage = intent.getStringExtra("POST_IMAGE");
             postType = intent.getStringExtra("POST_TYPE");
@@ -141,7 +142,7 @@ public class TransactionConfirmActivity extends AppCompatActivity {
         }
     }
 
-    // 🌟 ĐÃ THÊM: Lắng nghe phản hồi từ ViewModel phát ra ngoài UI
+    //Lắng nghe phản hồi từ ViewModel phát ra ngoài UI
     private void setupViewModelObservers() {
         // Quan sát trạng thái Loading để khóa/mở nút bấm, tránh người dùng bấm liên tục (Spam)
         transactionViewModel.getLoading().observe(this, isLoading -> {
@@ -162,7 +163,7 @@ public class TransactionConfirmActivity extends AppCompatActivity {
             if (isSuccess) {
                 Toast.makeText(this, "Gửi yêu cầu giao dịch thành công!", Toast.LENGTH_LONG).show();
 
-                // 🚀 CHUYỂN HƯỚNG SANG MÀN HÌNH LỊCH SỬ GIAO DỊCH
+                // CHUYỂN HƯỚNG SANG MÀN HÌNH LỊCH SỬ GIAO DỊCH
                 Intent intentHistory = new Intent(TransactionConfirmActivity.this, TransactionHistoryActivity.class);
 
                 // Mẹo nhỏ: Clear hết các màn hình xác nhận trước đó để khi ở màn History bấm Back sẽ về thẳng trang chủ, không bị quay lại màn xác nhận này nữa.
@@ -208,7 +209,7 @@ public class TransactionConfirmActivity extends AppCompatActivity {
                     "PENDING" // Trạng thái mặc định ban đầu gửi lên
             );
 
-            // ✅ ĐÃ THÊM: Ra lệnh cho ViewModel xử lý API chạy ngầm
+            // Ra lệnh cho ViewModel xử lý API chạy ngầm
             transactionViewModel.createTransaction(requestDTO);
         });
     }
