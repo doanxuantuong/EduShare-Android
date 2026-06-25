@@ -540,7 +540,7 @@
 
     <include
         android:id="@+id/footer_layout"
-        layout="@layout/layout_footer"
+        layout="@layout/custom_bottom_nav"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"

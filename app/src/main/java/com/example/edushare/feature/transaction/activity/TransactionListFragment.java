@@ -1,16 +1,20 @@
 package com.example.edushare.feature.transaction.activity;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView; // Nhớ thêm import này để không bị lỗi đỏ TextView
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.example.edushare.R;
 import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.feature.transaction.adapter.TransactionAdapter;
@@ -26,6 +30,7 @@ public class TransactionListFragment extends Fragment {
     private String status;
     private String role = "BUYER";
     private TransactionHistoryViewModel viewModel;
+    private View loadingOverlay;
 
     public static TransactionListFragment newInstance(String status, String role) {
         TransactionListFragment fragment = new TransactionListFragment();
@@ -36,6 +41,7 @@ public class TransactionListFragment extends Fragment {
         return fragment;
     }
 
+    @SuppressLint("MissingInflatedId")
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -43,6 +49,7 @@ public class TransactionListFragment extends Fragment {
         // ĐÃ SỬA: Tìm Id và kết nối cả RecyclerView lẫn TextView báo trống từ XML vào đây
         rvTransactions = view.findViewById(R.id.rvTransactions);
         tvEmptyState = view.findViewById(R.id.tvEmptyState);
+        loadingOverlay = view.findViewById(R.id.loadingOverlay);
         return view;
     }
 
@@ -63,6 +70,7 @@ public class TransactionListFragment extends Fragment {
         String token = UserSessionHelper.getToken(requireContext());
 
     }
+
     @Override
     public void onResume() {
         super.onResume();
@@ -74,6 +82,7 @@ public class TransactionListFragment extends Fragment {
             viewModel.fetchHistory(token, currentUserId, role, status);
         }
     }
+
     private void setupRecyclerView() {
         rvTransactions.setLayoutManager(new LinearLayoutManager(requireContext()));
         String token = UserSessionHelper.getToken(requireContext());
@@ -87,10 +96,12 @@ public class TransactionListFragment extends Fragment {
             public void onRejectClick(int transactionId) {
                 viewModel.rejectTransaction(token, transactionId);
             }
+
             @Override
             public void onCompleteClick(int transactionId) {
                 viewModel.completeTransaction(token, transactionId);
             }
+
             @Override
             public void onCancelClick(int transactionId) {
                 viewModel.cancelTransaction(token, transactionId);
@@ -129,7 +140,15 @@ public class TransactionListFragment extends Fragment {
         });
         // Lắng nghe loading
         viewModel.getIsLoading().observe(getViewLifecycleOwner(), isLoading -> {
-            // Tạm thời để trống
+            if (loadingOverlay != null) {
+                if (isLoading) {
+                    // Hiện màn che đang tải
+                    loadingOverlay.setVisibility(View.VISIBLE);
+                } else {
+                    // Tải xong -> Ẩn màn che đi
+                    loadingOverlay.setVisibility(View.GONE);
+                }
+            }
         });
 
         // Lắng nghe lỗi

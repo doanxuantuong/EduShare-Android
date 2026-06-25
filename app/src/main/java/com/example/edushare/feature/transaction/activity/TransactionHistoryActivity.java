@@ -1,6 +1,7 @@
 package com.example.edushare.feature.transaction.activity;
 
 import android.os.Bundle;
+import android.widget.ProgressBar;
 import android.widget.RadioGroup;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -17,6 +18,8 @@ public class TransactionHistoryActivity extends AppCompatActivity {
     private ViewPager2 viewPager;
     private RadioGroup rgRoleSelector;
     private String currentRole = "BUYER"; // Mặc định hiển thị đơn tôi đi mua trước
+
+    private ProgressBar progressBar;
 
     private final String[] tabTitles = {"Chờ xác nhận", "Đang xử lý", "Thành công", "Đã hủy"};
 
@@ -45,6 +48,7 @@ public class TransactionHistoryActivity extends AppCompatActivity {
         tabLayout = findViewById(R.id.tabLayout);
         viewPager = findViewById(R.id.viewPager);
         rgRoleSelector = findViewById(R.id.rgRoleSelector);
+        progressBar = findViewById(R.id.progressBar);
         findViewById(R.id.btnBack).setOnClickListener(v -> finish());
     }
 
