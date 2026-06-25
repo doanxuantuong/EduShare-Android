@@ -12,7 +12,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.edushare.R;
 import com.example.edushare.common.base.view_model.BaseViewModelFactory;
 import com.example.edushare.common.helper.UserSessionHelper;
-import com.example.edushare.feature.users.UserRepository;
+import com.example.edushare.feature.users.repository.UserRepository;
 import com.example.edushare.feature.users.dto.request.UserProfileDetailRequest;
 import com.example.edushare.feature.users.view_model.ProfileDetailViewModel;
 

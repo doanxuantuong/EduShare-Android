@@ -1,4 +1,4 @@
-package com.example.edushare.feature.my_items;
+package com.example.edushare.feature.my_items.repository;
 
 import android.content.Context;
 

@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.edushare.common.base.retrofit.OnActionCallback;
-import com.example.edushare.feature.users.UserRepository;
+import com.example.edushare.feature.users.repository.UserRepository;
 import com.example.edushare.feature.users.dto.request.UserProfileDetailRequest;
 import com.example.edushare.feature.users.model.User;
 

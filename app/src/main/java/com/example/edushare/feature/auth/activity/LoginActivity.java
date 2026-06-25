@@ -15,7 +15,7 @@ import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.feature.auth.request.LoginRequest;
 import com.example.edushare.feature.auth.response.LoginResponse;
 import com.example.edushare.feature.home.activity.HomeActivity;
-import com.example.edushare.feature.users.UserRepository;
+import com.example.edushare.feature.users.repository.UserRepository;
 
 public class LoginActivity extends AppCompatActivity {
 

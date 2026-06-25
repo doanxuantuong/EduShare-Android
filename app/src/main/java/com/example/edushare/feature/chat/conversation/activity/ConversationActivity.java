@@ -17,25 +17,20 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.edushare.R;
-import com.example.edushare.common.base.retrofit.OnActionCallback;
 import com.example.edushare.common.base.view_model.BaseViewModelFactory;
 import com.example.edushare.common.helper.BottomNavigationHelper;
 import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.common.helper.WebSocketManager;
-import com.example.edushare.feature.chat.ChatRepository;
+import com.example.edushare.feature.chat.repository.ChatRepository;
 import com.example.edushare.feature.chat.conversation.adapter.ConversationAdapter;
-import com.example.edushare.feature.chat.conversation.model.Conversation;
 import com.example.edushare.feature.chat.conversation.view_model.ConversationViewModel;
 import com.example.edushare.feature.chat.message.dto.MessageResponse;
-import com.example.edushare.feature.chat.message.dto.PageResponse;
 import com.example.edushare.common.firebase.user_fcm_token.FcmTokenManager;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import io.reactivex.disposables.Disposable;
-import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
 
 /*

@@ -1,4 +1,4 @@
-package com.example.edushare.feature.users;
+package com.example.edushare.feature.users.repository;
 
 import android.content.Context;
 
@@ -12,6 +12,7 @@ import com.example.edushare.feature.auth.request.RegisterRequest;
 import com.example.edushare.feature.auth.request.SendOtpRequest;
 import com.example.edushare.feature.auth.response.LoginResponse;
 import com.example.edushare.feature.auth.response.RegisterResponse;
+import com.example.edushare.feature.users.api.UserApi;
 import com.example.edushare.feature.users.dto.request.UserProfileDetailRequest;
 import com.example.edushare.feature.users.model.User;
 

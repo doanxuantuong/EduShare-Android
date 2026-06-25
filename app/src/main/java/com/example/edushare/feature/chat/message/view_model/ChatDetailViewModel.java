@@ -7,8 +7,8 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.edushare.common.base.retrofit.OnActionCallback;
-import com.example.edushare.feature.chat.ChatRepository;
-import com.example.edushare.feature.chat.PostSummaryResponse;
+import com.example.edushare.feature.chat.repository.ChatRepository;
+import com.example.edushare.feature.chat.message.dto.PostSummaryResponse;
 import com.example.edushare.feature.chat.conversation.dto.request.ConversationCreateRequest;
 import com.example.edushare.feature.chat.message.dto.MessageRequest;
 import com.example.edushare.feature.chat.message.dto.MessageResponse;

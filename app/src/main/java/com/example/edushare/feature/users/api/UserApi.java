@@ -1,4 +1,4 @@
-package com.example.edushare.feature.users;
+package com.example.edushare.feature.users.api;
 
 import com.example.edushare.feature.auth.request.LoginRequest;
 import com.example.edushare.feature.auth.request.OcrLoginRequest;

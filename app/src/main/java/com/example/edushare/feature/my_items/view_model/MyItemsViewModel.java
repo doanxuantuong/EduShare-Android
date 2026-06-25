@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.edushare.common.base.retrofit.OnActionCallback;
-import com.example.edushare.feature.my_items.MyItemsRepository;
+import com.example.edushare.feature.my_items.repository.MyItemsRepository;
 import com.example.edushare.feature.my_items.model.MyItem;
 
 import java.util.ArrayList;

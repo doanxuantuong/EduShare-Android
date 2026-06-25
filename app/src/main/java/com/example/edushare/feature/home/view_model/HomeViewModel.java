@@ -5,11 +5,11 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.edushare.R;
 import com.example.edushare.common.base.retrofit.OnActionCallback;
-import com.example.edushare.feature.home.HomeRepository;
+import com.example.edushare.feature.home.repository.HomeRepository;
 import com.example.edushare.feature.home.model.MarketplaceItem;
 import com.example.edushare.feature.home.model.PageResponse;
 import com.example.edushare.feature.home.model.PostListItemResponse;
-import com.example.edushare.feature.notification.NotificationRepository;
+import com.example.edushare.feature.notification.repository.NotificationRepository;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;

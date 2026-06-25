@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -22,17 +21,14 @@ import com.example.edushare.R;
 import com.example.edushare.common.base.view_model.BaseViewModelFactory;
 import com.example.edushare.common.helper.BottomNavigationHelper;
 import com.example.edushare.common.helper.UserSessionHelper;
-import com.example.edushare.feature.home.HomeRepository;
+import com.example.edushare.feature.home.repository.HomeRepository;
 import com.example.edushare.feature.home.adapter.MarketplaceItemAdapter;
 import com.example.edushare.feature.home.view_model.HomeViewModel;
 import com.example.edushare.feature.locations.activity.MapActivity;
-import com.example.edushare.feature.notification.NotificationRepository;
+import com.example.edushare.feature.notification.repository.NotificationRepository;
 import com.example.edushare.feature.notification.activity.NotificationActivity;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 
 public class HomeActivity extends AppCompatActivity {
     private static final int LOAD_MORE_THRESHOLD_PX = 120;

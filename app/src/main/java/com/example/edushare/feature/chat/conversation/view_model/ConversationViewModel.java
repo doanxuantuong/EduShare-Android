@@ -4,7 +4,7 @@ import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.edushare.common.base.retrofit.OnActionCallback;
-import com.example.edushare.feature.chat.ChatRepository;
+import com.example.edushare.feature.chat.repository.ChatRepository;
 import com.example.edushare.feature.chat.conversation.model.Conversation;
 import com.example.edushare.feature.chat.message.dto.MessageResponse;
 import com.example.edushare.feature.chat.message.dto.PageResponse;

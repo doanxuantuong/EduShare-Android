@@ -1,4 +1,4 @@
-package com.example.edushare.feature.home;
+package com.example.edushare.feature.home.repository;
 
 import android.content.Context;
 import android.util.Log;
