@@ -55,6 +55,8 @@ import java.util.List;
 import java.util.Locale;
 
 import com.example.edushare.feature.locations.model.ItemLocation;
+import android.content.Intent;
+import com.example.edushare.feature.item_detail.activity.PostDetailActivity;
 
 public class MapActivity extends AppCompatActivity {
 
@@ -104,8 +106,8 @@ public class MapActivity extends AppCompatActivity {
 
    private final List<ItemLocation> allItems = new ArrayList<>();
 
-    private boolean userInteracting = false;
-
+   private boolean userInteracting = false;
+    private int currentPostId = -1;
 
     // Sample data
 //    private void loadSampleData() {
@@ -226,6 +228,38 @@ public class MapActivity extends AppCompatActivity {
 //        loadSampleData();
         loadPostsFromApi();
 
+        // Nhận tọa độ từ PostDetailActivity nếu có
+        double targetLat = getIntent().getDoubleExtra("TARGET_LAT", 0);
+        double targetLng = getIntent().getDoubleExtra("TARGET_LNG", 0);
+        String targetName = getIntent().getStringExtra("TARGET_NAME");
+
+        if (targetLat != 0 && targetLng != 0) {
+            GeoPoint target = new GeoPoint(targetLat, targetLng);
+
+            destination = target;
+
+            map.getController().setCenter(target);
+            map.getController().setZoom(18.0);
+
+            Marker marker = new Marker(map);
+            marker.setPosition(target);
+            marker.setTitle(targetName != null ? targetName : "Vị trí");
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            map.getOverlays().add(marker);
+            marker.showInfoWindow();
+
+            itemMarker = marker;
+
+            infoCard.setVisibility(View.VISIBLE);
+            txtItemName.setText(targetName != null ? targetName : "Vị trí sản phẩm");
+            txtItemArea.setText("Vị trí từ bài đăng");
+            txtRouteInfo.setText("Bật GPS để xem đường đi");
+
+            getCurrentLocation();
+
+            map.invalidate();
+        }
+
         setupSearch();
         setupAreaFilters();
 
@@ -237,8 +271,22 @@ public class MapActivity extends AppCompatActivity {
 
         btnStartNav.setOnClickListener(v -> startNavigation());
         btnStopNav.setOnClickListener(v -> stopNavigation());
+
+        infoCard.setOnClickListener(v -> openPostDetail());
+        txtItemName.setOnClickListener(v -> openPostDetail());
+        txtItemArea.setOnClickListener(v -> openPostDetail());
     }
 
+    private void openPostDetail() {
+        if (currentPostId == -1) {
+            Toast.makeText(this, "Không tìm thấy bài đăng", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Intent intent = new Intent(MapActivity.this, PostDetailActivity.class);
+        intent.putExtra("POST_ID", currentPostId);
+        startActivity(intent);
+    }
 
     // View binding
 
@@ -364,6 +412,7 @@ public class MapActivity extends AppCompatActivity {
 
     private void focusItem(ItemLocation item) {
         if (isNavigating) stopNavigation();
+        currentPostId = item.getId();
 
         infoCard.setVisibility(View.VISIBLE);
         txtItemName.setText(item.getName());

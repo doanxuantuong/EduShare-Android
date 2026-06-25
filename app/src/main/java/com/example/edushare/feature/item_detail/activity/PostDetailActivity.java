@@ -2,6 +2,7 @@ package com.example.edushare.feature.item_detail.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -19,8 +20,16 @@ import com.example.edushare.feature.chat.message.activity.ChatDetailActivity;
 import com.example.edushare.feature.item_detail.adapter.TagAdapter;
 import com.example.edushare.feature.item_detail.model.PostDetailResponseDTO;
 import com.example.edushare.feature.item_detail.view_model.PostDetailViewModel;
+import com.example.edushare.feature.locations.activity.MapActivity;
 import com.example.edushare.feature.transaction.activity.TransactionConfirmActivity;
 
+import org.osmdroid.config.Configuration;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
+
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +41,9 @@ public class PostDetailActivity extends AppCompatActivity {
     private TextView tvSellerName, tvSellerStatus;
     private View btnMessage, btnRequestTransaction;
     private PostDetailResponseDTO postDetail;
+
+    private MapView miniMap;
+    private View viewMiniMapOverlay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,6 +70,7 @@ public class PostDetailActivity extends AppCompatActivity {
         tvShortLocation = findViewById(R.id.tvShortLocation);
         tvFreeBadge = findViewById(R.id.tvFreeBadge);
         btnRequestTransaction = findViewById(R.id.btnRequestTransaction);
+        viewMiniMapOverlay = findViewById(R.id.viewMiniMapOverlay);
 
         View sellerInfoLayout = findViewById(R.id.layoutSellerInfo);
         if (sellerInfoLayout != null) {
@@ -67,10 +80,53 @@ public class PostDetailActivity extends AppCompatActivity {
             tvSellerStatus = sellerInfoLayout.findViewById(R.id.tvSellerStatus);
             btnMessage = sellerInfoLayout.findViewById(R.id.btnMessage);
         }
+
+        miniMap = findViewById(R.id.miniMap);
+
+        // Setup osmdroid
+        Configuration.getInstance().setUserAgentValue(getPackageName());
+        Configuration.getInstance().load(
+                getApplicationContext(),
+                PreferenceManager.getDefaultSharedPreferences(getApplicationContext())
+        );
+        File osmdroidDir = new File(getCacheDir(), "osmdroid");
+        Configuration.getInstance().setOsmdroidTileCache(osmdroidDir);
+
+        // Setup mini map
+        miniMap.setTileSource(TileSourceFactory.MAPNIK);
+        miniMap.setMultiTouchControls(false); // tắt gesture để không conflict scroll
+        miniMap.setClickable(true);          // tắt click trên map, dùng overlay bên ngoài
+        miniMap.getController().setZoom(17.0);
+    }
+    private void showMiniMap(double latitude, double longitude, String locationName) {
+        if (miniMap == null) return;
+
+        GeoPoint point = new GeoPoint(latitude, longitude);
+        miniMap.getController().setCenter(point);
+
+        // Đặt marker
+        Marker marker = new Marker(miniMap);
+        marker.setPosition(point);
+        marker.setTitle(locationName);
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        miniMap.getOverlays().add(marker);
+        miniMap.invalidate();
+
+        // Click vào mini map → mở MapActivity
+        viewMiniMapOverlay.setOnClickListener(v -> {
+            Intent intent = new Intent(PostDetailActivity.this,
+                    MapActivity.class);
+
+            intent.putExtra("TARGET_LAT", latitude);
+            intent.putExtra("TARGET_LNG", longitude);
+            intent.putExtra("TARGET_NAME", locationName);
+
+            startActivity(intent);
+        });
     }
 
     private void setupViewModel() {
-        // 🔥 KHỞI TẠO THẲNG KHÔNG CẦN FACTORY NỮA
+        // KHỞI TẠO THẲNG KHÔNG CẦN FACTORY NỮA
         viewModel = new ViewModelProvider(this).get(PostDetailViewModel.class);
 
         // Lắng nghe dữ liệu bài đăng đổ về
@@ -146,6 +202,12 @@ public class PostDetailActivity extends AppCompatActivity {
         }
 
         handleButtonVisibilities(data);
+
+        // Hiện mini map nếu có tọa độ
+        if (data.getLatitude() != null && data.getLongitude() != null) {
+            showMiniMap(data.getLatitude(), data.getLongitude(),
+                    data.getLocationName());
+        }
     }
 
     private void handleButtonVisibilities(PostDetailResponseDTO data) {
@@ -228,5 +290,28 @@ public class PostDetailActivity extends AppCompatActivity {
             rvTags.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
             rvTags.setAdapter(tagAdapter);
         }
+    }
+    private void openFullMap(double latitude, double longitude, String locationName) {
+        Intent intent = new Intent(
+                PostDetailActivity.this,
+                com.example.edushare.feature.locations.activity.MapActivity.class
+        );
+
+        intent.putExtra("TARGET_LAT", latitude);
+        intent.putExtra("TARGET_LNG", longitude);
+        intent.putExtra("TARGET_NAME", locationName);
+
+        startActivity(intent);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (miniMap != null) miniMap.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (miniMap != null) miniMap.onPause();
     }
 }
