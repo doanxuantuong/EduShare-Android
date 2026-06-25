@@ -224,6 +224,38 @@ public class MapActivity extends AppCompatActivity {
 //        loadSampleData();
         loadPostsFromApi();
 
+        // Nhận tọa độ từ PostDetailActivity nếu có
+        double targetLat = getIntent().getDoubleExtra("TARGET_LAT", 0);
+        double targetLng = getIntent().getDoubleExtra("TARGET_LNG", 0);
+        String targetName = getIntent().getStringExtra("TARGET_NAME");
+
+        if (targetLat != 0 && targetLng != 0) {
+            GeoPoint target = new GeoPoint(targetLat, targetLng);
+
+            destination = target;
+
+            map.getController().setCenter(target);
+            map.getController().setZoom(18.0);
+
+            Marker marker = new Marker(map);
+            marker.setPosition(target);
+            marker.setTitle(targetName != null ? targetName : "Vị trí");
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            map.getOverlays().add(marker);
+            marker.showInfoWindow();
+
+            itemMarker = marker;
+
+            infoCard.setVisibility(View.VISIBLE);
+            txtItemName.setText(targetName != null ? targetName : "Vị trí sản phẩm");
+            txtItemArea.setText("Vị trí từ bài đăng");
+            txtRouteInfo.setText("Bật GPS để xem đường đi");
+
+            getCurrentLocation();
+
+            map.invalidate();
+        }
+
         setupSearch();
         setupAreaFilters();
 
