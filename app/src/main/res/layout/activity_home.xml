@@ -368,7 +368,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
-
+    <!-- Dùng chung overlay loading giống màn Notification để Activity chỉ cần observe trạng thái từ ViewModel. -->
     <include layout="@layout/layout_loading_overlay" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
