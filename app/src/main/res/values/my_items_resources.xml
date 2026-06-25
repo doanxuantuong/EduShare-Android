@@ -43,4 +43,6 @@
         <item name="android:focusable">true</item>
         <item name="android:foreground">?attr/selectableItemBackground</item>
     </style>
+    <string name="my_items_edit_coming_soon">Edit will be added later</string>
+    <string name="my_items_delete_coming_soon">Delete will be added later</string>
 </resources>

@@ -125,6 +125,7 @@
                 android:visibility="gone" />
         </FrameLayout>
     </LinearLayout>
+    <include layout="@layout/layout_loading_overlay" />
 
     <include
         android:id="@+id/footer_layout"
