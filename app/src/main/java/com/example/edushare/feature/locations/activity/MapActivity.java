@@ -54,6 +54,8 @@ import java.util.List;
 import java.util.Locale;
 
 import com.example.edushare.feature.locations.model.ItemLocation;
+import android.content.Intent;
+import com.example.edushare.feature.item_detail.activity.PostDetailActivity;
 
 public class MapActivity extends AppCompatActivity {
 
@@ -102,8 +104,8 @@ public class MapActivity extends AppCompatActivity {
 
    private final List<ItemLocation> allItems = new ArrayList<>();
 
-    private boolean userInteracting = false;
-
+   private boolean userInteracting = false;
+    private int currentPostId = -1;
 
     // Sample data
 //    private void loadSampleData() {
@@ -267,8 +269,22 @@ public class MapActivity extends AppCompatActivity {
 
         btnStartNav.setOnClickListener(v -> startNavigation());
         btnStopNav.setOnClickListener(v -> stopNavigation());
+
+        infoCard.setOnClickListener(v -> openPostDetail());
+        txtItemName.setOnClickListener(v -> openPostDetail());
+        txtItemArea.setOnClickListener(v -> openPostDetail());
     }
 
+    private void openPostDetail() {
+        if (currentPostId == -1) {
+            Toast.makeText(this, "Không tìm thấy bài đăng", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Intent intent = new Intent(MapActivity.this, PostDetailActivity.class);
+        intent.putExtra("POST_ID", currentPostId);
+        startActivity(intent);
+    }
 
     // View binding
 
@@ -391,6 +407,7 @@ public class MapActivity extends AppCompatActivity {
 
     private void focusItem(ItemLocation item) {
         if (isNavigating) stopNavigation();
+        currentPostId = item.getId();
 
         infoCard.setVisibility(View.VISIBLE);
         txtItemName.setText(item.getName());
