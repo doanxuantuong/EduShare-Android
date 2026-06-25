@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/post_background">
+    android:background="@color/post_background"
+    android:fitsSystemWindows="true">
 
     <!-- Header cố định: có nút quay lại và tiêu đề màn hình ở giữa. -->
     <androidx.constraintlayout.widget.ConstraintLayout
