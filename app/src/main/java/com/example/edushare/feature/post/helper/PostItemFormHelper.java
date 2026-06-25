@@ -1,4 +1,4 @@
- package com.example.edushare.feature.post.helper;
+package com.example.edushare.feature.post.helper;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -10,8 +10,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.edushare.R;
+import com.example.edushare.common.base.retrofit.OnActionCallback;
 import com.example.edushare.feature.post.activity.PickLocationActivity;
+import com.example.edushare.feature.post.model.CreatePostRequest;
 import com.example.edushare.feature.post.model.PostItemForm;
+import com.example.edushare.feature.post.model.PostResponse;
+import com.example.edushare.feature.post.repository.PostRepository;
 
 /**
  * Gắn các view của màn Post với hành vi chỉ liên quan đến UI.
@@ -21,6 +25,7 @@ public class PostItemFormHelper {
     private final Activity activity;
     private final PostItemFormValidator validator;
     private final PostItemOptionProvider optionProvider;
+    private final PostRepository postRepository;
 
     private TextView tvTypeSale;
     private TextView tvTypeFree;
@@ -31,6 +36,7 @@ public class PostItemFormHelper {
     private TextView tvConditionGood;
     private TextView tvConditionFair;
     private TextView tvConditionPoor;
+    private TextView btnSubmitPost;
     private EditText edtTitle;
     private EditText edtPrice;
     private EditText edtDescription;
@@ -42,11 +48,13 @@ public class PostItemFormHelper {
     private String selectedLocation = "";
 
     private int selectedLocationId = -1;
+    private boolean isSubmitting = false;
 
     public PostItemFormHelper(Activity activity) {
         this.activity = activity;
         this.validator = new PostItemFormValidator(activity);
         this.optionProvider = new PostItemOptionProvider(activity);
+        this.postRepository = new PostRepository(activity);
         this.selectedItemType = activity.getString(R.string.post_type_sale);
     }
 
@@ -70,6 +78,7 @@ public class PostItemFormHelper {
         tvConditionGood = activity.findViewById(R.id.tvConditionGood);
         tvConditionFair = activity.findViewById(R.id.tvConditionFair);
         tvConditionPoor = activity.findViewById(R.id.tvConditionPoor);
+        btnSubmitPost = activity.findViewById(R.id.btnSubmitPost);
         edtTitle = activity.findViewById(R.id.edtPostTitle);
         edtPrice = activity.findViewById(R.id.edtPostPrice);
         edtDescription = activity.findViewById(R.id.edtPostDescription);
@@ -80,7 +89,6 @@ public class PostItemFormHelper {
     }
 
     private void setupPhotoAction() {
-        // Tạm thời chỉ hiển thị thông báo; chọn ảnh/upload sẽ tách sang helper riêng sau.
         activity.findViewById(R.id.layoutAddPhoto).setOnClickListener(view ->
                 Toast.makeText(activity, R.string.post_photo_picker_message, Toast.LENGTH_SHORT).show());
     }
@@ -146,7 +154,7 @@ public class PostItemFormHelper {
     }
     public void onLocationPicked(int locationId, String locationName) {
         selectedLocationId = locationId;
-        selectedLocation   = locationName;
+        selectedLocation = locationName;
         tvLocation.setText(locationName);
     }
 
@@ -165,17 +173,70 @@ public class PostItemFormHelper {
     }
 
     private void setupSubmitAction() {
-        activity.findViewById(R.id.btnSubmitPost).setOnClickListener(view -> submitForm());
+        btnSubmitPost.setOnClickListener(view -> submitForm());
     }
 
     private void submitForm() {
+        if (isSubmitting) {
+            return;
+        }
+
         PostItemForm form = buildForm();
         String error = validator.validate(form);
         if (error != null) {
             Toast.makeText(activity, error, Toast.LENGTH_SHORT).show();
             return;
         }
-        Toast.makeText(activity, R.string.post_submit_success, Toast.LENGTH_SHORT).show();
+
+        setSubmitting(true);
+        postRepository.createPost(toCreatePostRequest(form), new OnActionCallback<PostResponse>() {
+            @Override
+            public void onSuccess(PostResponse data) {
+                setSubmitting(false);
+                Toast.makeText(activity, R.string.post_submit_success, Toast.LENGTH_SHORT).show();
+                activity.finish();
+            }
+
+            @Override
+            public void onFailure(String error) {
+                setSubmitting(false);
+                Toast.makeText(activity, error, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void setSubmitting(boolean submitting) {
+        isSubmitting = submitting;
+        btnSubmitPost.setEnabled(!submitting);
+        btnSubmitPost.setText(submitting ? R.string.post_submit_loading : R.string.post_submit);
+    }
+
+    private CreatePostRequest toCreatePostRequest(PostItemForm form) {
+        String transactionType = activity.getString(R.string.post_type_sale).equals(form.getItemType())
+                ? "SALE"
+                : "FREE";
+        return new CreatePostRequest(
+                form.getTitle(),
+                form.getDescription(),
+                form.getCondition(),
+                parsePrice(form, transactionType),
+                null,
+                form.getCategory(),
+                form.getLocationId(),
+                form.getItemType(),
+                transactionType
+        );
+    }
+
+    private Double parsePrice(PostItemForm form, String transactionType) {
+        if (!"SALE".equals(transactionType)) {
+            return 0D;
+        }
+        String rawPrice = form.getPrice().trim();
+        if (rawPrice.isEmpty()) {
+            return null;
+        }
+        return Double.parseDouble(rawPrice);
     }
 
     private PostItemForm buildForm() {
@@ -185,6 +246,7 @@ public class PostItemFormHelper {
                 selectedCategory,
                 selectedCondition,
                 edtPrice.getText().toString().trim(),
+                selectedLocationId,
                 selectedLocation,
                 edtDescription.getText().toString().trim()
         );
