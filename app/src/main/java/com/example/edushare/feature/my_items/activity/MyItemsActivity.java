@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,6 +30,7 @@ public class MyItemsActivity extends AppCompatActivity implements MyItemAdapter.
     private TextView tvActiveTab;
     private TextView tvSoldTab;
     private TextView tvEmptyState;
+    private ProgressBar progressBar;
     private View btnAddItem;
     private View footerLayout;
 
@@ -42,8 +44,14 @@ public class MyItemsActivity extends AppCompatActivity implements MyItemAdapter.
         initViewModel();
         setupClickListeners();
         observeViewModel();
+    }
 
-        myItemsViewModel.loadItems();
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (myItemsViewModel != null) {
+            myItemsViewModel.loadItems();
+        }
     }
 
     private void initViews() {
@@ -51,6 +59,7 @@ public class MyItemsActivity extends AppCompatActivity implements MyItemAdapter.
         tvActiveTab = findViewById(R.id.tvActiveItemsTab);
         tvSoldTab = findViewById(R.id.tvSoldItemsTab);
         tvEmptyState = findViewById(R.id.tvMyItemsEmptyState);
+        progressBar = findViewById(R.id.progressBar);
         btnAddItem = findViewById(R.id.btnAddMyItem);
         footerLayout = findViewById(R.id.footer_layout);
 
@@ -64,7 +73,7 @@ public class MyItemsActivity extends AppCompatActivity implements MyItemAdapter.
     }
 
     private void initViewModel() {
-        MyItemsRepository repository = new MyItemsRepository();
+        MyItemsRepository repository = new MyItemsRepository(this);
         myItemsViewModel = new ViewModelProvider(this, new BaseViewModelFactory<>(
                 () -> new MyItemsViewModel(repository))
         ).get(MyItemsViewModel.class);
@@ -94,6 +103,17 @@ public class MyItemsActivity extends AppCompatActivity implements MyItemAdapter.
                 tvSoldTab.setText(getString(R.string.my_items_sold_tab_format, count)));
 
         myItemsViewModel.getShowingSoldItems().observe(this, this::updateTabStyle);
+
+        myItemsViewModel.getErrorMessage().observe(this, message ->
+                Toast.makeText(this, message, Toast.LENGTH_LONG).show());
+
+        myItemsViewModel.getLoading().observe(this, isLoading -> {
+            boolean loading = Boolean.TRUE.equals(isLoading);
+            progressBar.setVisibility(loading ? View.VISIBLE : View.GONE);
+            if (loading) {
+                tvEmptyState.setVisibility(View.GONE);
+            }
+        });
     }
 
     private void updateTabStyle(Boolean showingSoldItems) {
@@ -120,15 +140,11 @@ public class MyItemsActivity extends AppCompatActivity implements MyItemAdapter.
 
     @Override
     public void onEditItem(MyItem item) {
-        Intent intent = new Intent(this, PostItemActivity.class);
-        intent.putExtra("EDIT_POST_ID", item.getId());
-        startActivity(intent);
+        Toast.makeText(this, R.string.my_items_edit_coming_soon, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onDeleteItem(MyItem item) {
-        // Hiện tại xoá khỏi list mẫu trước; khi có API chỉ cần đổi luồng trong Repository/ViewModel.
-        myItemsViewModel.deleteItem(item);
-        Toast.makeText(this, getString(R.string.my_items_deleted_message, item.getTitle()), Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.my_items_delete_coming_soon, Toast.LENGTH_SHORT).show();
     }
 }
