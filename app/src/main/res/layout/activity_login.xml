@@ -2,6 +2,8 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:fitsSystemWindows="true"
     android:fillViewport="true">
 
     <LinearLayout android:id="@+id/layout_login_main"
@@ -70,7 +72,7 @@
                 <EditText android:id="@+id/edt_email"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:hint="student@university.edu"
+                    android:hint="mssv@st.hcmuaf.edu.vn"
                     style="@style/EmailTextEdit" />
 
                 <TextView android:id="@+id/tv_note"
@@ -85,12 +87,20 @@
                     android:text="Mật khẩu"
                     style="@style/EmailTextView" />
 
-                <EditText android:id="@+id/edt_password"
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:passwordToggleEnabled="true"
+                    app:passwordToggleTint="#1A1A2E"
+                    app:hintEnabled="false"> <EditText
+                    android:id="@+id/edt_password"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:hint="Nhập mật khẩu"
                     android:inputType="textPassword"
                     style="@style/EmailTextEdit" />
+
+                </com.google.android.material.textfield.TextInputLayout>
 
                 <TextView android:id="@+id/tv_forgot"
                     android:layout_width="wrap_content"

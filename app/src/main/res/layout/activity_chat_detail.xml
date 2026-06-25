@@ -6,7 +6,8 @@
     android:layout_height="match_parent"
     android:background="#F9FAFB"
     android:name=".feature.chat.message.activity.ChatDetailActivity"
-    android:windowSoftInputMode="adjustResize">
+    android:windowSoftInputMode="adjustResize"
+    android:fitsSystemWindows="true">
 
     <!-- PHẦN 1: Header - Thông tin người nhận tin nhắn (Tên, ảnh) và nút quay về -->
     <androidx.constraintlayout.widget.ConstraintLayout

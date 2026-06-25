@@ -67,9 +67,9 @@ public class MapActivity extends AppCompatActivity {
     // Views
     private MapView map;
     private AutoCompleteTextView edtSearch;
-    private ImageButton btnSearch;
+    private ImageButton btnSearch, btnBack;
     private FloatingActionButton btnMyLocation;
-    private MaterialCardView btnBack;
+
     private String selectedArea = "All";
     private ChipGroup chipGroupAreas;
 

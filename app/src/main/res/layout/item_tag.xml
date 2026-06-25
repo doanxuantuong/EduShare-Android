@@ -9,4 +9,5 @@
     android:paddingVertical="6dp"
     android:text="Tag Name"
     android:textColor="#4B5563"
-    android:textSize="14sp" />
+    android:textSize="14sp"
+    android:fitsSystemWindows="true"/>
