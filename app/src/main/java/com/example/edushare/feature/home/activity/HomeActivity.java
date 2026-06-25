@@ -55,6 +55,9 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        if (homeRepository != null && itemAdapter != null) {
+            fetchMarketplaceItems();
+        }
         if (userId != null && !userId.isEmpty()) {
             checkUnreadNotification();
         }
@@ -72,8 +75,6 @@ public class HomeActivity extends AppCompatActivity {
         setupCategoryFilters();
         setupSearch();
         setupBottomNavigation();
-        fetchMarketplaceItems();
-
         btnNotification.setOnClickListener(item -> {
             Intent intent = new Intent(this, NotificationActivity.class);
             startActivity(intent);

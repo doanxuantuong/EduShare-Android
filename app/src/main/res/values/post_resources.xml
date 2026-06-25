@@ -41,7 +41,8 @@
     <string name="post_validation_condition_required">Please select condition</string>
     <string name="post_validation_price_required">Please enter price</string>
     <string name="post_validation_location_required">Please select location</string>
-    <string name="post_submit_success">Post item form is ready</string>
+    <string name="post_submit_success">Post created successfully</string>
+    <string name="post_submit_loading">Posting...</string>
     <string name="desc_back">Back</string>
     <string name="desc_add_photo">Add photos</string>
 
@@ -95,7 +96,6 @@
         <item name="android:layout_height">48dp</item>
         <item name="android:layout_marginTop">12dp</item>
         <item name="android:background">@drawable/bg_post_input</item>
-        <item name="android:importantForAutofill">no</item>
         <item name="android:maxLines">1</item>
         <item name="android:paddingStart">16dp</item>
         <item name="android:paddingEnd">16dp</item>

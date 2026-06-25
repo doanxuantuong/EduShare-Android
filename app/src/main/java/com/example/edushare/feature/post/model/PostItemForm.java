@@ -9,6 +9,7 @@ public class PostItemForm {
     private final String category;
     private final String condition;
     private final String price;
+    private final int locationId;
     private final String location;
     private final String description;
 
@@ -18,6 +19,7 @@ public class PostItemForm {
             String category,
             String condition,
             String price,
+            int locationId,
             String location,
             String description
     ) {
@@ -26,6 +28,7 @@ public class PostItemForm {
         this.category = category;
         this.condition = condition;
         this.price = price;
+        this.locationId = locationId;
         this.location = location;
         this.description = description;
     }
@@ -48,6 +51,10 @@ public class PostItemForm {
 
     public String getPrice() {
         return price;
+    }
+
+    public int getLocationId() {
+        return locationId;
     }
 
     public String getLocation() {
