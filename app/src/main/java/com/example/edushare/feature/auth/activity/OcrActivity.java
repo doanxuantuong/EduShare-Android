@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -119,6 +120,54 @@ public class OcrActivity extends AppCompatActivity {
         startCamera();
 
         btnCapture.setOnClickListener(v -> captureAndRecognizeText());
+
+        View viewOverlay = findViewById(R.id.viewOverlay);
+        viewOverlay.post(() -> {
+            int width = viewOverlay.getWidth();
+            int height = viewOverlay.getHeight();
+
+            int rectWidth = (int) (width * 0.85);
+            int rectHeight = (int) (rectWidth * 0.60);
+
+            int left = (width - rectWidth) / 2;
+            int top = (height - rectHeight) / 2;
+            int right = left + rectWidth;
+            int bottom = top + rectHeight;
+
+            android.graphics.RectF rectCard = new android.graphics.RectF(left, top, right, bottom);
+            android.graphics.drawable.Drawable drawable = new android.graphics.drawable.Drawable() {
+                @Override
+                public void draw(@NonNull android.graphics.Canvas canvas) {
+                    android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
+
+                    // 1. Vẽ lớp phủ mờ màu đen mờ toàn màn hình camera
+                    paint.setColor(android.graphics.Color.parseColor("#99000000"));
+                    paint.setStyle(android.graphics.Paint.Style.FILL);
+                    canvas.drawRect(0, 0, width, height, paint);
+
+                    // 2. Đục lỗ một hình chữ nhật bo góc ở giữa (Xóa màu lớp phủ tại vùng này)
+                    paint.setXfermode(new android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.CLEAR));
+                    canvas.drawRoundRect(rectCard, 24, 24, paint);
+                    paint.setXfermode(null);
+
+                    // 3. Vẽ viền nét đứt màu trắng bo quanh ô ngắm để định vị rõ hơn
+                    paint.setColor(android.graphics.Color.WHITE);
+                    paint.setStyle(android.graphics.Paint.Style.STROKE);
+                    paint.setStrokeWidth(6f);
+                    paint.setPathEffect(new android.graphics.DashPathEffect(new float[]{20, 10}, 0));
+                    canvas.drawRoundRect(rectCard, 24, 24, paint);
+                }
+
+                @Override
+                public void setAlpha(int alpha) {}
+                @Override
+                public void setColorFilter(@androidx.annotation.Nullable android.graphics.ColorFilter colorFilter) {}
+                @Override
+                public int getOpacity() { return android.graphics.PixelFormat.TRANSLUCENT; }
+            };
+
+            viewOverlay.setBackground(drawable);
+        });
     }
 
     @Override
