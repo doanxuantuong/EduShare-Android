@@ -3,10 +3,13 @@ package com.example.edushare.common.helper;
 import android.annotation.SuppressLint;
 import android.util.Log;
 
+import com.example.edushare.common.base.AppConstant;
+
 import ua.naiksoftware.stomp.Stomp;
 import ua.naiksoftware.stomp.StompClient;
 
 public class WebSocketManager {
+    private static final String WS_URL = AppConstant.BASE_URL_CHAT;
     @SuppressLint("StaticFieldLeak")
     private static WebSocketManager instance;
 
@@ -29,8 +32,7 @@ public class WebSocketManager {
         }
 
         if (stompClient == null) {
-            String wsUrl = "ws://10.0.2.2:8080/ws-edushare/websocket";
-            stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, wsUrl);
+            stompClient = Stomp.over(Stomp.ConnectionProvider.OKHTTP, WS_URL);
 
             // Lắng nghe trạng thái (Chỉ cần 1 thằng Manager nghe là đủ)
             stompClient.lifecycle().subscribe(lifecycleEvent -> {

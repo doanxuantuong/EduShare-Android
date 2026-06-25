@@ -2,6 +2,7 @@ package com.example.edushare.common.base.retrofit;
 
 import android.content.Context;
 
+import com.example.edushare.common.base.AppConstant;
 import com.example.edushare.common.helper.AuthInterceptor;
 
 import java.util.concurrent.TimeUnit;
@@ -13,7 +14,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitClient {
 
-    private static final String BASE_URL = "http://192.168.1.6:8080/";
+    private static final String BASE_URL = AppConstant.BASE_URL_API;
     //Test OCR cái 172....2 thì sẽ đổi theo mạng
 //    private static final String BASE_URL = "http://172.20.10.2:8080/";
     private static Retrofit retrofit = null;
