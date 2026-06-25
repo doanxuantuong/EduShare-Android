@@ -116,6 +116,7 @@ public class PickLocationActivity extends AppCompatActivity {
         map.getOverlays().add(pickedMarker);
         map.invalidate();
 
+
         tvInstruction.setText(String.format("📍 %.5f, %.5f",
                 point.getLatitude(), point.getLongitude()));
 
