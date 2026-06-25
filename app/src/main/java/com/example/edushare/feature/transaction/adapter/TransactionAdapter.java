@@ -93,7 +93,9 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         }
         // 4. Xử lý hiển thị Trạng thái (Text + Màu sắc)
         setupStatusDisplay(holder.tvStatus, trans.getStatus());
-
+        holder.layoutActionButtons.setVisibility(View.GONE);
+        holder.btnAccept.setVisibility(View.GONE);
+        holder.btnReject.setVisibility(View.GONE);
         if ("PENDING".equalsIgnoreCase(trans.getStatus())) {
             if ("SELLER".equals(currentRole)) {
                 // Người bán: Hiện Duyệt và Từ chối
