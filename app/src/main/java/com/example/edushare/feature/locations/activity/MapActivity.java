@@ -23,6 +23,7 @@ import androidx.core.content.ContextCompat;
 
 import com.example.edushare.R;
 import com.example.edushare.common.base.retrofit.RetrofitClient;
+import com.example.edushare.common.helper.BottomNavigationHelper;
 import com.example.edushare.feature.locations.adapter.SearchSuggestionAdapter;
 import com.example.edushare.feature.locations.helper.*;
 import com.example.edushare.feature.locations.model.PostMapDto;
@@ -99,6 +100,7 @@ public class MapActivity extends AppCompatActivity {
     private int currentStepIndex = 0;
     private GeoPoint destination;
     private LocationCallback navLocationCallback;
+    private View footerLayout;
 
    private final List<ItemLocation> allItems = new ArrayList<>();
 
@@ -258,6 +260,9 @@ public class MapActivity extends AppCompatActivity {
         txtNavStep     = findViewById(R.id.txtNavStep);
         txtNavDistance = findViewById(R.id.txtNavDistance);
         btnStopNav     = findViewById(R.id.btnStopNav);
+
+        footerLayout = findViewById(R.id.footer);
+        BottomNavigationHelper.setup(this, footerLayout, R.id.nav_map);
     }
 
     // Map setup
