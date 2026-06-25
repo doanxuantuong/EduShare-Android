@@ -9,6 +9,9 @@ import com.example.edushare.R;
 import com.example.edushare.feature.post.helper.PostItemFormHelper;
 
 public class PostItemActivity extends AppCompatActivity {
+    private static final int REQUEST_PICK_LOCATION = 200;
+    private static final int REQUEST_PICK_PHOTO = 201;
+
     private PostItemFormHelper postItemFormHelper;
 
     @Override
@@ -16,17 +19,21 @@ public class PostItemActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_item);
 
-        // Giữ Activity chỉ xử lý vòng đời; phần gắn sự kiện UI của form nằm trong Helper.
-        postItemFormHelper = new PostItemFormHelper(this);
+        postItemFormHelper = new PostItemFormHelper(this, REQUEST_PICK_PHOTO);
         postItemFormHelper.setup();
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 200 && resultCode == RESULT_OK && data != null) {
-            int locationId      = data.getIntExtra(PickLocationActivity.EXTRA_LOCATION_ID, -1);
+        if (requestCode == REQUEST_PICK_LOCATION && resultCode == RESULT_OK && data != null) {
+            int locationId = data.getIntExtra(PickLocationActivity.EXTRA_LOCATION_ID, -1);
             String locationName = data.getStringExtra(PickLocationActivity.EXTRA_LOCATION_NAME);
             postItemFormHelper.onLocationPicked(locationId, locationName);
+            return;
+        }
+
+        if (requestCode == REQUEST_PICK_PHOTO && resultCode == RESULT_OK && data != null) {
+            postItemFormHelper.onPhotoPicked(data.getData());
         }
     }
 }
