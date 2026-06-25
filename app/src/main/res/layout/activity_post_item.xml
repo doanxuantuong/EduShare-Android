@@ -176,20 +176,20 @@
                     style="@style/PostInput"
                     android:hint="@string/post_title_hint"
                     android:inputType="textCapSentences" />
-            </LinearLayout>
 
-            <LinearLayout
-                style="@style/PostFormCard"
-                android:layout_height="116dp">
+                <LinearLayout
+                    style="@style/PostFormCard"
+                    android:layout_height="116dp">
 
-                <TextView
-                    style="@style/PostSectionTitle"
-                    android:text="@string/post_category" />
+                    <TextView
+                        style="@style/PostSectionTitle"
+                        android:text="@string/post_category" />
 
-                <TextView
-                    android:id="@+id/tvPostCategory"
-                    style="@style/PostSelectInput"
-                    android:text="@string/post_select_category" />
+                    <TextView
+                        android:id="@+id/tvPostCategory"
+                        style="@style/PostSelectInput"
+                        android:text="@string/post_select_category" />
+                </LinearLayout>
             </LinearLayout>
 
             <!-- Chip tình trạng dùng Flow để tự xuống dòng gọn trên màn hình hẹp. -->
