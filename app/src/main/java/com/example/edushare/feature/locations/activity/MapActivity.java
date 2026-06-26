@@ -309,7 +309,7 @@ public class MapActivity extends AppCompatActivity {
         txtNavDistance = findViewById(R.id.txtNavDistance);
         btnStopNav     = findViewById(R.id.btnStopNav);
 
-//        footerLayout = findViewById(R.id.footer);
+        footerLayout = findViewById(R.id.footer);
         BottomNavigationHelper.setup(this, footerLayout, R.id.nav_map);
     }
 
