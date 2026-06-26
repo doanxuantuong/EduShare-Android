@@ -81,6 +81,25 @@ public class PostRepository {
         });
     }
 
+
+    public void deletePost(Integer postId, OnActionCallback<Void> callback) {
+        postApi.deletePost(postId).enqueue(new Callback<Void>() {
+            @Override
+            public void onResponse(@NonNull Call<Void> call, @NonNull Response<Void> response) {
+                if (response.isSuccessful()) {
+                    callback.onSuccess(null);
+                    return;
+                }
+
+                callback.onFailure(readErrorMessage(response));
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Void> call, @NonNull Throwable t) {
+                callback.onFailure("Loi ket noi: " + t.getMessage());
+            }
+        });
+    }
     private String readErrorMessage(Response<?> response) {
         if (response.errorBody() == null) {
             return "Loi Server: " + response.code();
