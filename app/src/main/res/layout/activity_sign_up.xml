@@ -107,7 +107,7 @@
                     android:id="@+id/edt_register_email"
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
-                    android:hint="student@university.edu"
+                    android:hint="mssv@st.hcmuaf.edu.vn"
                     style="@style/EmailTextEdit"
                     />
 
@@ -147,6 +147,11 @@
                     android:layout_width="match_parent"
                     android:layout_height="48dp"
                     android:hint="Nhập mã số sinh viên"
+                    android:drawableEnd="@drawable/ic_camera"
+                    android:drawableTint="#1BAA8B"
+                    android:paddingEnd="16dp"
+                    android:focusable="false"
+                    android:cursorVisible="false"
                     style="@style/EmailTextEdit"
                     />
 

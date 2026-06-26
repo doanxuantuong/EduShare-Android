@@ -1,7 +1,9 @@
 package com.example.edushare.feature.auth.activity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -22,9 +24,9 @@ public class LoginActivity extends AppCompatActivity {
     private EditText edtEmail, edtPassword;
     private Button btnVerify;
     private UserRepository userRepository;
-
     private TextView tvSignUp, tvSubSignUp;
 
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,13 +35,11 @@ public class LoginActivity extends AppCompatActivity {
         edtEmail = findViewById(R.id.edt_email);
         edtPassword = findViewById(R.id.edt_password);
         btnVerify = findViewById(R.id.btn_verify);
-
         tvSignUp = findViewById(R.id.tv_sign_up);
         tvSubSignUp = findViewById(R.id.tv_sub_sign_up);
 
         userRepository = new UserRepository(this);
 
-        // nút đăng nhập
         btnVerify.setOnClickListener(v -> {
             String email = edtEmail.getText().toString().trim();
             String password = edtPassword.getText().toString().trim();
@@ -73,31 +73,30 @@ public class LoginActivity extends AppCompatActivity {
             });
         });
 
-        // nút ocr
-        Button btnOcr = findViewById(R.id.btn_ocr);
-        btnOcr.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, OcrActivity.class);
-            startActivity(intent);
+        // icon máy ảnh nằm bên phải ô nhập liệu Email
+        edtEmail.setOnTouchListener((v, event) -> {
+            final int DRAWABLE_RIGHT = 2; // Chỉ số mảng đại diện cho drawableEnd/drawableRight
+
+            if (edtEmail.getCompoundDrawables()[DRAWABLE_RIGHT] != null) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    int iconWidth = edtEmail.getCompoundDrawables()[DRAWABLE_RIGHT].getBounds().width();
+
+                    if (event.getRawX() >= (edtEmail.getRight() - iconWidth - edtEmail.getPaddingEnd())) {
+                        Intent intent = new Intent(LoginActivity.this, OcrActivity.class);
+                        startActivity(intent);
+                        return true;
+                    }
+                }
+            }
+            return false;
         });
 
-        tvSignUp.setOnClickListener(v -> {
-            navigateToSignUp();
-        });
-
-        tvSubSignUp.setOnClickListener(v -> {
-            navigateToSignUp();
-        });
-
+        tvSignUp.setOnClickListener(v -> navigateToSignUp());
+        tvSubSignUp.setOnClickListener(v -> navigateToSignUp());
     }
 
-    // Hàm phụ trợ dùng chung để chuyển màn hình sang Đăng ký
     private void navigateToSignUp() {
         Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
         startActivity(intent);
-        // Nếu bạn muốn đóng luôn màn hình Login khi sang Register thì bỏ comment dòng dưới:
-        // finish();
     }
 }
-
-
-
