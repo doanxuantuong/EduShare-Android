@@ -12,6 +12,7 @@
 
     <!-- Text chỉ dùng cho màn tạo Post item. -->
     <string name="post_item_title">Post New Item</string>
+    <string name="post_edit_item_title">Edit Item</string>
     <string name="post_photos">Photos</string>
     <string name="post_add_photo">Add</string>
     <string name="post_photo_limit">Add up to 8 photos</string>
@@ -38,6 +39,7 @@
     <string name="post_description">Description</string>
     <string name="post_description_hint">Describe your item...</string>
     <string name="post_submit">Post Item</string>
+    <string name="post_update">Update Item</string>
     <string name="post_photo_picker_message">Photo picker will be added when upload API is ready</string>
     <string name="post_validation_title_required">Please enter item title</string>
     <string name="post_validation_category_required">Please select category</string>
@@ -45,7 +47,9 @@
     <string name="post_validation_price_required">Please enter price</string>
     <string name="post_validation_location_required">Please select location</string>
     <string name="post_submit_success">Post created successfully</string>
+    <string name="post_update_success">Post updated successfully</string>
     <string name="post_submit_loading">Posting...</string>
+    <string name="post_update_loading">Updating...</string>
     <string name="desc_back">Back</string>
     <string name="desc_add_photo">Add photos</string>
 

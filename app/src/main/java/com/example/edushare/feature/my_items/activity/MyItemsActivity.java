@@ -140,7 +140,9 @@ public class MyItemsActivity extends AppCompatActivity implements MyItemAdapter.
 
     @Override
     public void onEditItem(MyItem item) {
-        Toast.makeText(this, R.string.my_items_edit_coming_soon, Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, PostItemActivity.class);
+        intent.putExtra(PostItemActivity.EXTRA_EDIT_POST_ID, item.getId());
+        startActivity(intent);
     }
 
     @Override
