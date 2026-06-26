@@ -309,12 +309,11 @@ public class MapActivity extends AppCompatActivity {
         txtNavDistance = findViewById(R.id.txtNavDistance);
         btnStopNav     = findViewById(R.id.btnStopNav);
 
-        footerLayout = findViewById(R.id.footer);
+//        footerLayout = findViewById(R.id.footer);
         BottomNavigationHelper.setup(this, footerLayout, R.id.nav_map);
     }
 
     // Map setup
-
     private void setupMap() {
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
@@ -326,7 +325,6 @@ public class MapActivity extends AppCompatActivity {
     }
 
     //Search
-
     private void setupSearch() {
         suggestionAdapter = new SearchSuggestionAdapter(this, allItems);
         edtSearch.setAdapter(suggestionAdapter);
@@ -478,7 +476,10 @@ public class MapActivity extends AppCompatActivity {
             marker.setTitle(item.getName());
             marker.setSnippet(item.getAreaName());
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+
+            // Khi click marker → giữ lại markers cùng khu vực, ẩn marker khác, zoom vào
             marker.setOnMarkerClickListener((m, mapView) -> {
+                filterMarkersByArea(item.getAreaName());
                 focusItem(item);
                 return true;
             });
@@ -487,6 +488,7 @@ public class MapActivity extends AppCompatActivity {
             searchMarkers.add(marker);
         }
 
+        // Hiện tất cả markers trước
         if (geoPoints.size() == 1) {
             map.getController().animateTo(geoPoints.get(0));
             map.getController().setZoom(16.5);
@@ -499,6 +501,35 @@ public class MapActivity extends AppCompatActivity {
         }
 
         map.invalidate();
+    }
+
+    private void filterMarkersByArea(String areaName) {
+        // Lưu lại danh sách markers cùng khu vực
+        List<Marker> sameAreaMarkers = new ArrayList<>();
+        List<GeoPoint> sameAreaPoints = new ArrayList<>();
+
+        for (Marker marker : searchMarkers) {
+            if (areaName.equals(marker.getSnippet())) {
+                // Giữ lại marker cùng khu vực
+                marker.setAlpha(1.0f);
+                sameAreaMarkers.add(marker);
+                sameAreaPoints.add(marker.getPosition());
+            } else {
+                // Ẩn marker khác khu vực
+                marker.setAlpha(0f);
+            }
+        }
+
+        map.invalidate();
+
+        // Zoom vào khu vực được chọn
+        if (sameAreaPoints.size() == 1) {
+            map.getController().animateTo(sameAreaPoints.get(0));
+            map.getController().setZoom(18.5);
+        } else if (sameAreaPoints.size() > 1) {
+            BoundingBox box = BoundingBox.fromGeoPoints(sameAreaPoints);
+            map.zoomToBoundingBox(box.increaseByScale(1.3f), true, 120);
+        }
     }
 
     // Route drawing
@@ -551,7 +582,10 @@ public class MapActivity extends AppCompatActivity {
     }
 
     private void clearSearchMarkers() {
-        for (Marker marker : searchMarkers) map.getOverlays().remove(marker);
+        for (Marker marker : searchMarkers) {
+            marker.setAlpha(1.0f); // reset trước khi xóa
+            map.getOverlays().remove(marker);
+        }
         searchMarkers.clear();
     }
 
@@ -773,7 +807,6 @@ public class MapActivity extends AppCompatActivity {
     }
 
     // Permissions
-
     @Override
     public void onRequestPermissionsResult(int requestCode,
                                            String[] permissions, int[] grantResults) {
