@@ -14,7 +14,7 @@
     <color name="my_items_card_stroke">#F1F5F9</color>
 
     <!-- Text chỉ dùng cho màn quản lý vật phẩm của người dùng. -->
-    <string name="my_items_title">Vật phẩm của tôi</string>
+    <string name="my_items_title">Vật phẩm</string>
     <string name="my_items_active_tab_format">Đang đăng (%1$d)</string>
     <string name="my_items_sold_tab_format">Đã bán (%1$d)</string>
     <string name="my_items_views_format">%1$d lượt xem</string>

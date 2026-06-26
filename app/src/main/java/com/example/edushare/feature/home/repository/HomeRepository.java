@@ -27,9 +27,12 @@ public class HomeRepository {
             int size,
             String category,
             String keyword,
+            String status,
+            String transactionType,
             OnActionCallback<PageResponse<PostListItemResponse>> callback
     ) {
-        homeApi.getPosts(page, size, category, keyword).enqueue(new Callback<PageResponse<PostListItemResponse>>() {
+        homeApi.getPosts(page, size, category, keyword, status, transactionType)
+                .enqueue(new Callback<PageResponse<PostListItemResponse>>() {
             @Override
             public void onResponse(@NonNull Call<PageResponse<PostListItemResponse>> call,
                                    @NonNull Response<PageResponse<PostListItemResponse>> response) {
