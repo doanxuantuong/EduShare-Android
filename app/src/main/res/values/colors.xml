@@ -20,4 +20,7 @@
     <color name="home_teal_light">#14B8A6</color>
     <color name="home_green">#10B981</color>
     <color name="home_orange">#F97316</color>
+    <color name="home_stat_active_border">#0F766E</color>
+    <color name="home_stat_free_border">#047857</color>
+    <color name="home_stat_sale_border">#C2410C</color>
 </resources>

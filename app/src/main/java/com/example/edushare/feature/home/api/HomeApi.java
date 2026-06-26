@@ -13,6 +13,8 @@ public interface HomeApi {
             @Query("page") int page,
             @Query("size") int size,
             @Query("category") String category,
-            @Query("keyword") String keyword
+            @Query("keyword") String keyword,
+            @Query("status") String status,
+            @Query("transactionType") String transactionType
     );
 }

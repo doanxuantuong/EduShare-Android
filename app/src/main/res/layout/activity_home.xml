@@ -167,7 +167,7 @@
                     android:gravity="center"
                     android:paddingStart="17dp"
                     android:paddingEnd="17dp"
-                    android:text="@string/home_category_textbooks"
+                    android:text="@string/home_category_textbooks_label"
                     android:textColor="#1A1A2E"
                     android:textSize="12sp" />
 
@@ -180,7 +180,7 @@
                     android:gravity="center"
                     android:paddingStart="17dp"
                     android:paddingEnd="17dp"
-                    android:text="@string/home_category_lab_equipment"
+                    android:text="@string/home_category_lab_equipment_label"
                     android:textColor="#1A1A2E"
                     android:textSize="12sp" />
 
@@ -193,7 +193,7 @@
                     android:gravity="center"
                     android:paddingStart="17dp"
                     android:paddingEnd="17dp"
-                    android:text="@string/home_category_electronics"
+                    android:text="@string/home_category_electronics_label"
                     android:textColor="#1A1A2E"
                     android:textSize="12sp" />
             </LinearLayout>
@@ -232,9 +232,13 @@
                 android:orientation="horizontal">
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardActiveItems"
                     android:layout_width="0dp"
                     android:layout_height="72dp"
                     android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
                     app:cardBackgroundColor="#14B8A6"
                     app:cardCornerRadius="8dp"
                     app:cardElevation="0dp"
@@ -249,9 +253,10 @@
                         android:paddingEnd="10dp">
 
                         <TextView
+                            android:id="@+id/tvActiveItemsCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="248"
+                            android:text="0"
                             android:textColor="#FFFFFF"
                             android:textSize="20sp"
                             android:textStyle="bold" />
@@ -261,17 +266,21 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="3dp"
                             android:maxLines="1"
-                            android:text="Active Items"
+                            android:text="@string/home_active_items"
                             android:textColor="#EFFFFB"
                             android:textSize="10sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardFreeItems"
                     android:layout_width="0dp"
                     android:layout_height="72dp"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
                     app:cardBackgroundColor="#10B981"
                     app:cardCornerRadius="8dp"
                     app:cardElevation="0dp"
@@ -286,9 +295,10 @@
                         android:paddingEnd="10dp">
 
                         <TextView
+                            android:id="@+id/tvFreeItemsCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="89"
+                            android:text="0"
                             android:textColor="#FFFFFF"
                             android:textSize="20sp"
                             android:textStyle="bold" />
@@ -298,17 +308,21 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="3dp"
                             android:maxLines="1"
-                            android:text="Free Items"
+                            android:text="@string/home_free_items"
                             android:textColor="#EFFFF8"
                             android:textSize="10sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
                 <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardSaleItems"
                     android:layout_width="0dp"
                     android:layout_height="72dp"
                     android:layout_marginStart="8dp"
                     android:layout_weight="1"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:foreground="?attr/selectableItemBackground"
                     app:cardBackgroundColor="#F97316"
                     app:cardCornerRadius="8dp"
                     app:cardElevation="0dp"
@@ -323,9 +337,10 @@
                         android:paddingEnd="10dp">
 
                         <TextView
+                            android:id="@+id/tvSaleItemsCount"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="156"
+                            android:text="0"
                             android:textColor="#FFFFFF"
                             android:textSize="20sp"
                             android:textStyle="bold" />
@@ -335,7 +350,7 @@
                             android:layout_height="wrap_content"
                             android:layout_marginTop="3dp"
                             android:maxLines="1"
-                            android:text="Total Shared"
+                            android:text="@string/home_sale_items"
                             android:textColor="#FFF4EA"
                             android:textSize="10sp" />
                     </LinearLayout>
