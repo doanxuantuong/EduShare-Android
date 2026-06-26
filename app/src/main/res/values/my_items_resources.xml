@@ -23,6 +23,10 @@
     <string name="my_items_edit">Edit</string>
     <string name="my_items_empty_state">No items in this tab</string>
     <string name="my_items_deleted_message">Removed "%1$s" from My Items</string>
+    <string name="my_items_delete_confirm_title">Delete item?</string>
+    <string name="my_items_delete_confirm_message">This will remove "%1$s" from My Items.</string>
+    <string name="my_items_delete_confirm">Delete</string>
+    <string name="my_items_delete_cancel">Cancel</string>
     <string name="desc_add_my_item">Post a new item</string>
     <string name="desc_my_item_image">My item photo</string>
     <string name="desc_delete_my_item">Delete my item</string>

@@ -6,6 +6,7 @@ import com.example.edushare.feature.post.model.PostResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
@@ -21,4 +22,7 @@ public interface PostApi {
 
     @PUT("/posts/{postId}")
     Call<PostResponse> updatePost(@Path("postId") Integer postId, @Body CreatePostRequest request);
+
+    @DELETE("/posts/{postId}")
+    Call<Void> deletePost(@Path("postId") Integer postId);
 }

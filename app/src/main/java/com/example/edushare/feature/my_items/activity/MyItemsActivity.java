@@ -1,5 +1,6 @@
 package com.example.edushare.feature.my_items.activity;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -14,6 +15,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.edushare.R;
+import com.example.edushare.common.base.retrofit.OnActionCallback;
 import com.example.edushare.common.base.view_model.BaseViewModelFactory;
 import com.example.edushare.common.helper.BottomNavigationHelper;
 import com.example.edushare.feature.item_detail.activity.PostDetailActivity;
@@ -22,6 +24,7 @@ import com.example.edushare.feature.my_items.adapter.MyItemAdapter;
 import com.example.edushare.feature.my_items.model.MyItem;
 import com.example.edushare.feature.my_items.view_model.MyItemsViewModel;
 import com.example.edushare.feature.post.activity.PostItemActivity;
+import com.example.edushare.feature.post.repository.PostRepository;
 
 public class MyItemsActivity extends AppCompatActivity implements MyItemAdapter.OnMyItemActionListener {
     private RecyclerView rvMyItems;
@@ -33,6 +36,7 @@ public class MyItemsActivity extends AppCompatActivity implements MyItemAdapter.
     private ProgressBar progressBar;
     private View btnAddItem;
     private View footerLayout;
+    private PostRepository postRepository;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +78,7 @@ public class MyItemsActivity extends AppCompatActivity implements MyItemAdapter.
 
     private void initViewModel() {
         MyItemsRepository repository = new MyItemsRepository(this);
+        postRepository = new PostRepository(this);
         myItemsViewModel = new ViewModelProvider(this, new BaseViewModelFactory<>(
                 () -> new MyItemsViewModel(repository))
         ).get(MyItemsViewModel.class);
@@ -147,6 +152,28 @@ public class MyItemsActivity extends AppCompatActivity implements MyItemAdapter.
 
     @Override
     public void onDeleteItem(MyItem item) {
-        Toast.makeText(this, R.string.my_items_delete_coming_soon, Toast.LENGTH_SHORT).show();
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.my_items_delete_confirm_title)
+                .setMessage(getString(R.string.my_items_delete_confirm_message, item.getTitle()))
+                .setNegativeButton(R.string.my_items_delete_cancel, null)
+                .setPositiveButton(R.string.my_items_delete_confirm, (dialog, which) -> deleteItem(item))
+                .show();
+    }
+
+    private void deleteItem(MyItem item) {
+        postRepository.deletePost(item.getId(), new OnActionCallback<Void>() {
+            @Override
+            public void onSuccess(Void data) {
+                Toast.makeText(MyItemsActivity.this,
+                        getString(R.string.my_items_deleted_message, item.getTitle()),
+                        Toast.LENGTH_SHORT).show();
+                myItemsViewModel.loadItems();
+            }
+
+            @Override
+            public void onFailure(String error) {
+                Toast.makeText(MyItemsActivity.this, error, Toast.LENGTH_LONG).show();
+            }
+        });
     }
 }

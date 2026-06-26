@@ -1,4 +1,4 @@
-﻿package com.example.edushare.feature.post.helper;
+package com.example.edushare.feature.post.helper;
 
 import android.app.Activity;
 import android.app.AlertDialog;
