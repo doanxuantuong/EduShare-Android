@@ -6,6 +6,7 @@ import androidx.annotation.NonNull;
 
 import com.example.edushare.common.base.retrofit.OnActionCallback;
 import com.example.edushare.common.base.retrofit.RetrofitClient;
+import com.example.edushare.feature.item_detail.model.PostDetailResponseDTO;
 import com.example.edushare.feature.post.api.PostApi;
 import com.example.edushare.feature.post.model.CreatePostRequest;
 import com.example.edushare.feature.post.model.PostResponse;
@@ -42,7 +43,45 @@ public class PostRepository {
         });
     }
 
-    private String readErrorMessage(Response<PostResponse> response) {
+    public void updatePost(Integer postId, CreatePostRequest request, OnActionCallback<PostResponse> callback) {
+        postApi.updatePost(postId, request).enqueue(new Callback<PostResponse>() {
+            @Override
+            public void onResponse(@NonNull Call<PostResponse> call, @NonNull Response<PostResponse> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    callback.onSuccess(response.body());
+                    return;
+                }
+
+                callback.onFailure(readErrorMessage(response));
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<PostResponse> call, @NonNull Throwable t) {
+                callback.onFailure("Loi ket noi: " + t.getMessage());
+            }
+        });
+    }
+
+    public void getPostDetail(Integer postId, OnActionCallback<PostDetailResponseDTO> callback) {
+        postApi.getPostDetail(postId).enqueue(new Callback<PostDetailResponseDTO>() {
+            @Override
+            public void onResponse(@NonNull Call<PostDetailResponseDTO> call, @NonNull Response<PostDetailResponseDTO> response) {
+                if (response.isSuccessful() && response.body() != null) {
+                    callback.onSuccess(response.body());
+                    return;
+                }
+
+                callback.onFailure(readErrorMessage(response));
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<PostDetailResponseDTO> call, @NonNull Throwable t) {
+                callback.onFailure("Loi ket noi: " + t.getMessage());
+            }
+        });
+    }
+
+    private String readErrorMessage(Response<?> response) {
         if (response.errorBody() == null) {
             return "Loi Server: " + response.code();
         }

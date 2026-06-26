@@ -9,6 +9,8 @@ import com.example.edushare.R;
 import com.example.edushare.feature.post.helper.PostItemFormHelper;
 
 public class PostItemActivity extends AppCompatActivity {
+    public static final String EXTRA_EDIT_POST_ID = "EDIT_POST_ID";
+
     private static final int REQUEST_PICK_LOCATION = 200;
     private static final int REQUEST_PICK_PHOTO = 201;
 
@@ -19,7 +21,8 @@ public class PostItemActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_post_item);
 
-        postItemFormHelper = new PostItemFormHelper(this, REQUEST_PICK_PHOTO);
+        int editPostId = getIntent().getIntExtra(EXTRA_EDIT_POST_ID, -1);
+        postItemFormHelper = new PostItemFormHelper(this, REQUEST_PICK_PHOTO, editPostId);
         postItemFormHelper.setup();
     }
     @Override

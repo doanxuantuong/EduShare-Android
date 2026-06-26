@@ -1,4 +1,4 @@
-package com.example.edushare.feature.post.helper;
+﻿package com.example.edushare.feature.post.helper;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -16,6 +16,7 @@ import android.widget.Toast;
 import com.example.edushare.R;
 import com.example.edushare.common.base.retrofit.OnActionCallback;
 import com.example.edushare.common.firebase.storage.FirebaseStorageHelper;
+import com.example.edushare.feature.item_detail.model.PostDetailResponseDTO;
 import com.example.edushare.feature.post.activity.PickLocationActivity;
 import com.example.edushare.feature.post.model.CreatePostRequest;
 import com.example.edushare.feature.post.model.PostItemForm;
@@ -24,9 +25,12 @@ import com.example.edushare.feature.post.repository.PostRepository;
 
 public class PostItemFormHelper {
     private static final int REQUEST_PICK_LOCATION = 200;
+    private static final String CONDITION_PREFIX = "Condition: ";
 
     private final Activity activity;
     private final int requestPickPhoto;
+    private final int editPostId;
+    private final boolean editMode;
     private final PostItemFormValidator validator;
     private final PostItemOptionProvider optionProvider;
     private final PostRepository postRepository;
@@ -35,6 +39,7 @@ public class PostItemFormHelper {
     private View layoutAddPhoto;
     private View layoutAddPhotoPlaceholder;
     private ImageView ivPostPhotoPreview;
+    private TextView tvHeaderTitle;
     private TextView tvTypeSale;
     private TextView tvTypeFree;
     private TextView tvCategory;
@@ -61,12 +66,18 @@ public class PostItemFormHelper {
     private boolean isSubmitting = false;
 
     public PostItemFormHelper(Activity activity) {
-        this(activity, 201);
+        this(activity, 201, -1);
     }
 
     public PostItemFormHelper(Activity activity, int requestPickPhoto) {
+        this(activity, requestPickPhoto, -1);
+    }
+
+    public PostItemFormHelper(Activity activity, int requestPickPhoto, int editPostId) {
         this.activity = activity;
         this.requestPickPhoto = requestPickPhoto;
+        this.editPostId = editPostId;
+        this.editMode = editPostId > 0;
         this.validator = new PostItemFormValidator(activity);
         this.optionProvider = new PostItemOptionProvider(activity);
         this.postRepository = new PostRepository(activity);
@@ -76,18 +87,24 @@ public class PostItemFormHelper {
 
     public void setup() {
         bindViews();
+        setupModeUi();
         setupBackButton();
         setupPhotoAction();
         setupItemTypeActions();
         setupConditionActions();
         setupSelectActions();
         setupSubmitAction();
+
+        if (editMode) {
+            loadPostForEdit();
+        }
     }
 
     private void bindViews() {
         layoutAddPhoto = activity.findViewById(R.id.layoutAddPhoto);
         layoutAddPhotoPlaceholder = activity.findViewById(R.id.layoutAddPhotoPlaceholder);
         ivPostPhotoPreview = activity.findViewById(R.id.ivPostPhotoPreview);
+        tvHeaderTitle = activity.findViewById(R.id.tvPostHeaderTitle);
         tvTypeSale = activity.findViewById(R.id.tvTypeSale);
         tvTypeFree = activity.findViewById(R.id.tvTypeFree);
         tvCategory = activity.findViewById(R.id.tvPostCategory);
@@ -102,6 +119,14 @@ public class PostItemFormHelper {
         edtImageUrl = activity.findViewById(R.id.edtPostImageUrl);
         edtPrice = activity.findViewById(R.id.edtPostPrice);
         edtDescription = activity.findViewById(R.id.edtPostDescription);
+    }
+
+    private void setupModeUi() {
+        if (!editMode) {
+            return;
+        }
+        tvHeaderTitle.setText(R.string.post_edit_item_title);
+        btnSubmitPost.setText(R.string.post_update);
     }
 
     private void setupBackButton() {
@@ -167,6 +192,26 @@ public class PostItemFormHelper {
         selectedView.setTextColor(Color.WHITE);
     }
 
+    private void selectConditionByValue(String condition) {
+        if (condition == null || condition.trim().isEmpty()) {
+            return;
+        }
+        String value = condition.trim();
+        if (value.equalsIgnoreCase(tvConditionNew.getText().toString())) {
+            selectCondition(tvConditionNew);
+        } else if (value.equalsIgnoreCase(tvConditionLikeNew.getText().toString())) {
+            selectCondition(tvConditionLikeNew);
+        } else if (value.equalsIgnoreCase(tvConditionGood.getText().toString())) {
+            selectCondition(tvConditionGood);
+        } else if (value.equalsIgnoreCase(tvConditionFair.getText().toString())) {
+            selectCondition(tvConditionFair);
+        } else if (value.equalsIgnoreCase(tvConditionPoor.getText().toString())) {
+            selectCondition(tvConditionPoor);
+        } else {
+            selectedCondition = value;
+        }
+    }
+
     private void resetConditionStyle(TextView view) {
         view.setBackgroundResource(R.drawable.bg_post_chip_inactive);
         view.setTextColor(activity.getColor(R.color.post_text_secondary));
@@ -213,6 +258,53 @@ public class PostItemFormHelper {
         btnSubmitPost.setOnClickListener(view -> submitForm());
     }
 
+    private void loadPostForEdit() {
+        setSubmitting(true);
+        postRepository.getPostDetail(editPostId, new OnActionCallback<PostDetailResponseDTO>() {
+            @Override
+            public void onSuccess(PostDetailResponseDTO post) {
+                fillForm(post);
+                setSubmitting(false);
+            }
+
+            @Override
+            public void onFailure(String error) {
+                setSubmitting(false);
+                Toast.makeText(activity, error, Toast.LENGTH_LONG).show();
+            }
+        });
+    }
+
+    private void fillForm(PostDetailResponseDTO post) {
+        edtTitle.setText(nullToEmpty(post.getTitle()));
+        edtImageUrl.setText(nullToEmpty(post.getImageUrl()));
+        edtPrice.setText(formatPrice(post.getPrice()));
+
+        String description = nullToEmpty(post.getDescription());
+        String condition = extractCondition(description);
+        edtDescription.setText(removeCondition(description));
+        selectConditionByValue(condition);
+
+        selectedCategory = nullToEmpty(post.getCategoryName());
+        if (!selectedCategory.isEmpty()) {
+            tvCategory.setText(selectedCategory);
+        }
+
+        if (post.getLocationId() != null) {
+            selectedLocationId = post.getLocationId();
+        }
+        selectedLocation = nullToEmpty(post.getLocationName());
+        if (!selectedLocation.isEmpty()) {
+            tvLocation.setText(selectedLocation);
+        }
+
+        if ("SALE".equalsIgnoreCase(post.getTransactionType())) {
+            selectItemType(activity.getString(R.string.post_type_sale));
+        } else {
+            selectItemType(activity.getString(R.string.post_type_free));
+        }
+    }
+
     private void submitForm() {
         if (isSubmitting) {
             return;
@@ -233,19 +325,19 @@ public class PostItemFormHelper {
 
         setSubmitting(true);
         if (!manualImageUrl.isEmpty()) {
-            createPost(form, manualImageUrl);
+            savePost(form, manualImageUrl);
             return;
         }
 
         if (selectedPhotoUri == null) {
-            createPost(form, null);
+            savePost(form, null);
             return;
         }
 
         storageHelper.uploadPostImage(selectedPhotoUri, new OnActionCallback<String>() {
             @Override
             public void onSuccess(String imageUrl) {
-                createPost(form, imageUrl);
+                savePost(form, imageUrl);
             }
 
             @Override
@@ -267,23 +359,28 @@ public class PostItemFormHelper {
         return null;
     }
     private void showUploadFailedDialog(PostItemForm form, String error) {
+        String positiveText = editMode ? "Save without image" : "Post without image";
+        String actionText = editMode ? "Save this post without an image?" : "Create this post without an image?";
         new AlertDialog.Builder(activity)
                 .setTitle("Cannot upload image")
-                .setMessage(error + "\n\nCreate this post without an image?")
+                .setMessage(error + "\n\n" + actionText)
                 .setNegativeButton("Cancel", null)
-                .setPositiveButton("Post without image", (dialog, which) -> {
+                .setPositiveButton(positiveText, (dialog, which) -> {
                     setSubmitting(true);
-                    createPost(form, null);
+                    savePost(form, null);
                 })
                 .show();
     }
 
-    private void createPost(PostItemForm form, String imageUrl) {
-        postRepository.createPost(toCreatePostRequest(form, imageUrl), new OnActionCallback<PostResponse>() {
+    private void savePost(PostItemForm form, String imageUrl) {
+        CreatePostRequest request = toCreatePostRequest(form, imageUrl);
+        OnActionCallback<PostResponse> callback = new OnActionCallback<PostResponse>() {
             @Override
             public void onSuccess(PostResponse data) {
                 setSubmitting(false);
-                Toast.makeText(activity, R.string.post_submit_success, Toast.LENGTH_SHORT).show();
+                Toast.makeText(activity,
+                        editMode ? R.string.post_update_success : R.string.post_submit_success,
+                        Toast.LENGTH_SHORT).show();
                 activity.finish();
             }
 
@@ -292,13 +389,23 @@ public class PostItemFormHelper {
                 setSubmitting(false);
                 Toast.makeText(activity, error, Toast.LENGTH_LONG).show();
             }
-        });
+        };
+
+        if (editMode) {
+            postRepository.updatePost(editPostId, request, callback);
+        } else {
+            postRepository.createPost(request, callback);
+        }
     }
 
     private void setSubmitting(boolean submitting) {
         isSubmitting = submitting;
         btnSubmitPost.setEnabled(!submitting);
-        btnSubmitPost.setText(submitting ? R.string.post_submit_loading : R.string.post_submit);
+        if (submitting) {
+            btnSubmitPost.setText(editMode ? R.string.post_update_loading : R.string.post_submit_loading);
+        } else {
+            btnSubmitPost.setText(editMode ? R.string.post_update : R.string.post_submit);
+        }
     }
 
     private CreatePostRequest toCreatePostRequest(PostItemForm form, String imageUrl) {
@@ -340,6 +447,36 @@ public class PostItemFormHelper {
                 selectedLocation,
                 edtDescription.getText().toString().trim()
         );
+    }
+
+    private String extractCondition(String description) {
+        int index = description.lastIndexOf(CONDITION_PREFIX);
+        if (index < 0) {
+            return "";
+        }
+        return description.substring(index + CONDITION_PREFIX.length()).trim();
+    }
+
+    private String removeCondition(String description) {
+        int index = description.lastIndexOf(CONDITION_PREFIX);
+        if (index < 0) {
+            return description;
+        }
+        return description.substring(0, index).trim();
+    }
+
+    private String formatPrice(Double price) {
+        if (price == null) {
+            return "";
+        }
+        if (price.doubleValue() == Math.rint(price.doubleValue())) {
+            return String.valueOf(price.longValue());
+        }
+        return String.valueOf(price);
+    }
+
+    private String nullToEmpty(String value) {
+        return value == null ? "" : value;
     }
 
     private interface OnMenuValueSelected {
