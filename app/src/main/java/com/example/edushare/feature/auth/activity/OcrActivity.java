@@ -23,12 +23,6 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.example.edushare.R;
-import com.example.edushare.common.base.retrofit.OnActionCallback;
-import com.example.edushare.common.helper.UserSessionHelper;
-import com.example.edushare.feature.auth.request.OcrLoginRequest;
-import com.example.edushare.feature.auth.response.LoginResponse;
-import com.example.edushare.feature.home.activity.HomeActivity;
-import com.example.edushare.feature.users.repository.UserRepository;
 import com.google.common.util.concurrent.ListenableFuture;
 import com.google.mlkit.vision.common.InputImage;
 import com.google.mlkit.vision.text.TextRecognition;
@@ -89,12 +83,10 @@ public class OcrActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ocr);
 
-        // Ánh xạ View
         previewView = findViewById(R.id.previewView);
         btnCapture = findViewById(R.id.btnCapture);
         tvResult = findViewById(R.id.tvResult);
 
-        // Kiểm tra quyền Camera
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 100);
@@ -105,84 +97,60 @@ public class OcrActivity extends AppCompatActivity {
         cameraExecutor = Executors.newSingleThreadExecutor();
         btnCapture.setOnClickListener(v -> captureAndRecognizeText());
 
-        // Vẽ khung ngắm định vị chữ nhật bo góc
         View viewOverlay = findViewById(R.id.viewOverlay);
         viewOverlay.post(() -> {
             int width = viewOverlay.getWidth();
             int height = viewOverlay.getHeight();
-
             int rectWidth = (int) (width * 0.85);
             int rectHeight = (int) (rectWidth * 0.60);
-
             int left = (width - rectWidth) / 2;
             int top = (height - rectHeight) / 2;
-            int right = left + rectWidth;
-            int bottom = top + rectHeight;
 
-            android.graphics.RectF rectCard = new android.graphics.RectF(left, top, right, bottom);
-            android.graphics.drawable.Drawable drawable = new android.graphics.drawable.Drawable() {
+            android.graphics.RectF rectCard = new android.graphics.RectF(left, top, left + rectWidth, top + rectHeight);
+            viewOverlay.setBackground(new android.graphics.drawable.Drawable() {
                 @Override
                 public void draw(@NonNull android.graphics.Canvas canvas) {
                     android.graphics.Paint paint = new android.graphics.Paint(android.graphics.Paint.ANTI_ALIAS_FLAG);
-
-                    // 1. Vẽ lớp phủ mờ màu đen toàn màn hình camera
                     paint.setColor(android.graphics.Color.parseColor("#99000000"));
                     paint.setStyle(android.graphics.Paint.Style.FILL);
                     canvas.drawRect(0, 0, width, height, paint);
 
-                    // 2. Đục lỗ một hình chữ nhật bo góc ở giữa
                     paint.setXfermode(new android.graphics.PorterDuffXfermode(android.graphics.PorterDuff.Mode.CLEAR));
                     canvas.drawRoundRect(rectCard, 24, 24, paint);
                     paint.setXfermode(null);
 
-                    // 3. Vẽ viền nét đứt màu trắng bo quanh ô ngắm
                     paint.setColor(android.graphics.Color.WHITE);
                     paint.setStyle(android.graphics.Paint.Style.STROKE);
                     paint.setStrokeWidth(6f);
                     paint.setPathEffect(new android.graphics.DashPathEffect(new float[]{20, 10}, 0));
                     canvas.drawRoundRect(rectCard, 24, 24, paint);
                 }
-
-                @Override
-                public void setAlpha(int alpha) {}
-                @Override
-                public void setColorFilter(@androidx.annotation.Nullable android.graphics.ColorFilter colorFilter) {}
-                @Override
-                public int getOpacity() { return android.graphics.PixelFormat.TRANSLUCENT; }
-            };
-            viewOverlay.setBackground(drawable);
+                @Override public void setAlpha(int alpha) {}
+                @Override public void setColorFilter(android.graphics.ColorFilter filter) {}
+                @Override public int getOpacity() { return android.graphics.PixelFormat.TRANSLUCENT; }
+            });
         });
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == 100) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startCamera();
-            } else {
-                tvResult.setText("Bạn cần cấp quyền camera để quét OCR");
-            }
+        if (requestCode == 100 && grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            startCamera();
+        } else {
+            tvResult.setText("Bạn cần cấp quyền camera để quét OCR");
         }
     }
 
     private void startCamera() {
-        ListenableFuture<ProcessCameraProvider> cameraProviderFuture =
-                ProcessCameraProvider.getInstance(this);
-
+        ListenableFuture<ProcessCameraProvider> cameraProviderFuture = ProcessCameraProvider.getInstance(this);
         cameraProviderFuture.addListener(() -> {
             try {
                 ProcessCameraProvider cameraProvider = cameraProviderFuture.get();
                 imageCapture = new ImageCapture.Builder().build();
-
-                androidx.camera.core.Preview preview =
-                        new androidx.camera.core.Preview.Builder().build();
+                androidx.camera.core.Preview preview = new androidx.camera.core.Preview.Builder().build();
                 preview.setSurfaceProvider(previewView.getSurfaceProvider());
-
-                CameraSelector cameraSelector = new CameraSelector.Builder()
-                        .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-                        .build();
+                CameraSelector cameraSelector = new CameraSelector.Builder().requireLensFacing(CameraSelector.LENS_FACING_BACK).build();
 
                 cameraProvider.unbindAll();
                 cameraProvider.bindToLifecycle(this, cameraSelector, preview, imageCapture);
@@ -193,11 +161,7 @@ public class OcrActivity extends AppCompatActivity {
     }
 
     private void captureAndRecognizeText() {
-        if (isProcessing) {
-            Log.d(TAG, "Đang xử lý, bỏ qua lượt bấm này.");
-            return;
-        }
-
+        if (isProcessing) return;
         if (imageCapture == null) {
             tvResult.setText("Camera chưa sẵn sàng, vui lòng thử lại.");
             return;
@@ -206,91 +170,57 @@ public class OcrActivity extends AppCompatActivity {
         isProcessing = true;
         runOnUiThread(() -> tvResult.setText("Đang quét dữ liệu, vui lòng đợi..."));
 
-        imageCapture.takePicture(
-                cameraExecutor,
-                new ImageCapture.OnImageCapturedCallback() {
-                    @OptIn(markerClass = ExperimentalGetImage.class)
-                    @Override
-                    public void onCaptureSuccess(@NonNull ImageProxy imageProxy) {
-                        try {
-                            InputImage image = InputImage.fromMediaImage(
-                                    imageProxy.getImage(),
-                                    imageProxy.getImageInfo().getRotationDegrees()
-                            );
+        imageCapture.takePicture(cameraExecutor, new ImageCapture.OnImageCapturedCallback() {
+            @OptIn(markerClass = ExperimentalGetImage.class)
+            @Override
+            public void onCaptureSuccess(@NonNull ImageProxy imageProxy) {
+                try {
+                    InputImage image = InputImage.fromMediaImage(imageProxy.getImage(), imageProxy.getImageInfo().getRotationDegrees());
+                    TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS).process(image)
+                            .addOnSuccessListener(text -> {
+                                String result = text.getText();
+                                String studentCode = extractStudentCode(result);
+                                String fullName = extractFullName(result);
 
-                            TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-                                    .process(image)
-                                    .addOnSuccessListener(text -> {
-                                        String result = text.getText();
-                                        String studentCode = extractStudentCode(result);
-                                        String fullName = extractFullName(result);
+                                if (studentCode.isEmpty() || fullName.isEmpty()) {
+                                    runOnUiThread(() -> tvResult.setText("Không đọc được thông tin, vui lòng căn chỉnh lại thẻ."));
+                                    imageProxy.close();
+                                    isProcessing = false;
+                                    return;
+                                }
 
-                                        if (studentCode.isEmpty() || fullName.isEmpty()) {
-                                            runOnUiThread(() -> tvResult.setText("Không đọc được thông tin, vui lòng căn chỉnh lại thẻ."));
-                                            imageProxy.close();
-                                            isProcessing = false;
-                                            return;
-                                        }
+                                // Trả kết quả ngược lại cho RegisterActivity thay vì gọi API Đăng nhập
+                                Intent data = new Intent();
+                                data.putExtra("STUDENT_CODE", studentCode);
+                                data.putExtra("FULL_NAME", fullName);
+                                setResult(RESULT_OK, data);
 
-                                        String email = studentCode + "@st.hcmuaf.edu.vn";
-
-                                        OcrLoginRequest request = new OcrLoginRequest();
-                                        request.setStudentCode(studentCode);
-                                        request.setFullName(fullName);
-                                        request.setEmail(email);
-
-                                        new UserRepository(OcrActivity.this).loginUserByOcr(request, new OnActionCallback<LoginResponse>() {
-                                            @Override
-                                            public void onSuccess(LoginResponse response) {
-                                                runOnUiThread(() -> {
-                                                    UserSessionHelper.saveSession(
-                                                            OcrActivity.this,
-                                                            response.getToken(),
-                                                            response.getUserId(),
-                                                            response.getFullName(),
-                                                            response.getEmail()
-                                                    );
-                                                    Intent intent = new Intent(OcrActivity.this, HomeActivity.class);
-                                                    startActivity(intent);
-                                                    finish();
-                                                });
-                                            }
-
-                                            @Override
-                                            public void onFailure(String message) {
-                                                runOnUiThread(() -> tvResult.setText(message));
-                                            }
-                                        });
-
-                                        imageProxy.close();
-                                        isProcessing = false;
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        runOnUiThread(() -> tvResult.setText("Không đọc được thông tin, vui lòng thử lại."));
-                                        imageProxy.close();
-                                        isProcessing = false;
-                                    });
-                        } catch (Exception e) {
-                            imageProxy.close();
-                            isProcessing = false;
-                            runOnUiThread(() -> tvResult.setText("Có lỗi xảy ra trong quá trình quét."));
-                        }
-                    }
-
-                    @Override
-                    public void onError(@NonNull ImageCaptureException exception) {
-                        runOnUiThread(() -> tvResult.setText("Không thể chụp ảnh, vui lòng thử lại."));
-                        isProcessing = false;
-                    }
+                                imageProxy.close();
+                                finish(); // Đóng OcrActivity
+                            })
+                            .addOnFailureListener(e -> {
+                                runOnUiThread(() -> tvResult.setText("Không đọc được thông tin, vui lòng thử lại."));
+                                imageProxy.close();
+                                isProcessing = false;
+                            });
+                } catch (Exception e) {
+                    imageProxy.close();
+                    isProcessing = false;
+                    runOnUiThread(() -> tvResult.setText("Có lỗi xảy ra trong quá trình quét."));
                 }
-        );
+            }
+
+            @Override
+            public void onError(@NonNull ImageCaptureException exception) {
+                runOnUiThread(() -> tvResult.setText("Không thể chụp ảnh, vui lòng thử lại."));
+                isProcessing = false;
+            }
+        });
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        if (cameraExecutor != null) {
-            cameraExecutor.shutdown();
-        }
+        if (cameraExecutor != null) cameraExecutor.shutdown();
     }
 }
