@@ -17,7 +17,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.edushare.R;
 import com.example.edushare.common.base.retrofit.OnActionCallback;
 import com.example.edushare.common.base.view_model.BaseViewModelFactory;
-import com.example.edushare.common.helper.BottomNavigationHelper;
 import com.example.edushare.feature.item_detail.activity.PostDetailActivity;
 import com.example.edushare.feature.my_items.repository.MyItemsRepository;
 import com.example.edushare.feature.my_items.adapter.MyItemAdapter;
@@ -34,8 +33,8 @@ public class MyItemsActivity extends AppCompatActivity implements MyItemAdapter.
     private TextView tvSoldTab;
     private TextView tvEmptyState;
     private ProgressBar progressBar;
+    private View btnBack;
     private View btnAddItem;
-    private View footerLayout;
     private PostRepository postRepository;
 
     @Override
@@ -64,10 +63,8 @@ public class MyItemsActivity extends AppCompatActivity implements MyItemAdapter.
         tvSoldTab = findViewById(R.id.tvSoldItemsTab);
         tvEmptyState = findViewById(R.id.tvMyItemsEmptyState);
         progressBar = findViewById(R.id.progressBar);
+        btnBack = findViewById(R.id.btnBack);
         btnAddItem = findViewById(R.id.btnAddMyItem);
-        footerLayout = findViewById(R.id.footer_layout);
-
-        BottomNavigationHelper.setup(this, footerLayout, R.id.nav_profile);
     }
 
     private void initRecyclerView() {
@@ -85,6 +82,9 @@ public class MyItemsActivity extends AppCompatActivity implements MyItemAdapter.
     }
 
     private void setupClickListeners() {
+        // Nút back dùng chung style với Notification để hành vi và giao diện đồng bộ trong app.
+        btnBack.setOnClickListener(view -> finish());
+
         // Nút cộng dùng lại màn Post hiện có để người dùng đăng thêm item từ My Items.
         btnAddItem.setOnClickListener(view -> {
             Intent intent = new Intent(MyItemsActivity.this, PostItemActivity.class);

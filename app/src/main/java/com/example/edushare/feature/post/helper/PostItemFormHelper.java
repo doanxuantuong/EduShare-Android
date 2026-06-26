@@ -141,7 +141,7 @@ public class PostItemFormHelper {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.setType("image/*");
-        activity.startActivityForResult(Intent.createChooser(intent, "Select post image"), requestPickPhoto);
+        activity.startActivityForResult(Intent.createChooser(intent, activity.getString(R.string.post_photo_chooser_title)), requestPickPhoto);
     }
 
     public void onPhotoPicked(Uri imageUri) {
@@ -197,15 +197,20 @@ public class PostItemFormHelper {
             return;
         }
         String value = condition.trim();
-        if (value.equalsIgnoreCase(tvConditionNew.getText().toString())) {
+        if (value.equalsIgnoreCase(tvConditionNew.getText().toString())
+                || "New".equalsIgnoreCase(value)) {
             selectCondition(tvConditionNew);
-        } else if (value.equalsIgnoreCase(tvConditionLikeNew.getText().toString())) {
+        } else if (value.equalsIgnoreCase(tvConditionLikeNew.getText().toString())
+                || "Like New".equalsIgnoreCase(value)) {
             selectCondition(tvConditionLikeNew);
-        } else if (value.equalsIgnoreCase(tvConditionGood.getText().toString())) {
+        } else if (value.equalsIgnoreCase(tvConditionGood.getText().toString())
+                || "Good".equalsIgnoreCase(value)) {
             selectCondition(tvConditionGood);
-        } else if (value.equalsIgnoreCase(tvConditionFair.getText().toString())) {
+        } else if (value.equalsIgnoreCase(tvConditionFair.getText().toString())
+                || "Fair".equalsIgnoreCase(value)) {
             selectCondition(tvConditionFair);
-        } else if (value.equalsIgnoreCase(tvConditionPoor.getText().toString())) {
+        } else if (value.equalsIgnoreCase(tvConditionPoor.getText().toString())
+                || "Poor".equalsIgnoreCase(value)) {
             selectCondition(tvConditionPoor);
         } else {
             selectedCondition = value;
@@ -224,7 +229,7 @@ public class PostItemFormHelper {
 
     private void showCategoryMenu() {
         showMenu(tvCategory, optionProvider.getCategoryOptions(), value -> {
-            selectedCategory = value;
+            selectedCategory = optionProvider.getCategoryApiValue(value);
             tvCategory.setText(value);
         });
     }
@@ -287,7 +292,7 @@ public class PostItemFormHelper {
 
         selectedCategory = nullToEmpty(post.getCategoryName());
         if (!selectedCategory.isEmpty()) {
-            tvCategory.setText(selectedCategory);
+            tvCategory.setText(optionProvider.getCategoryDisplayValue(selectedCategory));
         }
 
         if (post.getLocationId() != null) {
@@ -358,13 +363,18 @@ public class PostItemFormHelper {
         }
         return null;
     }
+
     private void showUploadFailedDialog(PostItemForm form, String error) {
-        String positiveText = editMode ? "Save without image" : "Post without image";
-        String actionText = editMode ? "Save this post without an image?" : "Create this post without an image?";
+        String positiveText = activity.getString(editMode
+                ? R.string.post_save_without_image
+                : R.string.post_post_without_image);
+        String actionText = activity.getString(editMode
+                ? R.string.post_save_without_image_question
+                : R.string.post_create_without_image_question);
         new AlertDialog.Builder(activity)
-                .setTitle("Cannot upload image")
+                .setTitle(R.string.post_upload_failed_title)
                 .setMessage(error + "\n\n" + actionText)
-                .setNegativeButton("Cancel", null)
+                .setNegativeButton(R.string.post_cancel, null)
                 .setPositiveButton(positiveText, (dialog, which) -> {
                     setSubmitting(true);
                     savePost(form, null);

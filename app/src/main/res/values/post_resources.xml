@@ -10,61 +10,74 @@
     <color name="post_primary">#0D9488</color>
     <color name="post_primary_dark">#0D9488</color>
 
-    <!-- Text chỉ dùng cho màn tạo Post item. -->
-    <string name="post_item_title">Post New Item</string>
-    <string name="post_edit_item_title">Edit Item</string>
-    <string name="post_photos">Photos</string>
-    <string name="post_add_photo">Add</string>
-    <string name="post_photo_limit">Add up to 8 photos</string>
-    <string name="post_image_url">Image URL</string>
-    <string name="post_image_url_hint">Paste image link while upload is unavailable</string>
-    <string name="post_validation_image_url_invalid">Image URL must start with http:// or https://</string>
-    <string name="post_item_type">Item Type</string>
-    <string name="post_type_sale">For Sale</string>
-    <string name="post_type_free">Free/Borrow</string>
-    <string name="post_title_label">Title</string>
-    <string name="post_title_hint">e.g., Organic Chemistry Textbook</string>
-    <string name="post_category">Category</string>
-    <string name="post_select_category">Select category</string>
-    <string name="post_condition">Condition</string>
-    <string name="post_condition_new">New</string>
-    <string name="post_condition_like_new">Like New</string>
-    <string name="post_condition_good">Good</string>
-    <string name="post_condition_fair">Fair</string>
-    <string name="post_condition_poor">Poor</string>
-    <string name="post_price">Price (&#273;)</string>
-    <string name="post_price_hint">Enter price</string>
-    <string name="post_location">Location</string>
-    <string name="post_select_location">Select location</string>
-    <string name="post_description">Description</string>
-    <string name="post_description_hint">Describe your item...</string>
-    <string name="post_submit">Post Item</string>
-    <string name="post_update">Update Item</string>
-    <string name="post_photo_picker_message">Photo picker will be added when upload API is ready</string>
-    <string name="post_validation_title_required">Please enter item title</string>
-    <string name="post_validation_category_required">Please select category</string>
-    <string name="post_validation_condition_required">Please select condition</string>
-    <string name="post_validation_price_required">Please enter price</string>
-    <string name="post_validation_location_required">Please select location</string>
-    <string name="post_submit_success">Post created successfully</string>
-    <string name="post_update_success">Post updated successfully</string>
-    <string name="post_submit_loading">Posting...</string>
-    <string name="post_update_loading">Updating...</string>
-    <string name="desc_back">Back</string>
-    <string name="desc_add_photo">Add photos</string>
+    <!-- Text chỉ dùng cho màn tạo/chỉnh sửa vật phẩm. -->
+    <string name="post_item_title">Đăng vật phẩm mới</string>
+    <string name="post_edit_item_title">Chỉnh sửa vật phẩm</string>
+    <string name="post_photos">Ảnh</string>
+    <string name="post_add_photo">Thêm</string>
+    <string name="post_photo_limit">Thêm tối đa 8 ảnh</string>
+    <string name="post_image_url">Liên kết ảnh</string>
+    <string name="post_image_url_hint">Dán liên kết ảnh khi chưa dùng tải ảnh</string>
+    <string name="post_validation_image_url_invalid">Liên kết ảnh phải bắt đầu bằng http:// hoặc https://</string>
+    <string name="post_item_type">Loại vật phẩm</string>
+    <string name="post_type_sale">Để bán</string>
+    <string name="post_type_free">Miễn phí/Mượn</string>
+    <string name="post_title_label">Tiêu đề</string>
+    <string name="post_title_hint">VD: Sách Hóa hữu cơ</string>
+    <string name="post_category">Danh mục</string>
+    <string name="post_select_category">Chọn danh mục</string>
+    <string name="post_condition">Tình trạng</string>
+    <string name="post_condition_new">Mới</string>
+    <string name="post_condition_like_new">Như mới</string>
+    <string name="post_condition_good">Tốt</string>
+    <string name="post_condition_fair">Khá</string>
+    <string name="post_condition_poor">Cũ</string>
+    <string name="post_price">Giá (đ)</string>
+    <string name="post_price_hint">Nhập giá</string>
+    <string name="post_location">Vị trí</string>
+    <string name="post_select_location">Chọn vị trí</string>
+    <string name="post_description">Mô tả</string>
+    <string name="post_description_hint">Mô tả vật phẩm của bạn...</string>
+    <string name="post_submit">Đăng vật phẩm</string>
+    <string name="post_update">Cập nhật vật phẩm</string>
+    <string name="post_photo_picker_message">Tính năng chọn ảnh sẽ được thêm khi API tải ảnh sẵn sàng</string>
+    <string name="post_validation_title_required">Vui lòng nhập tiêu đề vật phẩm</string>
+    <string name="post_validation_category_required">Vui lòng chọn danh mục</string>
+    <string name="post_validation_condition_required">Vui lòng chọn tình trạng</string>
+    <string name="post_validation_price_required">Vui lòng nhập giá</string>
+    <string name="post_validation_location_required">Vui lòng chọn vị trí</string>
+    <string name="post_submit_success">Đăng vật phẩm thành công</string>
+    <string name="post_update_success">Cập nhật vật phẩm thành công</string>
+    <string name="post_submit_loading">Đang đăng...</string>
+    <string name="post_update_loading">Đang cập nhật...</string>
+    <string name="post_photo_chooser_title">Chọn ảnh bài đăng</string>
+    <string name="post_upload_failed_title">Không thể tải ảnh lên</string>
+    <string name="post_save_without_image">Lưu không kèm ảnh</string>
+    <string name="post_post_without_image">Đăng không kèm ảnh</string>
+    <string name="post_save_without_image_question">Bạn muốn lưu bài đăng này mà không kèm ảnh?</string>
+    <string name="post_create_without_image_question">Bạn muốn tạo bài đăng này mà không kèm ảnh?</string>
+    <string name="post_cancel">Hủy</string>
+    <string name="desc_back">Quay lại</string>
+    <string name="desc_add_photo">Thêm ảnh</string>
 
-    <!-- Option của Popup đặt trong resources để Helper không hardcode dữ liệu UI. -->
+    <!-- Mảng đầu tiên là text tiếng Việt hiển thị trên UI; mảng thứ hai giữ giá trị cũ gửi về API. -->
     <string-array name="post_category_options">
-        <item>@string/home_category_textbooks</item>
-        <item>@string/home_category_lab_equipment</item>
-        <item>@string/home_category_electronics</item>
+        <item>Sách giáo trình</item>
+        <item>Thiết bị thí nghiệm</item>
+        <item>Đồ điện tử</item>
+    </string-array>
+
+    <string-array name="post_category_api_values">
+        <item>Textbooks</item>
+        <item>Lab Equipment</item>
+        <item>Electronics</item>
     </string-array>
 
     <string-array name="post_location_options">
-        <item>Dorm A - Room 305</item>
-        <item>Dorm B - Room 201</item>
-        <item>Library</item>
-        <item>Canteen</item>
+        <item>Ký túc xá A - Phòng 305</item>
+        <item>Ký túc xá B - Phòng 201</item>
+        <item>Thư viện</item>
+        <item>Căn tin</item>
     </string-array>
 
     <!-- Theme của màn Post chỉ đổi nền màn hình, không chỉnh theme chung của app. -->
@@ -147,4 +160,3 @@
         <item name="android:maxLines">6</item>
     </style>
 </resources>
-
