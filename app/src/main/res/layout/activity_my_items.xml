@@ -6,7 +6,7 @@
     android:background="@color/my_items_background"
     android:fitsSystemWindows="true">
 
-    <!-- Nội dung chính được giữ phía trên footer để danh sách không bị che bởi bottom navigation. -->
+    <!-- Nội dung chính chiếm toàn màn hình vì My Items không dùng bottom navigation. -->
     <LinearLayout
         android:id="@+id/myItemsContent"
         android:layout_width="match_parent"
@@ -16,7 +16,7 @@
         android:paddingStart="16dp"
         android:paddingTop="10dp"
         android:paddingEnd="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/footer_layout"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -26,17 +26,30 @@
             android:layout_height="57dp"
             android:paddingTop="6dp">
 
+            <ImageButton
+                android:id="@+id/btnBack"
+                style="@style/Widget.App.BackButton"
+                android:contentDescription="@string/desc_back"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
             <TextView
                 android:id="@+id/tvMyItemsTitle"
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginEnd="8dp"
                 android:layout_marginTop="-5dp"
+                android:ellipsize="end"
+                android:maxLines="1"
                 android:text="@string/my_items_title"
                 android:textColor="@color/my_items_text_primary"
                 android:textSize="28sp"
                 android:textStyle="bold"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/btnAddMyItem"
+                app:layout_constraintStart_toEndOf="@+id/btnBack"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <FrameLayout
@@ -48,6 +61,7 @@
                 android:contentDescription="@string/desc_add_my_item"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackgroundBorderless"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
@@ -111,7 +125,7 @@
                 android:layout_height="match_parent"
                 android:clipToPadding="false"
                 android:overScrollMode="never"
-                android:paddingBottom="16dp"
+                android:paddingBottom="24dp"
                 android:scrollbars="none" />
 
             <TextView
@@ -126,14 +140,6 @@
                 android:visibility="gone" />
         </FrameLayout>
     </LinearLayout>
-    <include layout="@layout/layout_loading_overlay" />
 
-    <include
-        android:id="@+id/footer_layout"
-        layout="@layout/custom_bottom_nav"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+    <include layout="@layout/layout_loading_overlay" />
 </androidx.constraintlayout.widget.ConstraintLayout>

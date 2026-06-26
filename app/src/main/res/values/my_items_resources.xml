@@ -13,23 +13,28 @@
     <color name="my_items_danger_light">#FFE1E1</color>
     <color name="my_items_card_stroke">#F1F5F9</color>
 
-    <!-- Text chỉ dùng cho màn quản lý item của người dùng. -->
-    <string name="my_items_title">My Items</string>
-    <string name="my_items_active_tab_format">Active (%1$d)</string>
-    <string name="my_items_sold_tab_format">Sold (%1$d)</string>
-    <string name="my_items_views_format">%1$d views</string>
-    <string name="my_items_likes_format">%1$d likes</string>
-    <string name="my_items_view">View</string>
-    <string name="my_items_edit">Edit</string>
-    <string name="my_items_empty_state">No items in this tab</string>
-    <string name="my_items_deleted_message">Removed "%1$s" from My Items</string>
-    <string name="my_items_delete_confirm_title">Delete item?</string>
-    <string name="my_items_delete_confirm_message">This will remove "%1$s" from My Items.</string>
-    <string name="my_items_delete_confirm">Delete</string>
-    <string name="my_items_delete_cancel">Cancel</string>
-    <string name="desc_add_my_item">Post a new item</string>
-    <string name="desc_my_item_image">My item photo</string>
-    <string name="desc_delete_my_item">Delete my item</string>
+    <!-- Text chỉ dùng cho màn quản lý vật phẩm của người dùng. -->
+    <string name="my_items_title">Vật phẩm của tôi</string>
+    <string name="my_items_active_tab_format">Đang đăng (%1$d)</string>
+    <string name="my_items_sold_tab_format">Đã bán (%1$d)</string>
+    <string name="my_items_views_format">%1$d lượt xem</string>
+    <string name="my_items_likes_format">%1$d lượt thích</string>
+    <string name="my_items_view">Xem</string>
+    <string name="my_items_edit">Sửa</string>
+    <string name="my_items_empty_state">Chưa có vật phẩm nào trong mục này</string>
+    <string name="my_items_deleted_message">Đã xóa &quot;%1$s&quot; khỏi danh sách vật phẩm</string>
+    <string name="my_items_delete_confirm_title">Xóa vật phẩm?</string>
+    <string name="my_items_delete_confirm_message">Bạn có chắc muốn xóa &quot;%1$s&quot; khỏi danh sách vật phẩm không?</string>
+    <string name="my_items_delete_confirm">Xóa</string>
+    <string name="my_items_delete_cancel">Hủy</string>
+    <string name="my_items_error_login_again">Vui lòng đăng nhập lại để xem vật phẩm của bạn</string>
+    <string name="my_items_error_load_posts_code">Không thể tải vật phẩm của bạn. Mã lỗi máy chủ: %1$d</string>
+    <string name="my_items_error_connect_posts">Không thể kết nối đến dịch vụ bài đăng</string>
+    <string name="my_items_untitled_item">Vật phẩm chưa có tiêu đề</string>
+    <string name="my_items_contact_price">Liên hệ</string>
+    <string name="desc_add_my_item">Đăng vật phẩm mới</string>
+    <string name="desc_my_item_image">Ảnh vật phẩm của tôi</string>
+    <string name="desc_delete_my_item">Xóa vật phẩm của tôi</string>
 
     <!-- Theme riêng giúp màn My Items có nền đồng bộ nhưng vẫn kế thừa theme chung của app. -->
     <style name="Theme.EduShare.MyItems" parent="Theme.EduShare">
@@ -47,6 +52,7 @@
         <item name="android:focusable">true</item>
         <item name="android:foreground">?attr/selectableItemBackground</item>
     </style>
-    <string name="my_items_edit_coming_soon">Edit will be added later</string>
-    <string name="my_items_delete_coming_soon">Delete will be added later</string>
+
+    <string name="my_items_edit_coming_soon">Tính năng sửa sẽ được bổ sung sau</string>
+    <string name="my_items_delete_coming_soon">Tính năng xóa sẽ được bổ sung sau</string>
 </resources>

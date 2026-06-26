@@ -16,27 +16,14 @@
         android:elevation="2dp"
         app:layout_constraintTop_toTopOf="parent">
 
-        <FrameLayout
+        <ImageButton
             android:id="@+id/btnPostBack"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
+            style="@style/Widget.App.BackButton"
             android:layout_marginStart="8dp"
-            android:background="@drawable/bg_post_back_button"
-            android:clickable="true"
             android:contentDescription="@string/desc_back"
-            android:focusable="true"
-            android:foreground="?attr/selectableItemBackgroundBorderless"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <ImageView
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:layout_gravity="center"
-                android:contentDescription="@null"
-                android:src="@drawable/ic_post_arrow_back" />
-        </FrameLayout>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/tvPostHeaderTitle"
@@ -205,6 +192,7 @@
                     style="@style/PostInput"
                     android:hint="@string/post_title_hint"
                     android:inputType="textCapSentences" />
+            </LinearLayout>
 
                 <LinearLayout
                     style="@style/PostFormCard"
@@ -218,7 +206,6 @@
                         android:id="@+id/tvPostCategory"
                         style="@style/PostSelectInput"
                         android:text="@string/post_select_category" />
-                </LinearLayout>
             </LinearLayout>
 
             <!-- Chip tình trạng dùng Flow để tự xuống dòng gọn trên màn hình hẹp. -->

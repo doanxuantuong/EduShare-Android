@@ -37,7 +37,7 @@ public class MyItemsRepository {
     public void getMyItems(OnActionCallback<List<MyItem>> callback) {
         String userId = UserSessionHelper.getUserId(context);
         if (userId == null || userId.trim().isEmpty()) {
-            callback.onFailure("Please login again to view your posts");
+            callback.onFailure(context.getString(R.string.my_items_error_login_again));
             return;
         }
 
@@ -49,13 +49,13 @@ public class MyItemsRepository {
                     callback.onSuccess(toMyItems(response.body().getContent()));
                     return;
                 }
-                callback.onFailure("Cannot load your posts. Server code: " + response.code());
+                callback.onFailure(context.getString(R.string.my_items_error_load_posts_code, response.code()));
             }
 
             @Override
             public void onFailure(@NonNull Call<PageResponse<PostListItemResponse>> call,
                                   @NonNull Throwable t) {
-                callback.onFailure("Cannot connect to post service");
+                callback.onFailure(context.getString(R.string.my_items_error_connect_posts));
             }
         });
     }
@@ -71,7 +71,7 @@ public class MyItemsRepository {
                     post.getId() != null ? post.getId() : -1,
                     R.drawable.img_organic_chemistry_textbook,
                     post.getImageUrl(),
-                    safeText(post.getTitle(), "Untitled item"),
+                    safeText(post.getTitle(), context.getString(R.string.my_items_untitled_item)),
                     formatPrice(post.getPrice()),
                     0,
                     0,
@@ -94,7 +94,7 @@ public class MyItemsRepository {
 
     private String formatPrice(Double price) {
         if (price == null || price <= 0) {
-            return "Contact";
+            return context.getString(R.string.my_items_contact_price);
         }
         NumberFormat formatter = NumberFormat.getNumberInstance(new Locale("vi", "VN"));
         return formatter.format(price) + "d";
