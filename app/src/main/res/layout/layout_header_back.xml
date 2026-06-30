@@ -18,7 +18,7 @@
         android:id="@+id/tvHeaderTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Item Details"
+        android:text="Chi tiết vật phẩm"
         android:textColor="#1F2937"
         android:textSize="18sp"
         android:textStyle="bold"

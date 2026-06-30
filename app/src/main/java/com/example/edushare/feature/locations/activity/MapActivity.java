@@ -326,6 +326,24 @@ public class MapActivity extends AppCompatActivity {
 
         footerLayout = findViewById(R.id.footer);
         BottomNavigationHelper.setup(this, footerLayout, R.id.nav_map);
+
+        // Ẩn footer khi bàn phím xuất hiện
+        View rootView = findViewById(android.R.id.content);
+        rootView.getViewTreeObserver().addOnGlobalLayoutListener(() -> {
+            android.graphics.Rect r = new android.graphics.Rect();
+            rootView.getWindowVisibleDisplayFrame(r);
+            int screenHeight = rootView.getRootView().getHeight();
+            int keypadHeight = screenHeight - r.bottom;
+            if (keypadHeight > screenHeight * 0.15) {
+                if (footerLayout != null && footerLayout.getVisibility() != View.GONE) {
+                    footerLayout.setVisibility(View.GONE);
+                }
+            } else {
+                if (footerLayout != null && footerLayout.getVisibility() != View.VISIBLE) {
+                    footerLayout.setVisibility(View.VISIBLE);
+                }
+            }
+        });
     }
 
     private void setupMap() {

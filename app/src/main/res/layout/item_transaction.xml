@@ -131,11 +131,11 @@
                 android:layout_weight="1"
                 android:layout_marginStart="8dp"
                 android:text="Nhắn tin"
-                android:textColor="#059669"
+                android:textColor="#1F2937"
                 android:textSize="13sp"
                 android:textStyle="bold"
                 android:textAllCaps="false"
-                app:backgroundTint="#ECFDF5"
+                app:backgroundTint="#E5E7EB"
                 app:cornerRadius="10dp"
                 android:insetTop="0dp"
                 android:insetBottom="0dp"
@@ -147,29 +147,53 @@
             android:id="@+id/layoutActionButtons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="end"
+            android:orientation="vertical"
             android:layout_marginTop="12dp"
             android:visibility="gone">
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnReject"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:text="Từ chối"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
-                android:background="#EF4444"/>
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="#E5E7EB"
+                android:layout_marginBottom="12dp"/>
 
-            <androidx.appcompat.widget.AppCompatButton
-                android:id="@+id/btnAccept"
-                android:layout_width="wrap_content"
-                android:layout_height="36dp"
-                android:text="Chấp nhận"
-                android:textColor="#FFFFFF"
-                android:textSize="12sp"
-                android:layout_marginStart="8dp"
-                android:background="#1BAA8B"/>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="end">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnReject"
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="Từ chối"
+                    android:textColor="#EF4444"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:textAllCaps="false"
+                    app:backgroundTint="#FFE1E1"
+                    app:cornerRadius="8dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnAccept"
+                    style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="36dp"
+                    android:text="Chấp nhận"
+                    android:textColor="#059669"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:layout_marginStart="8dp"
+                    android:textAllCaps="false"
+                    app:backgroundTint="#ECFDF5"
+                    app:cornerRadius="8dp"
+                    android:insetTop="0dp"
+                    android:insetBottom="0dp"/>
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>
