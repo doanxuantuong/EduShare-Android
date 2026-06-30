@@ -57,6 +57,7 @@ import java.util.Locale;
 import com.example.edushare.feature.locations.model.ItemLocation;
 import android.content.Intent;
 import com.example.edushare.feature.item_detail.activity.PostDetailActivity;
+import com.example.edushare.feature.locations.helper.AreaBoundaryHelper;
 
 public class MapActivity extends AppCompatActivity {
 
@@ -108,6 +109,7 @@ public class MapActivity extends AppCompatActivity {
 
    private boolean userInteracting = false;
     private int currentPostId = -1;
+    private AreaBoundaryHelper areaBoundaryHelper;
 
     // Sample data
 //    private void loadSampleData() {
@@ -277,6 +279,7 @@ public class MapActivity extends AppCompatActivity {
         infoCard.setOnClickListener(v -> openPostDetail());
         txtItemName.setOnClickListener(v -> openPostDetail());
         txtItemArea.setOnClickListener(v -> openPostDetail());
+        areaBoundaryHelper = new AreaBoundaryHelper();
     }
 
     @Override
@@ -388,9 +391,13 @@ public class MapActivity extends AppCompatActivity {
 
             if (!"All".equals(selectedArea)) {
                 zoomToAreaCenter(selectedArea);
+                areaBoundaryHelper.drawBoundary(map, selectedArea);
+            } else {
+                areaBoundaryHelper.clearBoundary(map);
+                map.getController().animateTo(new GeoPoint(10.8710, 106.7932));
+                map.getController().setZoom(17.0);
             }
 
-            // Re-run current search with new area filter
             String kw = edtSearch.getText().toString().trim();
             if (!kw.isEmpty()) searchAndNavigate(kw);
         });
