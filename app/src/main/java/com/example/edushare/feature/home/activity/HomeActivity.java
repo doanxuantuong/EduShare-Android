@@ -73,6 +73,13 @@ public class HomeActivity extends AppCompatActivity {
         setupPaginationScroll();
         setupBottomNavigation();
         setupHeaderActions();
+
+        // Đăng ký FCM Token khi vào app để nhận thông báo
+        if (userId != null && !userId.trim().isEmpty()) {
+            com.example.edushare.common.firebase.user_fcm_token.FcmTokenManager fcmTokenManager =
+                    new com.example.edushare.common.firebase.user_fcm_token.FcmTokenManager(this);
+            fcmTokenManager.getAndSaveFcmToken(userId);
+        }
     }
 
     @Override
