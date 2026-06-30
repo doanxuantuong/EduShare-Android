@@ -22,6 +22,7 @@ import com.example.edushare.feature.item_detail.model.PostDetailResponseDTO;
 import com.example.edushare.feature.item_detail.view_model.PostDetailViewModel;
 import com.example.edushare.feature.locations.activity.MapActivity;
 import com.example.edushare.feature.transaction.activity.TransactionConfirmActivity;
+import com.example.edushare.feature.transaction.activity.TransactionHistoryActivity;
 
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
@@ -39,7 +40,7 @@ public class PostDetailActivity extends AppCompatActivity {
     private TextView tvProductTitle, tvProductPrice, tvShortLocation, tvFreeBadge;
     private ImageView ivSellerAvatar, ivVerifyTick;
     private TextView tvSellerName, tvSellerStatus;
-    private View btnMessage, btnRequestTransaction;
+    private View btnMessage, btnRequestTransaction, btnViewTransactions;
     private PostDetailResponseDTO postDetail;
 
     private MapView miniMap;
@@ -70,6 +71,7 @@ public class PostDetailActivity extends AppCompatActivity {
         tvShortLocation = findViewById(R.id.tvShortLocation);
         tvFreeBadge = findViewById(R.id.tvFreeBadge);
         btnRequestTransaction = findViewById(R.id.btnRequestTransaction);
+        btnViewTransactions = findViewById(R.id.btnViewTransactions);
         viewMiniMapOverlay = findViewById(R.id.viewMiniMapOverlay);
 
         View sellerInfoLayout = findViewById(R.id.layoutSellerInfo);
@@ -223,12 +225,19 @@ public class PostDetailActivity extends AppCompatActivity {
             if (btnMessage != null) {
                 btnMessage.setVisibility(currentUserId.equals(sellerId) ? View.GONE : View.VISIBLE);
             }
+            // Nếu là chủ bài đăng -> hiện nút "Xem giao dịch"
+            if (btnViewTransactions != null && currentUserId.equals(sellerId)) {
+                btnViewTransactions.setVisibility(View.VISIBLE);
+            }
         } else {
             if (btnRequestTransaction != null) {
                 btnRequestTransaction.setVisibility(View.VISIBLE);
             }
             if (btnMessage != null) {
                 btnMessage.setVisibility(View.VISIBLE);
+            }
+            if (btnViewTransactions != null) {
+                btnViewTransactions.setVisibility(View.GONE);
             }
         }
     }
@@ -278,6 +287,14 @@ public class PostDetailActivity extends AppCompatActivity {
         View btnFavorite = findViewById(R.id.btnFavorite);
         if (btnFavorite != null) {
             btnFavorite.setOnClickListener(v -> Toast.makeText(this, "Added to Favorites!", Toast.LENGTH_SHORT).show());
+        }
+
+        // Nút xem giao dịch của bài đăng -> mở TransactionHistoryActivity
+        if (btnViewTransactions != null) {
+            btnViewTransactions.setOnClickListener(v -> {
+                Intent intent = new Intent(PostDetailActivity.this, TransactionHistoryActivity.class);
+                startActivity(intent);
+            });
         }
     }
 
