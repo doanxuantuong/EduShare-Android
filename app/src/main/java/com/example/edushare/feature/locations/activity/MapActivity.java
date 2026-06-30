@@ -270,7 +270,10 @@ public class MapActivity extends AppCompatActivity {
         btnMyLocation.setOnClickListener(v -> getCurrentLocation());
         btnSearch.setOnClickListener(v -> {
             String kw = edtSearch.getText().toString().trim();
-            if (!kw.isEmpty()) searchAndNavigate(kw);
+            if (!kw.isEmpty()) {
+                searchAndNavigate(kw);
+                hideKeyboard();
+            }
         });
 
         btnStartNav.setOnClickListener(v -> startNavigation());
@@ -363,7 +366,22 @@ public class MapActivity extends AppCompatActivity {
 
         edtSearch.setOnItemClickListener((parent, view, position, id) -> {
             ItemLocation item = suggestionAdapter.getItem(position);
-            if (item != null) focusItem(item);
+            if (item != null) {
+                focusItem(item);
+                hideKeyboard();
+            }
+        });
+
+        edtSearch.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_SEARCH) {
+                String kw = edtSearch.getText().toString().trim();
+                if (!kw.isEmpty()) {
+                    searchAndNavigate(kw);
+                }
+                hideKeyboard();
+                return true;
+            }
+            return false;
         });
 
         edtSearch.addTextChangedListener(new TextWatcher() {
@@ -893,5 +911,16 @@ public class MapActivity extends AppCompatActivity {
         if (itemMarker != null && itemMarker.getPosition() != null) {
             drawRoute(myLocation, itemMarker.getPosition());
         }
+    }
+
+    private void hideKeyboard() {
+        View view = this.getCurrentFocus();
+        if (view != null) {
+            android.view.inputmethod.InputMethodManager imm = (android.view.inputmethod.InputMethodManager) getSystemService(android.content.Context.INPUT_METHOD_SERVICE);
+            if (imm != null) {
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
+        }
+        edtSearch.clearFocus();
     }
 }

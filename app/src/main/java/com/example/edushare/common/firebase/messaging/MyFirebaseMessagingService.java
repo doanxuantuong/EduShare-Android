@@ -16,6 +16,7 @@ import com.example.edushare.common.firebase.user_fcm_token.FcmTokenManager;
 import com.example.edushare.feature.chat.conversation.activity.ConversationActivity;
 import com.example.edushare.feature.home.activity.HomeActivity;
 import com.example.edushare.feature.notification.activity.NotificationActivity;
+import com.example.edushare.feature.transaction.activity.TransactionHistoryActivity;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -76,7 +77,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
                     case "TRANSACTION":
                         Log.d("FCM", "Định tuyến vào Giao dịch: " + referenceId);
-                        intent = new Intent(this, NotificationActivity.class);
+                        intent = new Intent(this, TransactionHistoryActivity.class);
                         break;
 
                     case "SYSTEM":

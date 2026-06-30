@@ -1,5 +1,6 @@
 package com.example.edushare.feature.notification.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -19,6 +20,7 @@ import com.example.edushare.common.helper.UserSessionHelper;
 import com.example.edushare.feature.notification.repository.NotificationRepository;
 import com.example.edushare.feature.notification.adapter.NotificationAdapter;
 import com.example.edushare.feature.notification.view_model.NotificationViewModel;
+import com.example.edushare.feature.transaction.activity.TransactionHistoryActivity;
 
 public class NotificationActivity extends AppCompatActivity {
     private RecyclerView rvNotifications;
@@ -71,6 +73,12 @@ public class NotificationActivity extends AppCompatActivity {
 
     private void initRecyclerView() {
         notificationAdapter = new NotificationAdapter();
+        notificationAdapter.setOnNotificationClickListener(notification -> {
+            if ("TRANSACTION".equalsIgnoreCase(notification.getType())) {
+                Intent intent = new Intent(NotificationActivity.this, TransactionHistoryActivity.class);
+                startActivity(intent);
+            }
+        });
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         rvNotifications.setLayoutManager(layoutManager);
         rvNotifications.setAdapter(notificationAdapter);

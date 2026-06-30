@@ -20,6 +20,15 @@ import java.util.List;
 
 public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapter.ViewHolder> {
     private final List<NotificationResponseDto> notificationList = new ArrayList<>();
+    private OnNotificationClickListener clickListener;
+
+    public interface OnNotificationClickListener {
+        void onNotificationClick(NotificationResponseDto notification);
+    }
+
+    public void setOnNotificationClickListener(OnNotificationClickListener clickListener) {
+        this.clickListener = clickListener;
+    }
 
     @SuppressLint("NotifyDataSetChanged")
     public void setData(List<NotificationResponseDto> list) {
@@ -60,6 +69,11 @@ public class NotificationAdapter extends RecyclerView.Adapter<NotificationAdapte
                 .circleCrop()
                 .into(holder.ivAvatar);
 
+        holder.itemView.setOnClickListener(v -> {
+            if (clickListener != null) {
+                clickListener.onNotificationClick(notificationResponseDto);
+            }
+        });
     }
 
     @Override

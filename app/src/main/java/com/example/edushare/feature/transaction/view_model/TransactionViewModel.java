@@ -38,7 +38,15 @@ public class TransactionViewModel extends ViewModel {
                 if (response.isSuccessful()) {
                     transactionSuccess.postValue(true); // Báo UI biết là thành công
                 } else {
-                    errorMessage.postValue("Lỗi hệ thống mã: " + response.code());
+                    String errorMsg = "Lỗi hệ thống mã: " + response.code();
+                    try {
+                        if (response.errorBody() != null) {
+                            errorMsg = response.errorBody().string();
+                        }
+                    } catch (Exception e) {
+                        // ignore
+                    }
+                    errorMessage.postValue(errorMsg);
                 }
             }
 
