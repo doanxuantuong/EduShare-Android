@@ -155,7 +155,14 @@ public class PostDetailActivity extends AppCompatActivity {
 
     private void displayPostDetail(PostDetailResponseDTO data) {
         if (tvProductTitle != null) tvProductTitle.setText(data.getTitle());
-        if (tvProductPrice != null) tvProductPrice.setText(data.getPrice() + "đ");
+        if (tvProductPrice != null) {
+            if (data.getPrice() != null) {
+                java.text.NumberFormat formatter = java.text.NumberFormat.getInstance(new java.util.Locale("vi", "VN"));
+                tvProductPrice.setText(formatter.format(data.getPrice()) + " đ");
+            } else {
+                tvProductPrice.setText("Liên hệ");
+            }
+        }
         if (tvShortLocation != null) tvShortLocation.setText(data.getLocationName());
 
         String type = data.getTransactionType();
@@ -187,11 +194,11 @@ public class PostDetailActivity extends AppCompatActivity {
         if (ivVerifyTick != null && tvSellerStatus != null) {
             if (data.isVerified()) {
                 ivVerifyTick.setVisibility(View.VISIBLE);
-                tvSellerStatus.setText("Verified Student");
+                tvSellerStatus.setText("Sinh viên đã xác thực");
                 tvSellerStatus.setTextColor(android.graphics.Color.parseColor("#059669"));
             } else {
                 ivVerifyTick.setVisibility(View.GONE);
-                tvSellerStatus.setText("Unverified Account");
+                tvSellerStatus.setText("Tài khoản chưa xác thực");
                 tvSellerStatus.setTextColor(android.graphics.Color.parseColor("#6B7280"));
             }
         }
@@ -286,7 +293,7 @@ public class PostDetailActivity extends AppCompatActivity {
 
         View btnFavorite = findViewById(R.id.btnFavorite);
         if (btnFavorite != null) {
-            btnFavorite.setOnClickListener(v -> Toast.makeText(this, "Added to Favorites!", Toast.LENGTH_SHORT).show());
+            btnFavorite.setOnClickListener(v -> Toast.makeText(this, "Đã thêm vào mục Yêu thích!", Toast.LENGTH_SHORT).show());
         }
 
         // Nút xem giao dịch của bài đăng -> mở TransactionHistoryActivity
