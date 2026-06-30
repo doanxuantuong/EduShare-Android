@@ -117,6 +117,7 @@ public class PostDetailActivity extends AppCompatActivity {
             Intent intent = new Intent(PostDetailActivity.this,
                     MapActivity.class);
 
+            intent.putExtra("POST_ID", postDetail.getId());
             intent.putExtra("TARGET_LAT", latitude);
             intent.putExtra("TARGET_LNG", longitude);
             intent.putExtra("TARGET_NAME", locationName);
@@ -297,6 +298,7 @@ public class PostDetailActivity extends AppCompatActivity {
                 com.example.edushare.feature.locations.activity.MapActivity.class
         );
 
+        intent.putExtra("POST_ID", postDetail.getId());
         intent.putExtra("TARGET_LAT", latitude);
         intent.putExtra("TARGET_LNG", longitude);
         intent.putExtra("TARGET_NAME", locationName);

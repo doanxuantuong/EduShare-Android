@@ -229,10 +229,12 @@ public class MapActivity extends AppCompatActivity {
         loadPostsFromApi();
 
         // Nhận tọa độ từ PostDetailActivity nếu có
+        int targetPostId = getIntent().getIntExtra("POST_ID", -1);
         double targetLat = getIntent().getDoubleExtra("TARGET_LAT", 0);
         double targetLng = getIntent().getDoubleExtra("TARGET_LNG", 0);
         String targetName = getIntent().getStringExtra("TARGET_NAME");
 
+        currentPostId = targetPostId;
         if (targetLat != 0 && targetLng != 0) {
             GeoPoint target = new GeoPoint(targetLat, targetLng);
 
@@ -384,12 +386,55 @@ public class MapActivity extends AppCompatActivity {
             List<ItemLocation> areaItems = getItemsForArea(selectedArea);
             suggestionAdapter.updateData(areaItems);
 
+            if (!"All".equals(selectedArea)) {
+                zoomToAreaCenter(selectedArea);
+            }
+
             // Re-run current search with new area filter
             String kw = edtSearch.getText().toString().trim();
             if (!kw.isEmpty()) searchAndNavigate(kw);
         });
     }
 
+    private void zoomToAreaCenter(String area) {
+        GeoPoint center;
+
+        switch (area) {
+            case "Dorm A":
+                center = new GeoPoint(10.8715, 106.7928);
+                break;
+
+            case "Dorm B":
+                center = new GeoPoint(10.8720, 106.7940);
+                break;
+
+            case "Canteen":
+                center = new GeoPoint(10.8707, 106.7925);
+                break;
+
+            case "Library":
+                center = new GeoPoint(10.8723, 106.7936);
+                break;
+
+            case "Hall A":
+                center = new GeoPoint(10.8730, 106.7930);
+                break;
+
+            case "Hall B":
+                center = new GeoPoint(10.8736, 106.7946);
+                break;
+
+            default:
+                center = new GeoPoint(10.8710, 106.7932);
+                break;
+        }
+
+        map.post(() -> {
+            map.getController().animateTo(center);
+            map.getController().setZoom(18.5);
+            map.invalidate();
+        });
+    }
     //Activity Navigation
     private void openPostDetail() {
         if (currentPostId == -1) {
