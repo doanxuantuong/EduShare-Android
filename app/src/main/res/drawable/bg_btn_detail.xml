@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Nền nút Chi tiết giao dịch - màu xanh lá theo project -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#059669" />
+    <corners android:radius="10dp" />
+</shape>

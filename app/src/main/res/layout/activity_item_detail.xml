@@ -250,6 +250,18 @@
             android:textColor="@color/white"
             android:textSize="16sp"
             android:textStyle="bold" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btnViewTransactions"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="#059669"
+            android:text="Xem giao dịch của bài đăng"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:visibility="gone" />
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

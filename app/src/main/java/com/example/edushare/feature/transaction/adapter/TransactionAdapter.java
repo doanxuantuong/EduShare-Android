@@ -1,6 +1,7 @@
 package com.example.edushare.feature.transaction.adapter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.edushare.R;
 import com.example.edushare.common.helper.UserSessionHelper;
+import com.example.edushare.feature.chat.message.activity.ChatDetailActivity;
+import com.example.edushare.feature.item_detail.activity.PostDetailActivity;
 import com.example.edushare.feature.transaction.dto.response.TransactionResponseDTO;
 
 import java.util.List;
@@ -167,6 +170,43 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
                 }
             }
         });
+
+        // Bắt sự kiện click nút Nhắn tin -> Chuyển sang ChatDetailActivity
+        holder.btnChat.setOnClickListener(v -> {
+
+            // Xác định đối tác (partner) là buyer hay seller dựa vào user hiện tại
+            String partnerId;
+            String partnerName;
+            String partnerAvatar;
+            if (currentUserId != null && currentUserId.equals(trans.getSellerId())) {
+                // Mình là seller -> đối tác là buyer
+                partnerId = trans.getBuyerId();
+                partnerName = trans.getBuyerName() != null ? trans.getBuyerName() : "Ẩn danh";
+                partnerAvatar = trans.getBuyerAvatar();
+            } else {
+                // Mình là buyer -> đối tác là seller
+                partnerId = trans.getSellerId();
+                partnerName = trans.getSellerName() != null ? trans.getSellerName() : "Ẩn danh";
+                partnerAvatar = trans.getSellerAvatar();
+            }
+
+            Intent intent = new Intent(context, ChatDetailActivity.class);
+            intent.putExtra("CONVERSATION_ID", -1); // Sẽ tự tìm hoặc tạo mới conversation
+            intent.putExtra("RECIPIENT_ID", partnerId);
+            intent.putExtra("RECIPIENT_NAME", partnerName);
+            intent.putExtra("RECIPIENT_AVATAR", partnerAvatar);
+            intent.putExtra("POST_ID", trans.getPostId());
+            intent.putExtra("POST_TITLE", trans.getPostTitle());
+            intent.putExtra("POST_IMAGE_URL", trans.getPostImage());
+            context.startActivity(intent);
+        });
+
+        // Bắt sự kiện click nút Chi tiết -> Xem chi tiết bài đăng của giao dịch
+        holder.btnDetail.setOnClickListener(v -> {
+            Intent intent = new Intent(context, PostDetailActivity.class);
+            intent.putExtra("POST_ID", trans.getPostId());
+            context.startActivity(intent);
+        });
     }
 
     @Override
@@ -210,7 +250,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         TextView tvOrderCode, tvStatus, tvProductTitle, tvTransactionType, tvPartnerName;
         ImageView ivProductImage, ivPartnerAvatar;
         LinearLayout layoutActionButtons;
-        Button btnReject, btnAccept;
+        Button btnReject, btnAccept, btnChat, btnDetail;
 
         public TransactionViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -227,6 +267,8 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
             layoutActionButtons = itemView.findViewById(R.id.layoutActionButtons);
             btnReject = itemView.findViewById(R.id.btnReject);
             btnAccept = itemView.findViewById(R.id.btnAccept);
+            btnChat = itemView.findViewById(R.id.btnChat);
+            btnDetail = itemView.findViewById(R.id.btnDetail);
         }
     }
 }
