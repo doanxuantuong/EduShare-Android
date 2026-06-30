@@ -168,7 +168,7 @@ public class MapActivity extends AppCompatActivity {
 //                10.8737, 106.7947, "Sony XB910N", ""));
 //    }
 
-    // Thêm method này vào MapActivity
+    //API
     private void loadPostsFromApi() {
         RetrofitClient.createService(LocationApiService.class, this).getPostsForMap(null, null)
                 .enqueue(new retrofit2.Callback<List<PostMapDto>>() {
@@ -277,19 +277,29 @@ public class MapActivity extends AppCompatActivity {
         txtItemArea.setOnClickListener(v -> openPostDetail());
     }
 
-    private void openPostDetail() {
-        if (currentPostId == -1) {
-            Toast.makeText(this, "Không tìm thấy bài đăng", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        Intent intent = new Intent(MapActivity.this, PostDetailActivity.class);
-        intent.putExtra("POST_ID", currentPostId);
-        startActivity(intent);
+    @Override
+    protected void onResume()  { super.onResume();  map.onResume(); }
+    @Override
+    protected void onPause()   { super.onPause();   map.onPause(); }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        stopLocationTracking();
+        osrmHelper.shutdown();
     }
-
-    // View binding
-
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == LOCATION_REQUEST
+                && grantResults.length > 0
+                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+            getCurrentLocation();
+        } else {
+            Toast.makeText(this, "Cần cấp quyền vị trí.", Toast.LENGTH_SHORT).show();
+        }
+    }
+    //Initialization
     private void bindViews() {
         map            = findViewById(R.id.mapView);
         edtSearch      = findViewById(R.id.edtSearch);
@@ -313,7 +323,6 @@ public class MapActivity extends AppCompatActivity {
         BottomNavigationHelper.setup(this, footerLayout, R.id.nav_map);
     }
 
-    // Map setup
     private void setupMap() {
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.setMultiTouchControls(true);
@@ -324,7 +333,6 @@ public class MapActivity extends AppCompatActivity {
         map.getController().setCenter(nlu);
     }
 
-    //Search
     private void setupSearch() {
         suggestionAdapter = new SearchSuggestionAdapter(this, allItems);
         edtSearch.setAdapter(suggestionAdapter);
@@ -343,20 +351,6 @@ public class MapActivity extends AppCompatActivity {
             }
         });
     }
-
-    private void clearSearchResult() {
-        if (isNavigating) stopNavigation();
-        clearSearchMarkers();
-        if (itemMarker != null) {
-            map.getOverlays().remove(itemMarker);
-            itemMarker = null;
-        }
-        clearRoute();
-        infoCard.setVisibility(View.GONE);
-        map.invalidate();
-    }
-
-    // Area filter chips
 
     private void setupAreaFilters() {
         // FIX: create proper Chip objects (not Button) so ChipGroup single-selection works
@@ -396,50 +390,21 @@ public class MapActivity extends AppCompatActivity {
         });
     }
 
-    /** Returns items matching the currently selected area. */
-    private List<ItemLocation> getItemsForArea(String area) {
-        if ("All".equals(area)) return new ArrayList<>(allItems);
-        List<ItemLocation> result = new ArrayList<>();
-        for (ItemLocation item : allItems) {
-            if (item.getAreaName().equalsIgnoreCase(area)) result.add(item);
+    //Activity Navigation
+    private void openPostDetail() {
+        if (currentPostId == -1) {
+            Toast.makeText(this, "Không tìm thấy bài đăng", Toast.LENGTH_SHORT).show();
+            return;
         }
-        return result;
+
+        Intent intent = new Intent(MapActivity.this, PostDetailActivity.class);
+        intent.putExtra("POST_ID", currentPostId);
+        startActivity(intent);
     }
 
-    // Item focus
-
-    private void focusItem(ItemLocation item) {
-        if (isNavigating) stopNavigation();
-        currentPostId = item.getId();
-
-        infoCard.setVisibility(View.VISIBLE);
-        txtItemName.setText(item.getName());
-        txtItemArea.setText(item.getAreaName() + " • " + item.getDescription());
-        txtRouteInfo.setText("Đang tính đường đi...");
-        btnStartNav.setVisibility(View.GONE);
-
-        destination = new GeoPoint(item.getLatitude(), item.getLongitude());
-
-        if (itemMarker != null) map.getOverlays().remove(itemMarker);
-        itemMarker = new Marker(map);
-        itemMarker.setPosition(destination);
-        itemMarker.setTitle(item.getName());
-        itemMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
-        map.getOverlays().add(itemMarker);
-        itemMarker.showInfoWindow();
-
-        if (myLocation != null) {
-            drawRoute(myLocation, destination);
-        } else {
-            txtRouteInfo.setText("Bật GPS để xem đường đi");
-            map.getController().animateTo(destination);
-            map.getController().setZoom(17.0);
-        }
-        map.invalidate();
-    }
+    //Search
 
     //Search & show results
-
     private void searchAndNavigate(String keyword) {
         String lowerKeyword = keyword.toLowerCase(Locale.ROOT);
         List<ItemLocation> results = new ArrayList<>();
@@ -503,6 +468,36 @@ public class MapActivity extends AppCompatActivity {
         map.invalidate();
     }
 
+    private void focusItem(ItemLocation item) {
+        if (isNavigating) stopNavigation();
+        currentPostId = item.getId();
+
+        infoCard.setVisibility(View.VISIBLE);
+        txtItemName.setText(item.getName());
+        txtItemArea.setText(item.getAreaName() + " • " + item.getDescription());
+        txtRouteInfo.setText("Đang tính đường đi...");
+        btnStartNav.setVisibility(View.GONE);
+
+        destination = new GeoPoint(item.getLatitude(), item.getLongitude());
+
+        if (itemMarker != null) map.getOverlays().remove(itemMarker);
+        itemMarker = new Marker(map);
+        itemMarker.setPosition(destination);
+        itemMarker.setTitle(item.getName());
+        itemMarker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        map.getOverlays().add(itemMarker);
+        itemMarker.showInfoWindow();
+
+        if (myLocation != null) {
+            drawRoute(myLocation, destination);
+        } else {
+            txtRouteInfo.setText("Bật GPS để xem đường đi");
+            map.getController().animateTo(destination);
+            map.getController().setZoom(17.0);
+        }
+        map.invalidate();
+    }
+
     private void filterMarkersByArea(String areaName) {
         // Lưu lại danh sách markers cùng khu vực
         List<Marker> sameAreaMarkers = new ArrayList<>();
@@ -531,6 +526,38 @@ public class MapActivity extends AppCompatActivity {
             map.zoomToBoundingBox(box.increaseByScale(1.3f), true, 120);
         }
     }
+
+
+    private void clearSearchResult() {
+        if (isNavigating) stopNavigation();
+        clearSearchMarkers();
+        if (itemMarker != null) {
+            map.getOverlays().remove(itemMarker);
+            itemMarker = null;
+        }
+        clearRoute();
+        infoCard.setVisibility(View.GONE);
+        map.invalidate();
+    }
+    private void clearSearchMarkers() {
+        for (Marker marker : searchMarkers) {
+            marker.setAlpha(1.0f); // reset trước khi xóa
+            map.getOverlays().remove(marker);
+        }
+        searchMarkers.clear();
+    }
+
+    //Area filter
+    /** Returns items matching the currently selected area. */
+    private List<ItemLocation> getItemsForArea(String area) {
+        if ("All".equals(area)) return new ArrayList<>(allItems);
+        List<ItemLocation> result = new ArrayList<>();
+        for (ItemLocation item : allItems) {
+            if (item.getAreaName().equalsIgnoreCase(area)) result.add(item);
+        }
+        return result;
+    }
+
 
     // Route drawing
     private void drawRoute(GeoPoint from, GeoPoint to) {
@@ -581,16 +608,8 @@ public class MapActivity extends AppCompatActivity {
         }
     }
 
-    private void clearSearchMarkers() {
-        for (Marker marker : searchMarkers) {
-            marker.setAlpha(1.0f); // reset trước khi xóa
-            map.getOverlays().remove(marker);
-        }
-        searchMarkers.clear();
-    }
 
     // Navigation
-
     private void startNavigation() {
         if (myLocation == null) {
             Toast.makeText(this, "Cần bật GPS trước!", Toast.LENGTH_SHORT).show();
@@ -659,6 +678,20 @@ public class MapActivity extends AppCompatActivity {
             case "arrive":            return "📍";
             default:                  return "⬆️";
         }
+    }
+
+    private void onArrived() {
+        stopLocationTracking();
+        isNavigating = false;
+        navCard.setVisibility(View.GONE);
+
+        // FIX: restore info card on arrival (was missing; stopNavigation() has the same logic
+        // but onArrived() bypassed it)
+        if (destination != null) infoCard.setVisibility(View.VISIBLE);
+
+        Toast.makeText(this, "Đã đến nơi!", Toast.LENGTH_LONG).show();
+        if (itemMarker != null) itemMarker.showInfoWindow();
+        map.invalidate();
     }
 
     // GPS tracking
@@ -742,26 +775,12 @@ public class MapActivity extends AppCompatActivity {
                 }
             }
         }
-
         // Single call — always reflects the (possibly just advanced) step
         showCurrentStep();
     }
 
-    private void onArrived() {
-        stopLocationTracking();
-        isNavigating = false;
-        navCard.setVisibility(View.GONE);
 
-        // FIX: restore info card on arrival (was missing; stopNavigation() has the same logic
-        // but onArrived() bypassed it)
-        if (destination != null) infoCard.setVisibility(View.VISIBLE);
-
-        Toast.makeText(this, "Đã đến nơi!", Toast.LENGTH_LONG).show();
-        if (itemMarker != null) itemMarker.showInfoWindow();
-        map.invalidate();
-    }
-
-    // One-shot GPS
+    //Current Location
 
     private void getCurrentLocation() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
@@ -804,28 +823,5 @@ public class MapActivity extends AppCompatActivity {
         if (itemMarker != null && itemMarker.getPosition() != null) {
             drawRoute(myLocation, itemMarker.getPosition());
         }
-    }
-
-    // Permissions
-    @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == LOCATION_REQUEST
-                && grantResults.length > 0
-                && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            getCurrentLocation();
-        } else {
-            Toast.makeText(this, "Cần cấp quyền vị trí.", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    @Override protected void onResume()  { super.onResume();  map.onResume(); }
-    @Override protected void onPause()   { super.onPause();   map.onPause(); }
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        stopLocationTracking();
-        osrmHelper.shutdown();
     }
 }
